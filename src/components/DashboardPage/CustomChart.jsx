@@ -3,8 +3,15 @@ import ReactApexChart from "react-apexcharts";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import MenuIcon from "@mui/icons-material/Menu";
+import PropTypes from "prop-types";
 
 const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
+  CustomChart.propTypes = {
+    title: PropTypes.string,
+    series: PropTypes.array,
+    colors: PropTypes.array,
+    labels: PropTypes.array,
+  };
   const [options] = useState({
     chart: {
       type: "donut",
@@ -59,7 +66,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
         ))}
         <div className="flex justify-between mt-4">
           <MenuIcon
-            style={{ color: "purple" }}
+            style={{ color: "#8761df" }}
             className="bg-[#ebe3ff] rounded p-0.5"
           />
           <p>Total</p>

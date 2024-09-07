@@ -2,8 +2,14 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import GroupIcon from "@mui/icons-material/Group";
+import PropTypes from 'prop-types';
 
 function CustomCard({ title, total, color }) {
+  CustomCard.propTypes = {
+    title: PropTypes.oneOf(['Projects', 'Tasks', 'Users']).isRequired,
+    total: PropTypes.number.isRequired,
+    color: PropTypes.string.isRequired, 
+  };
   return (
     <div className="shadow-lg p-5 rounded-lg">
       {title == "Projects" ? (

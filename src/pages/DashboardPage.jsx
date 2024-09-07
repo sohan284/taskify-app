@@ -1,5 +1,7 @@
-import CustomCard from "../components/CustomCard";
-import CustomChart from "../components/CustomChart";
+import CustomCard from "../components/DashboardPage/CustomCard";
+import CustomChart from "../components/DashboardPage/CustomChart";
+import EventsTab from "../components/DashboardPage/EventsTab";
+import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
 
 function DashboardPage() {
   const cardDetails = [
@@ -68,6 +70,12 @@ function DashboardPage() {
             />
           </div>
         ))}
+      </div>
+      <div>
+        <EventsTab />
+      </div>
+      <div>
+        <ProjectsTasksTab />
       </div>
     </div>
   );
