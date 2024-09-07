@@ -10,10 +10,11 @@ import Toolbar from "@mui/material/Toolbar";
 import { Button, Divider, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import HomeIcon from "@mui/icons-material/Home";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { useAuthState } from "react-firebase-hooks/auth";
 import auth from "../firebase.init";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
 const drawerWidth = 240;
 function SideBar(props) {
@@ -55,13 +56,25 @@ function SideBar(props) {
   const drawer = (
     <div>
       <img onClick={() => handleNavigate("/")} src={logo} alt="logo" />
-      <div className="text-center mt-8">
+      <div className="ml-8 mt-8">
         <Button
-          className="w-[80%]"
+          className=""
           style={{ color: "black" }}
-          onClick={() => handleNavigate("/dashboard")}
+          onClick={() => handleNavigate("/")}
         >
-          <HomeIcon className="mr-4" /> Dashboard
+          <HomeOutlinedIcon style={{ color: "red" }} className="mr-4" />{" "}
+          Dashboard
+        </Button>
+        <Button
+          className=""
+          style={{ color: "black" }}
+          onClick={() => handleNavigate("/")}
+        >
+          <BusinessCenterOutlinedIcon
+            style={{ color: "green" }}
+            className="mr-4"
+          />{" "}
+          Projects
         </Button>
       </div>
     </div>

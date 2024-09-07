@@ -7,8 +7,8 @@ import { getDashboardCount } from "../service/Dashboard";
 
 function DashboardPage() {
   const [cardDetails, setCardDetails] = useState(null);
-  const [ setLoading] = useState(true);
-  const [ setError] = useState(null);
+  const [setLoading] = useState(true);
+  const [setError] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
