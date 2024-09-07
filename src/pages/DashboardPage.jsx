@@ -1,31 +1,29 @@
+import { useEffect, useState } from "react";
 import CustomCard from "../components/DashboardPage/CustomCard";
 import CustomChart from "../components/DashboardPage/CustomChart";
 import EventsTab from "../components/DashboardPage/EventsTab";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
+import { getDashboardCount } from "../service/Dashboard";
 
 function DashboardPage() {
-  const cardDetails = [
-    {
-      title: "Projects",
-      total: "250",
-      color: "#70d100",
-    },
-    {
-      title: "Tasks",
-      total: "250",
-      color: "#852bfa",
-    },
-    {
-      title: "Users",
-      total: "250",
-      color: "#ebb400",
-    },
-    {
-      title: "Clients",
-      total: "250",
-      color: "#00b9d1",
-    },
-  ];
+  const [cardDetails, setCardDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await getDashboardCount();
+        setCardDetails(result?.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const chartDetails = [
     {
       title: "Project Statistics",

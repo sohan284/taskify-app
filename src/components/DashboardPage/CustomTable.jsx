@@ -1,4 +1,6 @@
 import { useState } from "react";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import {
   Table,
   TableBody,
@@ -12,9 +14,27 @@ import {
 } from "@mui/material";
 
 const membersData = [
-  { id: 1, title: "Project Alpha", users: 5, clients: "Company A", status: "started" },
-  { id: 2, title: "Project Beta", users: 8, clients: "Company B", status: "defaults" },
-  { id: 3, title: "Project Gamma", users: 12, clients: "Company C", status: "started" },
+  {
+    id: 1,
+    title: "Project Alpha",
+    users: 5,
+    clients: "Company A",
+    status: "started",
+  },
+  {
+    id: 2,
+    title: "Project Beta",
+    users: 8,
+    clients: "Company B",
+    status: "defaults",
+  },
+  {
+    id: 3,
+    title: "Project Gamma",
+    users: 12,
+    clients: "Company C",
+    status: "started",
+  },
 ];
 
 const CustomTable = () => {
@@ -71,7 +91,7 @@ const CustomTable = () => {
             },
           }}
         >
-          Delete Selected
+          <DeleteOutlineIcon className="mr-1" /> Delete Selected
         </Button>
         <Button
           variant="contained"
@@ -86,11 +106,9 @@ const CustomTable = () => {
             },
           }}
         >
-          Save Column Visibility
+          <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
         </Button>
       </div>
-
-     
 
       <TableContainer>
         <Table
@@ -133,13 +151,15 @@ const CustomTable = () => {
                 {visibleColumns.title && <TableCell>{member.title}</TableCell>}
                 {visibleColumns.users && <TableCell>{member.users}</TableCell>}
                 {visibleColumns.clients && (
-                  <TableCell sx={{ margin:5 }}>
+                  <TableCell sx={{ margin: 5 }}>
                     <div className="bg-[#8761df] text-white uppercase rounded text-center p-0.5">
-                    {member.clients}
+                      {member.clients}
                     </div>
                   </TableCell>
                 )}
-                {visibleColumns.status && <TableCell>{member.status}</TableCell>}
+                {visibleColumns.status && (
+                  <TableCell>{member.status}</TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

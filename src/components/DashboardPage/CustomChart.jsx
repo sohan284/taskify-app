@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
 
@@ -54,7 +54,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
                 className="bg-[#ebe3ff] rounded p-0.5"
               />
             ) : (
-              <AssignmentTurnedInIcon
+              <AssignmentTurnedInOutlinedIcon
                 style={{ color: colors[index] || "#000" }} // Ensures a fallback color if undefined
                 className="bg-[#ebe3ff] rounded p-0.5"
               />

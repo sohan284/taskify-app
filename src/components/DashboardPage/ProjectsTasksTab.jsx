@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
-import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import CustomTable from "./CustomTable";
 
 function CustomTabPanel(props) {
@@ -64,13 +64,15 @@ export default function ProjectsTasksTab() {
           aria-label="basic tabs example"
         >
           <Tab
-            icon={<WorkOutlineIcon style={{ color: "lightgreen" }} />}
+            icon={<BusinessCenterOutlinedIcon style={{ color: "lightgreen" }} />}
             iconPosition="start"
             label="Projects"
             value={0}
           />
           <Tab
-            icon={<AssignmentTurnedInIcon style={{ color: "#8761df" }} />}
+            icon={
+              <AssignmentTurnedInOutlinedIcon style={{ color: "#8761df" }} />
+            }
             iconPosition="start"
             label="Tasks"
             value={1}
@@ -84,9 +86,7 @@ export default function ProjectsTasksTab() {
         <CustomTable />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <h1 className="text-xl font-bold text-gray-500">
-          {"Admin's Tasks"}
-        </h1>
+        <h1 className="text-xl font-bold text-gray-500">{"Admin's Tasks"}</h1>
         <CustomTable />
       </CustomTabPanel>
     </Box>

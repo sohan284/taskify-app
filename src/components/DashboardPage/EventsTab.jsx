@@ -4,8 +4,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
-import CakeIcon from "@mui/icons-material/Cake";
-import HomeIcon from "@mui/icons-material/Home";
+import CakeOutlinedIcon from "@mui/icons-material/CakeOutlined";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import EventsTable from "./EventsTable";
 
 function CustomTabPanel(props) {
@@ -65,7 +65,7 @@ export default function EventsTab() {
           aria-label="basic tabs example"
         >
           <Tab
-            icon={<CakeIcon style={{ color: "lightgreen" }} />}
+            icon={<CakeOutlinedIcon style={{ color: "lightgreen" }} />}
             iconPosition="start"
             label="Upcoming Birthdays"
             value={0}
@@ -77,7 +77,7 @@ export default function EventsTab() {
             value={1}
           />
           <Tab
-            icon={<HomeIcon style={{ color: " #FF474C" }} />}
+            icon={<HomeOutlinedIcon style={{ color: " #FF474C" }} />}
             iconPosition="start"
             label="Members on Leave"
             value={2}
