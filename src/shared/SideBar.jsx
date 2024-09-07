@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -7,19 +7,23 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { Button } from "@mui/material";
+import { Button, Divider, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import HomeIcon from "@mui/icons-material/Home";
-
+import { useAuthState } from "react-firebase-hooks/auth";
+import auth from "../firebase.init";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
 const drawerWidth = 240;
-
 function SideBar(props) {
+  const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [isClosing, setIsClosing] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const [isClosing, setIsClosing] = useState(false);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -40,6 +44,14 @@ function SideBar(props) {
     navigate(route);
   };
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const drawer = (
     <div>
       <img onClick={() => handleNavigate("/")} src={logo} alt="logo" />
@@ -57,18 +69,21 @@ function SideBar(props) {
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
-
+  const handleSignOut = () => {
+    auth.signOut().then(() => {
+      navigate("/login");
+    });
+  };
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px - 20px)` }, // Adjust width to account for padding
-          left: { sm: `${drawerWidth + 10}px` }, // Add space from left
+          width: { sm: `calc(100% - ${drawerWidth}px - 20px)` },
+          left: { sm: `${drawerWidth + 10}px` },
           bgcolor: "white",
-          marginY: "10px", // Add padding inside AppBar
-
+          // marginY: "10px",
           color: "black",
         }}
       >
@@ -82,9 +97,54 @@ function SideBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Search
-          </Typography>
+          <div className="flex justify-between w-full ">
+            <p className="text-gray-400">Search</p>
+            <div>
+              {user?.photoURL ? (
+                <img
+                  className="w-7 h-7 shadow shadow-black rounded-full"
+                  src={user?.photoURL}
+                  alt="img"
+                  onClick={handleMenuClick}
+                />
+              ) : (
+                <AccountCircleIcon onClick={handleMenuClick} />
+              )}
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <MenuItem onClick={() => handleNavigate("/profile")}>
+                  Profile
+                </MenuItem>
+                <MenuItem onClick={() => handleNavigate("/account")}>
+                  My Account
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleSignOut}>
+                  <Button
+                    style={{ color: "tomato", border: "1px solid tomato" }}
+                    size="small"
+                    className="w-full"
+                  >
+                    Logout{" "}
+                    <LogoutSharpIcon
+                      style={{ fontSize: "18px", marginLeft: "10px" }}
+                    />
+                  </Button>
+                </MenuItem>
+              </Menu>
+            </div>
+          </div>
         </Toolbar>
       </AppBar>
       <Box

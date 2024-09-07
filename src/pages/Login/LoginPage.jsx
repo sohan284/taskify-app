@@ -33,14 +33,12 @@ function LoginPage() {
     }
 
     signInWithEmailAndPassword(email, password)
-      .then(handleNavigate("/"))
+      .then(() => {
+        navigate("/"); // Navigate to home page after successful login
+      })
       .catch((err) => {
         setErrorMsg(err.message);
       });
-  };
-
-  const handleNavigate = (route) => {
-    navigate(route);
   };
 
   return (
@@ -48,7 +46,7 @@ function LoginPage() {
       <div className="text-start p-5 w-[400px] rounded-lg shadow-lg">
         <div className="flex justify-center">
           <img
-            onClick={() => handleNavigate("/")}
+            onClick={() => navigate("/")}
             className="w-[80%]"
             src={logo}
             alt="Logo"
@@ -70,14 +68,14 @@ function LoginPage() {
           className="w-full text-sm"
         />
         <TextField
+          label="Password"
+          size="small"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           style={{
             marginTop: 20,
           }}
-          label="Password"
-          size="small"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-          type="password"
           className="w-full text-sm"
         />
         {errorMsg && (
@@ -98,7 +96,7 @@ function LoginPage() {
         <p className="text-center my-5">
           {"Don't have an account?"}{" "}
           <span
-            onClick={() => handleNavigate("/signup")}
+            onClick={() => navigate("/signup")}
             className="text-[#5b46bb] cursor-pointer "
           >
             Sign Up

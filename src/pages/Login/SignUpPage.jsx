@@ -10,7 +10,8 @@ import auth from "../../firebase.init";
 import { useState } from "react";
 
 function SignUpPage() {
-  const [signInWithGoogle] = useSignInWithGoogle(auth);
+  const [signInWithGoogle, googleLoading, googleError] =
+    useSignInWithGoogle(auth);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,14 +55,22 @@ function SignUpPage() {
     }
 
     createUserWithEmailAndPassword(email, password)
-      .then(handleNavigate("/"))
+      .then(() => {
+        navigate("/"); // Navigate to home page after successful sign-up
+      })
       .catch((err) => {
         setErrorMsg(err.message);
       });
   };
 
-  const handleNavigate = (route) => {
-    navigate(route);
+  const handleGoogleSignIn = () => {
+    signInWithGoogle()
+      .then(() => {
+        navigate("/"); // Navigate to home page after successful Google sign-in
+      })
+      .catch((err) => {
+        setErrorMsg(err.message);
+      });
   };
 
   return (
@@ -69,7 +78,7 @@ function SignUpPage() {
       <div className="text-start p-5 w-[400px] rounded-lg shadow-lg">
         <div className="flex justify-center">
           <img
-            onClick={() => handleNavigate("/")}
+            onClick={() => navigate("/")}
             className="w-[80%]"
             src={logo}
             alt="Logo"
@@ -128,7 +137,7 @@ function SignUpPage() {
         <p className="text-center my-5">
           {"Already have an account?"}{" "}
           <span
-            onClick={() => handleNavigate("/login")}
+            onClick={() => navigate("/login")}
             className="text-[#5b46bb] cursor-pointer "
           >
             Login
@@ -136,16 +145,29 @@ function SignUpPage() {
         </p>
 
         <Button
-          onClick={() => signInWithGoogle()}
+          onClick={handleGoogleSignIn}
           style={{ backgroundColor: "tomato", marginTop: 20, color: "white" }}
           className="w-full"
+          disabled={googleLoading}
         >
-          <GoogleIcon className="mr-3" /> Sign In With Google
+          {googleLoading ? (
+            "Signing In..."
+          ) : (
+            <>
+              <GoogleIcon className="mr-3" /> Sign In With Google
+            </>
+          )}
         </Button>
 
         {error && (
           <Alert severity="error" className="mt-4">
             {error.message}
+          </Alert>
+        )}
+
+        {googleError && (
+          <Alert severity="error" className="mt-4">
+            {googleError.message}
           </Alert>
         )}
       </div>
