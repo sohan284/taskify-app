@@ -16,14 +16,19 @@ import auth from "../firebase.init";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined"; // Added import for the dropdown arrow icon
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 const drawerWidth = 240;
+
 function SideBar(props) {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [projectsMenuAnchorEl, setProjectsMenuAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const projectsMenuOpen = Boolean(projectsMenuAnchorEl);
   const [isClosing, setIsClosing] = useState(false);
 
   const handleDrawerClose = () => {
@@ -53,40 +58,101 @@ function SideBar(props) {
     setAnchorEl(null);
   };
 
+  const handleProjectsMenuClick = (event) => {
+    setProjectsMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleProjectsMenuClose = () => {
+    setProjectsMenuAnchorEl(null);
+  };
+
+  const handleSignOut = () => {
+    auth.signOut().then(() => {
+      navigate("/login");
+    });
+  };
+
   const drawer = (
     <div>
-      <img onClick={() => handleNavigate("/")} src={logo} alt="logo" />
-      <div className="ml-8 mt-8">
-        <Button
-          className=""
-          style={{ color: "black" }}
-          onClick={() => handleNavigate("/")}
-        >
-          <HomeOutlinedIcon style={{ color: "red" }} className="mr-4" />{" "}
-          Dashboard
-        </Button>
-        <Button
-          className=""
-          style={{ color: "black" }}
-          onClick={() => handleNavigate("/")}
-        >
-          <BusinessCenterOutlinedIcon
-            style={{ color: "green" }}
-            className="mr-4"
-          />{" "}
-          Projects
-        </Button>
+      <img
+        onClick={() => handleNavigate("/")}
+        src={logo}
+        alt="logo"
+        style={{ cursor: "pointer" }}
+      />
+      <div className="mt-8 w-full">
+        <div className="flex flex-col">
+          <Button
+            className="flex items-center w-full"
+            style={{ color: "black", justifyContent: "flex-start" }}
+            onClick={() => handleNavigate("/")}
+          >
+            <HomeOutlinedIcon style={{ color: "red" }} className="mr-4" />
+            Dashboard
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{ color: "black", justifyContent: "flex-start" }}
+            onClick={handleProjectsMenuClick}
+          >
+            <BusinessCenterOutlinedIcon
+              style={{ color: "green" }}
+              className="mr-4"
+            />
+            Projects
+            <span className="ml-auto">
+              <IconButton size="small">
+                <ExpandMoreOutlinedIcon />
+              </IconButton>
+            </span>
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{ color: "black", justifyContent: "flex-start" }}
+            onClick={() => handleNavigate("/")}
+          >
+            <AssignmentTurnedInOutlinedIcon
+              style={{ color: "purple" }}
+              className="mr-4"
+            />
+            Tasks
+          </Button>
+          <Menu
+            anchorEl={projectsMenuAnchorEl}
+            open={projectsMenuOpen}
+            onClose={handleProjectsMenuClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+            PaperProps={{
+              style: {
+                width: "200px", // Set the width to match the button
+              },
+            }}
+          >
+            <MenuItem onClick={() => handleNavigate("/project1")}>
+              Manage Projects
+            </MenuItem>
+            <MenuItem onClick={() => handleNavigate("/project2")}>
+              Favorite Projects
+            </MenuItem>
+            <MenuItem onClick={() => handleNavigate("/project3")}>
+              Tags
+            </MenuItem>
+          </Menu>
+        </div>
       </div>
     </div>
   );
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
-  const handleSignOut = () => {
-    auth.signOut().then(() => {
-      navigate("/login");
-    });
-  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -96,7 +162,6 @@ function SideBar(props) {
           width: { sm: `calc(100% - ${drawerWidth}px - 20px)` },
           left: { sm: `${drawerWidth + 10}px` },
           bgcolor: "white",
-          // marginY: "10px",
           color: "black",
         }}
       >
@@ -110,7 +175,7 @@ function SideBar(props) {
           >
             <MenuIcon />
           </IconButton>
-          <div className="flex justify-between w-full ">
+          <div className="flex justify-between w-full">
             <p className="text-gray-400">Search</p>
             <div>
               {user?.photoURL ? (
@@ -149,7 +214,7 @@ function SideBar(props) {
                     size="small"
                     className="w-full"
                   >
-                    Logout{" "}
+                    Logout
                     <LogoutSharpIcon
                       style={{ fontSize: "18px", marginLeft: "10px" }}
                     />
