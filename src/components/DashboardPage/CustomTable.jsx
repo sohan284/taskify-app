@@ -12,26 +12,21 @@ import {
 } from "@mui/material";
 
 const membersData = [
-  { id: 1, name: "John Doe", birthday: "1990-05-15" },
-  { id: 2, name: "Jane Smith", birthday: "1988-10-10" },
-  { id: 3, name: "Alice Brown", birthday: "1992-12-22" },
+  { id: 1, title: "Project Alpha", users: 5, clients: "Company A", status: "started" },
+  { id: 2, title: "Project Beta", users: 8, clients: "Company B", status: "defaults" },
+  { id: 3, title: "Project Gamma", users: 12, clients: "Company C", status: "started" },
 ];
-
-const calculateDaysLeft = (birthday) => {
-  const today = new Date();
-  const nextBirthday = new Date(
-    today.getFullYear(),
-    new Date(birthday).getMonth(),
-    new Date(birthday).getDate()
-  );
-  if (nextBirthday < today) nextBirthday.setFullYear(today.getFullYear() + 1);
-  const timeDiff = nextBirthday - today;
-  return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-};
 
 const CustomTable = () => {
   const [members, setMembers] = useState(membersData);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [visibleColumns] = useState({
+    id: true,
+    title: true,
+    users: true,
+    clients: true,
+    status: true,
+  });
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
@@ -54,27 +49,56 @@ const CustomTable = () => {
     setSelectedIds([]);
   };
 
+  const handleSaveVisibility = () => {
+    console.log("Column visibility settings saved:", visibleColumns);
+  };
+
   return (
     <Paper>
-      <Button
-        variant="contained"
-        onClick={handleDeleteSelected}
-        disabled={selectedIds.length === 0}
-        sx={{
-            margin: "10px",
+      <div style={{ margin: "10px" }}>
+        <Button
+          variant="contained"
+          onClick={handleDeleteSelected}
+          disabled={selectedIds.length === 0}
+          sx={{
+            marginRight: "10px",
             backgroundColor: "white",
-            border: "1px solid  #FF474C",
-            color: ' #FF474C',
-            '&:hover': {
-              backgroundColor: ' #FF474C',
-              color: 'white',
-            }
-        }}
-      >
-        Delete Selected
-      </Button>
+            border: "1px solid #FF474C",
+            color: "#FF474C",
+            "&:hover": {
+              backgroundColor: "#FF474C",
+              color: "white",
+            },
+          }}
+        >
+          Delete Selected
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleSaveVisibility}
+          sx={{
+            backgroundColor: "white",
+            border: "1px solid #3f51b5",
+            color: "#3f51b5",
+            "&:hover": {
+              backgroundColor: "#3f51b5",
+              color: "white",
+            },
+          }}
+        >
+          Save Column Visibility
+        </Button>
+      </div>
+
+     
+
       <TableContainer>
-        <Table>
+        <Table
+          sx={{
+            border: "1px solid gray",
+            "& th, & td": { border: "1px solid gray" },
+          }}
+        >
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox">
@@ -89,10 +113,11 @@ const CustomTable = () => {
                   onChange={handleSelectAll}
                 />
               </TableCell>
-              <TableCell>ID</TableCell>
-              <TableCell>Member</TableCell>
-              <TableCell>Birthday Date</TableCell>
-              <TableCell>Days Left</TableCell>
+              {visibleColumns.id && <TableCell>ID</TableCell>}
+              {visibleColumns.title && <TableCell>Title</TableCell>}
+              {visibleColumns.users && <TableCell>Users</TableCell>}
+              {visibleColumns.clients && <TableCell>Clients</TableCell>}
+              {visibleColumns.status && <TableCell>Status</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -104,10 +129,17 @@ const CustomTable = () => {
                     onChange={() => handleSelect(member.id)}
                   />
                 </TableCell>
-                <TableCell>{member.id}</TableCell>
-                <TableCell>{member.name}</TableCell>
-                <TableCell>{member.birthday}</TableCell>
-                <TableCell>{calculateDaysLeft(member.birthday)}</TableCell>
+                {visibleColumns.id && <TableCell>{member.id}</TableCell>}
+                {visibleColumns.title && <TableCell>{member.title}</TableCell>}
+                {visibleColumns.users && <TableCell>{member.users}</TableCell>}
+                {visibleColumns.clients && (
+                  <TableCell sx={{ margin:5 }}>
+                    <div className="bg-[#8761df] text-white uppercase rounded text-center p-0.5">
+                    {member.clients}
+                    </div>
+                  </TableCell>
+                )}
+                {visibleColumns.status && <TableCell>{member.status}</TableCell>}
               </TableRow>
             ))}
           </TableBody>

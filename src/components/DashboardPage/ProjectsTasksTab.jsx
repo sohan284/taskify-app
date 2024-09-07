@@ -3,10 +3,9 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import HomeIcon from "@mui/icons-material/Home";
-import EventsTable from "./EventsTable";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
+import CustomTable from "./CustomTable";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -79,23 +78,16 @@ export default function ProjectsTasksTab() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
-            <Tab iconPosition="start" label="List" value={0} />
-            <Tab iconPosition="start" label="Calender" value={2} />
-          </Tabs>
-        </Box>
-        <CustomTabPanel2>
-          <EventsTable />
-        </CustomTabPanel2>
+        <h1 className="text-xl font-bold text-gray-500">
+          {"Admin's Projects"}
+        </h1>
+        <CustomTable />
       </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}></CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        Item Three
+      <CustomTabPanel value={value} index={1}>
+        <h1 className="text-xl font-bold text-gray-500">
+          {"Admin's Tasks"}
+        </h1>
+        <CustomTable />
       </CustomTabPanel>
     </Box>
   );
