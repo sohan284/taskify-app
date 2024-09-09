@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
+import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import CustomTable from "./CustomTable";
 
@@ -64,7 +64,9 @@ export default function ProjectsTasksTab() {
           aria-label="basic tabs example"
         >
           <Tab
-            icon={<BusinessCenterOutlinedIcon style={{ color: "lightgreen" }} />}
+            icon={
+              <BusinessCenterOutlinedIcon style={{ color: "lightgreen" }} />
+            }
             iconPosition="start"
             label="Projects"
             value={0}
