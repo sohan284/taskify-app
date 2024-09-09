@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import axios from "axios"; // Import Axios
 import {
   Dialog,
   DialogTitle,
@@ -17,6 +16,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import DashboardManagement from "../../../service/Dashboard";
 
 const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
@@ -42,9 +42,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
 
   const handleSave = () => {
     const { _id, ...updateData } = formData;
-
-    axios
-      .put(`http://localhost:5000/projects/${_id}`, updateData)
+    DashboardManagement.updateProject(_id, updateData)
       .then((response) => {
         console.log("Project updated successfully:", response.data);
         onSave(formData);
@@ -128,6 +126,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
             <p className="text-xs mt-2 text-gray-500">START DATE</p>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
+                views={["day"]}
                 format="DD-MM-YYYY"
                 value={formData.startsAt || null}
                 onChange={(newDate) => handleDateChange("startsAt", newDate)}
@@ -223,7 +222,7 @@ UpdateProjectDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   project: PropTypes.shape({
-    id: PropTypes.string,
+    _id: PropTypes.string.isRequired,
     title: PropTypes.string,
     status: PropTypes.string,
     priority: PropTypes.string,
@@ -245,6 +244,7 @@ UpdateProjectDialog.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
   }),
   onSave: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 // Define default props (if necessary)

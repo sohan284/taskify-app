@@ -11,6 +11,9 @@ import {
   Button,
   Paper,
   TablePagination,
+  Dialog,
+  DialogTitle,
+  DialogActions,
 } from "@mui/material";
 import DashboardManagement from "../../../service/Dashboard";
 
@@ -43,6 +46,9 @@ const CustomTable = () => {
     tags: true,
     options: true,
   });
+  const [open, setOpen] = useState(false);
+  const [memberId, setMemberId] = useState(null);
+  const [updateProjects, setUpdateProjects] = useState(false);
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -57,11 +63,12 @@ const CustomTable = () => {
         setError(err);
       } finally {
         setLoading(false);
+        setUpdateProjects(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [updateProjects]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -109,7 +116,25 @@ const CustomTable = () => {
   };
 
   const handleSaveDialog = () => {};
+  const handleClickOpen = (id) => {
+    setMemberId(id);
+    setOpen(true);
+  };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleDelete = (id) => {
+    DashboardManagement.deleteProject(id)
+      .then((response) => {
+        setUpdateProjects(true);
+        handleClose();
+        console.log("Project deleted successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error deleting the project:", error);
+      });
+  };
   return (
     <div>
       <Paper>
@@ -294,6 +319,7 @@ const CustomTable = () => {
                             onClick={() => handleOpenDialog(member)}
                           />
                           <RiDeleteBinLine
+                            onClick={() => handleClickOpen(member?._id)}
                             style={{
                               color: "tomato",
                               fontSize: "16px",
@@ -334,6 +360,24 @@ const CustomTable = () => {
       </Paper>
 
       {/* Use UpdateProjectDialog component */}
+      {/* delete dialog  */}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure want to delete this project ?"}
+        </DialogTitle>
+
+        <DialogActions>
+          <Button onClick={handleClose}>No</Button>
+          <Button onClick={() => handleDelete(memberId)} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
       <UpdateProjectDialog
         open={dialogOpen}
         onClose={handleCloseDialog}

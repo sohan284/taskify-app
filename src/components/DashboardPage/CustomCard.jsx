@@ -1,9 +1,9 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
-import GroupIcon from "@mui/icons-material/Group";
+// import GroupIcon from "@mui/icons-material/Group";
 import PropTypes from 'prop-types';
-
+import { PiUserListFill } from "react-icons/pi";
 function CustomCard({ title, total, color }) {
   CustomCard.propTypes = {
     title: PropTypes.oneOf(['Projects', 'Tasks', 'Users']).isRequired,
@@ -17,7 +17,7 @@ function CustomCard({ title, total, color }) {
       ) : title === "Tasks" ? (
         <AssignmentTurnedInIcon style={{ color: color }} />
       ) : (
-        <GroupIcon style={{ color: color }} />
+        <PiUserListFill style={{fontSize:'28px', color: color }} />
       )}
       <h2 className="text-gray-500 mt-5 text-[16px] text- font-semibold">
         Total {title}
