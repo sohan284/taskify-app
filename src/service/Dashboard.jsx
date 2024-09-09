@@ -20,11 +20,21 @@ const getProjectList = async () => {
     throw error;
   }
 };
+const updateProject = async (data,id) => {
+  try {
+    const response = await axios.put(`http://localhost:5000/projects/${id}`,data); // Replace with your API endpoint
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update project list:", error);
+    throw error;
+  }
+};
 
 // Attach the functions to an object
 const DashboardManagement = {
   getDashboardCount,
   getProjectList,
+  updateProject,
 };
 
 // Export the object

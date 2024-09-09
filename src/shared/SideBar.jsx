@@ -10,7 +10,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { Button, Divider, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import { RiHome8Line } from "react-icons/ri";
 import { useAuthState } from "react-firebase-hooks/auth";
 import auth from "../firebase.init";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -87,7 +87,7 @@ function SideBar(props) {
             style={{ color: "black", justifyContent: "flex-start" }}
             onClick={() => handleNavigate("/")}
           >
-            <HomeOutlinedIcon style={{ color: "red" }} className="mr-4" />
+            <RiHome8Line style={{ color: "tomato" }} className="mr-4 text-2xl" />
             Dashboard
           </Button>
           <Button
@@ -96,7 +96,7 @@ function SideBar(props) {
             onClick={handleProjectsMenuClick}
           >
             <BusinessCenterOutlinedIcon
-              style={{ color: "green" }}
+              style={{ color: "lightgreen" }}
               className="mr-4"
             />
             Projects
@@ -112,7 +112,7 @@ function SideBar(props) {
             onClick={() => handleNavigate("/")}
           >
             <AssignmentTurnedInOutlinedIcon
-              style={{ color: "purple" }}
+              style={{ color: "3f51b5" }}
               className="mr-4"
             />
             Tasks

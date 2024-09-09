@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import {
   Table,
@@ -13,14 +12,15 @@ import {
   Paper,
   TablePagination,
 } from "@mui/material";
-import DashboardManagement from "../../service/Dashboard";
-import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+import DashboardManagement from "../../../service/Dashboard";
+
+import { RiDeleteBinLine } from "react-icons/ri";
+import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { useAuthState } from "react-firebase-hooks/auth";
-import auth from "../../firebase.init";
+import auth from "../../../firebase.init";
 import UpdateProjectDialog from "./UpdateProjectDialog";
+import { FaRegEdit } from "react-icons/fa";
 
 const CustomTable = () => {
   const [user] = useAuthState(auth);
@@ -87,9 +87,7 @@ const CustomTable = () => {
     setSelectedIds([]);
   };
 
-  const handleSaveVisibility = () => {
-    console.log("Column visibility settings saved:", visibleColumns);
-  };
+  const handleSaveVisibility = () => {};
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -110,11 +108,7 @@ const CustomTable = () => {
     setSelectedProject(null);
   };
 
-  const handleSaveDialog = (updatedProject) => {
-    // Add logic to save the updated project details
-    console.log("Updated Project:", updatedProject);
-    // Update the project in the members list or send it to a server
-  };
+  const handleSaveDialog = () => {};
 
   return (
     <div>
@@ -135,7 +129,7 @@ const CustomTable = () => {
               },
             }}
           >
-            <DeleteOutlineIcon className="mr-1" /> Delete Selected
+            <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
           </Button>
           <Button
             variant="contained"
@@ -225,10 +219,10 @@ const CustomTable = () => {
                               ))
                             : "No users"}
                           <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
+                            className="rounded-full border h-8 w-8 flex items-center justify-center hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
                             onClick={() => handleOpenDialog(member)}
                           >
-                            <EditNoteRoundedIcon />
+                            <FaRegEdit />
                           </div>
                         </div>
                       </TableCell>
@@ -263,7 +257,7 @@ const CustomTable = () => {
                             className="rounded-full border h-8 w-8 flex items-center justify-center pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
                             onClick={() => handleOpenDialog(member)}
                           >
-                            <EditNoteRoundedIcon />
+                            <FaRegEdit />
                           </div>
                         </div>
                       </TableCell>
@@ -291,32 +285,32 @@ const CustomTable = () => {
                     {visibleColumns?.options && (
                       <TableCell>
                         <div className="flex justify-between">
-                          <EditNoteRoundedIcon
+                          <FaRegEdit
                             style={{
-                              color: "purple",
-                              fontSize: "20px",
-                              marginRight: "10px",
+                              color: "#3f51b5",
+                              fontSize: "16px",
+                              marginRight: "20px",
                             }}
                             onClick={() => handleOpenDialog(member)}
                           />
-                          <DeleteOutlineOutlinedIcon
+                          <RiDeleteBinLine
                             style={{
                               color: "tomato",
-                              fontSize: "20px",
-                              marginRight: "10px",
+                              fontSize: "16px",
+                              marginRight: "20px",
                             }}
                           />
-                          <ContentCopyOutlinedIcon
+                          <GoCopy
                             style={{
                               color: "orange",
-                              fontSize: "18px",
-                              marginRight: "10px",
+                              fontSize: "16px",
+                              marginRight: "20px",
                             }}
                           />
                           <ErrorOutlineOutlinedIcon
                             style={{
-                              color: "purple",
-                              fontSize: "20px",
+                              color: "#3f51b5",
+                              fontSize: "18px",
                               marginRight: "10px",
                             }}
                           />

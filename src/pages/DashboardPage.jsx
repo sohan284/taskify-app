@@ -23,7 +23,7 @@ function DashboardPage() {
     };
 
     fetchData();
-  }, [cardDetails]);
+  }, []);
 
   const chartDetails = [
     {

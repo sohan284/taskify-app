@@ -36,9 +36,6 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   const totalSeries = Array.isArray(series)
     ? series.reduce((acc, value) => acc + (value || 0), 0)
     : 0;
-  console.log("Series:", series);
-  console.log("Labels:", labels);
-  console.log("Colors:", colors);
   return (
     <div className="">
       <p className="text-lg font-medium font m-5 text-gray-500">{title}</p>
