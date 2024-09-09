@@ -28,7 +28,8 @@ const CustomTable = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [UpdateProjectDialog, setUpdateProjectDialog] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [visibleColumns] = useState({
     id: true,
     title: true,
@@ -46,7 +47,7 @@ const CustomTable = () => {
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const handleUpdateProjectDialog = () => {};
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -99,219 +100,253 @@ const CustomTable = () => {
     setPage(0);
   };
 
-  return (
-    <Paper>
-      <div style={{ margin: "10px" }}>
-        <Button
-          variant="contained"
-          onClick={handleDeleteSelected}
-          disabled={selectedIds?.length === 0}
-          sx={{
-            marginRight: "10px",
-            backgroundColor: "white",
-            border: "1px solid #FF474C",
-            color: "#FF474C",
-            "&:hover": {
-              backgroundColor: "#FF474C",
-              color: "white",
-            },
-          }}
-        >
-          <DeleteOutlineIcon className="mr-1" /> Delete Selected
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleSaveVisibility}
-          sx={{
-            backgroundColor: "white",
-            border: "1px solid #3f51b5",
-            color: "#3f51b5",
-            "&:hover": {
-              backgroundColor: "#3f51b5",
-              color: "white",
-            },
-          }}
-        >
-          <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
-        </Button>
-      </div>
+  const handleOpenDialog = (project) => {
+    setSelectedProject(project);
+    setDialogOpen(true);
+  };
 
-      <TableContainer>
-        <Table
-          sx={{
-            border: "1px solid gray",
-            "& th, & td": { border: "1px solid #E0E5E5", color: "gray" },
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  indeterminate={
-                    selectedIds?.length > 0 &&
-                    selectedIds?.length < members.length
-                  }
-                  checked={
-                    members?.length > 0 && selectedIds.length === members.length
-                  }
-                  onChange={handleSelectAll}
-                />
-              </TableCell>
-              {visibleColumns?.id && <TableCell>ID</TableCell>}
-              {visibleColumns?.title && <TableCell>TITLE</TableCell>}
-              {visibleColumns?.users && <TableCell>USERS</TableCell>}
-              {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
-              {visibleColumns?.status && <TableCell>STATUS</TableCell>}
-              {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
-              {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
-              {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
-              {visibleColumns?.budget && <TableCell>BUDGET</TableCell>}
-              {visibleColumns?.tags && <TableCell>TAGS</TableCell>}
-              {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
-            </TableRow>
-          </TableHead>
-          <TableBody className="text-nowrap">
-            {members
-              ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              ?.map((member) => (
-                <TableRow key={member?.id}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedIds?.includes(member?.id)}
-                      onChange={() => handleSelect(member?.id)}
-                    />
-                  </TableCell>
-                  {visibleColumns?.id && <TableCell>{member?.id}</TableCell>}
-                  {visibleColumns?.title && (
-                    <TableCell>{member?.title}</TableCell>
-                  )}
-                  {visibleColumns?.users && (
-                    <TableCell>
-                      <div className="flex">
-                        {Array.isArray(member?.users)
-                          ? member?.users.map((el, index) => (
-                              <div className="h-8 w-8" key={index}>
-                                {user?.photoURL && (
-                                  <img
-                                    className="rounded-full"
-                                    src={user?.photoURL}
-                                    alt={el?.name}
-                                  />
-                                )}
-                              </div>
-                            ))
-                          : "No users"}
-                        <div className="rounded-full border h-8 w-8 justify-center flex pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]">
-                          <div>
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedProject(null);
+  };
+
+  const handleSaveDialog = (updatedProject) => {
+    // Add logic to save the updated project details
+    console.log("Updated Project:", updatedProject);
+    // Update the project in the members list or send it to a server
+  };
+
+  return (
+    <div>
+      <Paper>
+        <div style={{ margin: "10px" }}>
+          <Button
+            variant="contained"
+            onClick={handleDeleteSelected}
+            disabled={selectedIds?.length === 0}
+            sx={{
+              marginRight: "10px",
+              backgroundColor: "white",
+              border: "1px solid #FF474C",
+              color: "#FF474C",
+              "&:hover": {
+                backgroundColor: "#FF474C",
+                color: "white",
+              },
+            }}
+          >
+            <DeleteOutlineIcon className="mr-1" /> Delete Selected
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveVisibility}
+            sx={{
+              backgroundColor: "white",
+              border: "1px solid #3f51b5",
+              color: "#3f51b5",
+              "&:hover": {
+                backgroundColor: "#3f51b5",
+                color: "white",
+              },
+            }}
+          >
+            <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
+          </Button>
+        </div>
+
+        <TableContainer>
+          <Table
+            sx={{
+              border: "1px solid gray",
+              "& th, & td": { border: "1px solid #E0E5E5", color: "gray" },
+            }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    indeterminate={
+                      selectedIds?.length > 0 &&
+                      selectedIds?.length < members.length
+                    }
+                    checked={
+                      members?.length > 0 &&
+                      selectedIds.length === members.length
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </TableCell>
+                {visibleColumns?.id && <TableCell>ID</TableCell>}
+                {visibleColumns?.title && <TableCell>TITLE</TableCell>}
+                {visibleColumns?.users && <TableCell>USERS</TableCell>}
+                {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
+                {visibleColumns?.status && <TableCell>STATUS</TableCell>}
+                {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
+                {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
+                {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
+                {visibleColumns?.budget && <TableCell>BUDGET</TableCell>}
+                {visibleColumns?.tags && <TableCell>TAGS</TableCell>}
+                {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody className="text-nowrap">
+              {members
+                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                ?.map((member) => (
+                  <TableRow key={member?.id}>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedIds?.includes(member?.id)}
+                        onChange={() => handleSelect(member?.id)}
+                      />
+                    </TableCell>
+                    {visibleColumns?.id && <TableCell>{member?.id}</TableCell>}
+                    {visibleColumns?.title && (
+                      <TableCell>
+                        <p className="text-[#5b6edd] font-semibold">
+                          {member?.title}
+                        </p>
+                      </TableCell>
+                    )}
+                    {visibleColumns?.users && (
+                      <TableCell>
+                        <div className="flex">
+                          {Array.isArray(member?.users)
+                            ? member?.users.map((el, index) => (
+                                <div className="h-8 w-8" key={index}>
+                                  {user?.photoURL && (
+                                    <img
+                                      className="rounded-full"
+                                      src={user?.photoURL}
+                                      alt={el?.name}
+                                    />
+                                  )}
+                                </div>
+                              ))
+                            : "No users"}
+                          <div
+                            className="rounded-full border h-8 w-8 flex items-center justify-center pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
+                            onClick={() => handleOpenDialog(member)}
+                          >
                             <EditNoteRoundedIcon />
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                  )}
-                  {visibleColumns?.clients && (
-                    <TableCell>
-                      <div className="flex">
-                        {Array.isArray(member?.clients) &&
-                        member?.clients.length > 0 ? (
-                          member?.clients.map((el, index) => (
-                            <div className="h-8 w-8" key={index}>
-                              {el?.photoURL ? (
-                                <img
-                                  className="rounded-full"
-                                  src={el?.photoURL}
-                                  alt={el?.name}
-                                />
-                              ) : (
-                                <div className="rounded-full border h-8 w-8 flex items-center justify-center">
-                                  <span>{el?.name?.charAt(0)}</span>{" "}
-                                  {/* Display first letter of name if image is not available */}
-                                </div>
-                              )}
+                      </TableCell>
+                    )}
+                    {visibleColumns?.clients && (
+                      <TableCell>
+                        <div className="flex">
+                          {Array.isArray(member?.clients) &&
+                          member?.clients.length > 0 ? (
+                            member?.clients.map((el, index) => (
+                              <div className="h-8 w-8" key={index}>
+                                {el?.photoURL ? (
+                                  <img
+                                    className="rounded-full"
+                                    src={el?.photoURL}
+                                    alt={el?.name}
+                                  />
+                                ) : (
+                                  <div className="rounded-full border h-8 w-8 flex items-center justify-center">
+                                    <span>{el?.name?.charAt(0)}</span>{" "}
+                                    {/* Display first letter of name if image is not available */}
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-white rounded-md px-1 flex flex-col justify-center font-medium h-7 bg-[#3f51b5]">
+                              NOT ASSIGNED
                             </div>
-                          ))
-                        ) : (
-                          <div className="text-white rounded-md px-1 flex flex-col justify-center font-medium h-7 bg-[#3f51b5]">
-                            NOT ASSIGNED
+                          )}
+                          <div
+                            className="rounded-full border h-8 w-8 flex items-center justify-center pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
+                            onClick={() => handleOpenDialog(member)}
+                          >
+                            <EditNoteRoundedIcon />
                           </div>
-                        )}
-                        <div className="rounded-full border h-8 w-8 flex items-center justify-center pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]">
-                          <EditNoteRoundedIcon />
                         </div>
-                      </div>
-                    </TableCell>
-                  )}
-                  {visibleColumns?.status && (
-                    <TableCell>{member?.status}</TableCell>
-                  )}
-                  {visibleColumns?.priority && (
-                    <TableCell>{member?.priority}</TableCell>
-                  )}
-                  {visibleColumns?.startsAt && (
-                    <TableCell>{member?.startsAt}</TableCell>
-                  )}
-                  {visibleColumns?.endsAt && (
-                    <TableCell>{member?.endsAt}</TableCell>
-                  )}
-                  {visibleColumns?.budget && (
-                    <TableCell>{member?.budget}</TableCell>
-                  )}
-                  {visibleColumns?.tags && (
-                    <TableCell>
-                      {member?.tags?.join(", ") || "No tags"}
-                    </TableCell>
-                  )}
-                  {visibleColumns?.options && (
-                    <TableCell>
-                      <div className="flex justify-between">
-                        {" "}
-                        <EditNoteRoundedIcon
-                          style={{
-                            color: "purple",
-                            fontSize: "20px",
-                            marginRight: "10px",
-                          }}
-                        />
-                        <DeleteOutlineOutlinedIcon
-                          style={{
-                            color: "tomato",
-                            fontSize: "20px",
-                            marginRight: "10px",
-                          }}
-                        />
-                        <ContentCopyOutlinedIcon
-                          style={{
-                            color: "orange",
-                            fontSize: "18px",
-                            marginRight: "10px",
-                          }}
-                        />
-                        <ErrorOutlineOutlinedIcon
-                          style={{
-                            color: "purple",
-                            fontSize: "20px",
-                            marginRight: "10px",
-                          }}
-                        />
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={members.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+                      </TableCell>
+                    )}
+                    {visibleColumns?.status && (
+                      <TableCell>{member?.status}</TableCell>
+                    )}
+                    {visibleColumns?.priority && (
+                      <TableCell>{member?.priority}</TableCell>
+                    )}
+                    {visibleColumns?.startsAt && (
+                      <TableCell>{member?.startsAt}</TableCell>
+                    )}
+                    {visibleColumns?.endsAt && (
+                      <TableCell>{member?.endsAt}</TableCell>
+                    )}
+                    {visibleColumns?.budget && (
+                      <TableCell>{member?.budget}</TableCell>
+                    )}
+                    {visibleColumns?.tags && (
+                      <TableCell>
+                        {member?.tags?.join(", ") || "No tags"}
+                      </TableCell>
+                    )}
+                    {visibleColumns?.options && (
+                      <TableCell>
+                        <div className="flex justify-between">
+                          <EditNoteRoundedIcon
+                            style={{
+                              color: "purple",
+                              fontSize: "20px",
+                              marginRight: "10px",
+                            }}
+                            onClick={() => handleOpenDialog(member)}
+                          />
+                          <DeleteOutlineOutlinedIcon
+                            style={{
+                              color: "tomato",
+                              fontSize: "20px",
+                              marginRight: "10px",
+                            }}
+                          />
+                          <ContentCopyOutlinedIcon
+                            style={{
+                              color: "orange",
+                              fontSize: "18px",
+                              marginRight: "10px",
+                            }}
+                          />
+                          <ErrorOutlineOutlinedIcon
+                            style={{
+                              color: "purple",
+                              fontSize: "20px",
+                              marginRight: "10px",
+                            }}
+                          />
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={members.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+
+      {/* Use UpdateProjectDialog component */}
+      <UpdateProjectDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        project={selectedProject}
+        onSave={handleSaveDialog}
       />
-      
-    </Paper>
+    </div>
   );
 };
 
