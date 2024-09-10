@@ -14,16 +14,20 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
+  Select,
+  MenuItem,
+  NativeSelect,
 } from "@mui/material";
-import DashboardManagement from "../../../service/Dashboard";
+import DashboardManagement from "../../service/Dashboard";
 
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { useAuthState } from "react-firebase-hooks/auth";
-import auth from "../../../firebase.init";
+import auth from "../../firebase.init";
 import UpdateProjectDialog from "./UpdateProjectDialog";
 import { FaRegEdit } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const CustomTable = () => {
   const [user] = useAuthState(auth);
@@ -129,11 +133,25 @@ const CustomTable = () => {
       .then((response) => {
         setUpdateProjects(true);
         handleClose();
-        console.log("Project deleted successfully:", response.data);
+        toast.success("Project Delete Successfully");
       })
       .catch((error) => {
         console.error("Error deleting the project:", error);
       });
+  };
+  const handleStatusChange = async (e, member) => {
+    const updatedStatus = e.target.value;
+    try {
+      await DashboardManagement.updateProjectStatus(member._id, updatedStatus);
+      setMembers((prevMembers) =>
+        prevMembers.map((m) =>
+          m.id === member.id ? { ...m, status: updatedStatus } : m
+        )
+      );
+      toast.success("Status Updated Successfully");
+    } catch (error) {
+      console.error("Error updating the status:", error);
+    }
   };
   return (
     <div>
@@ -288,7 +306,78 @@ const CustomTable = () => {
                       </TableCell>
                     )}
                     {visibleColumns?.status && (
-                      <TableCell>{member?.status}</TableCell>
+                      <TableCell>
+                        <NativeSelect
+                          name="status"
+                          style={{
+                            fontSize: "12px",
+                            borderRadius: "5px",
+                            height: "28px",
+                            width: "200px",
+                            textAlign: "center",
+                            backgroundColor:
+                              member?.status === "default"
+                                ? "#ff260056"
+                                : member?.status === "started"
+                                ? "#7737c056"
+                                : member?.status === "on going"
+                                ? "#3777c056"
+                                : "#ffd00056",
+                            color:
+                              member?.status === "default"
+                                ? "red"
+                                : member?.status === "started"
+                                ? "#ae00ff"
+                                : member?.status === "on going"
+                                ? "#00aeff"
+                                : "#ff9900",
+                          }}
+                          disableUnderline={true}
+                          value={member?.status}
+                          onChange={(e) => handleStatusChange(e, member)}
+                        >
+                          <option
+                            style={{
+                              backgroundColor: "#ff260056",
+                              color: "red",
+                              textAlign: "center",
+                            }}
+                            value="default"
+                          >
+                            Default
+                          </option>
+                          <option
+                            style={{
+                              backgroundColor: "#7737c056",
+                              color: "#ae00ff",
+                              textAlign: "center",
+                            }}
+                            value="started"
+                          >
+                            Started
+                          </option>
+                          <option
+                            style={{
+                              backgroundColor: "#3777c056",
+                              color: "#00aeff",
+                              textAlign: "center",
+                            }}
+                            value="on going"
+                          >
+                            On Going
+                          </option>
+                          <option
+                            style={{
+                              backgroundColor: "#ffd00056",
+                              color: "#ff9900",
+                              textAlign: "center",
+                            }}
+                            value="in review"
+                          >
+                            In Review
+                          </option>
+                        </NativeSelect>
+                      </TableCell>
                     )}
                     {visibleColumns?.priority && (
                       <TableCell>{member?.priority}</TableCell>

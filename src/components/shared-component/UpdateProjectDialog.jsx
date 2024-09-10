@@ -16,7 +16,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-import DashboardManagement from "../../../service/Dashboard";
+import DashboardManagement from "../../service/Dashboard";
+import { toast } from "react-toastify";
 
 const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
@@ -44,7 +45,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
     const { _id, ...updateData } = formData;
     DashboardManagement.updateProject(_id, updateData)
       .then((response) => {
-        console.log("Project updated successfully:", response.data);
+        toast.success("Project Updated Successfully");
         onSave(formData);
         onClose();
       })

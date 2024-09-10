@@ -5,7 +5,7 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
-import CustomTable from "./ProjectsAndTasks/CustomTable";
+import CustomTable from "../shared-component/CustomTable";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;

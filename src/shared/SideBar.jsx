@@ -135,13 +135,13 @@ function SideBar(props) {
               },
             }}
           >
-            <MenuItem onClick={() => handleNavigate("/project1")}>
+            <MenuItem onClick={() => handleNavigate("/projects")}>
               Manage Projects
             </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/project2")}>
+            <MenuItem onClick={() => handleNavigate("/projects")}>
               Favorite Projects
             </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/project3")}>
+            <MenuItem onClick={() => handleNavigate("/projects")}>
               Tags
             </MenuItem>
           </Menu>

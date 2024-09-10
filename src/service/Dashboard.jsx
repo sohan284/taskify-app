@@ -41,6 +41,21 @@ const deleteProject = async (id) => {
     throw error;
   }
 };
+const updateProjectStatus = async (projectId, status) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:5000/projects/${projectId}`,
+      { status }
+    );
+    if (response.data.success) {
+      console.log("Project status updated successfully");
+    } else {
+      console.error("Failed to update project status:", response.data.message);
+    }
+  } catch (error) {
+    console.error("Error updating project status:", error);
+  }
+};
 
 // Attach the functions to an object
 const DashboardManagement = {
@@ -48,6 +63,7 @@ const DashboardManagement = {
   getProjectList,
   updateProject,
   deleteProject,
+  updateProjectStatus,
 };
 
 // Export the object
