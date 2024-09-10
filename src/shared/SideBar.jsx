@@ -87,7 +87,10 @@ function SideBar(props) {
             style={{ color: "black", justifyContent: "flex-start" }}
             onClick={() => handleNavigate("/")}
           >
-            <RiHome8Line style={{ color: "tomato" }} className="mr-4 text-2xl" />
+            <RiHome8Line
+              style={{ color: "tomato" }}
+              className="mr-4 text-2xl"
+            />
             Dashboard
           </Button>
           <Button
@@ -138,7 +141,7 @@ function SideBar(props) {
             <MenuItem onClick={() => handleNavigate("/projects")}>
               Manage Projects
             </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/projects")}>
+            <MenuItem onClick={() => handleNavigate("/projects/favourite")}>
               Favorite Projects
             </MenuItem>
             <MenuItem onClick={() => handleNavigate("/projects")}>

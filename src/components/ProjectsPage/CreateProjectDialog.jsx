@@ -33,6 +33,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
     users: [],
     clients: [],
     tags: [],
+    favourite: true,
   });
 
   const handleChange = (event) => {

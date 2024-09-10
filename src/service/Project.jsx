@@ -10,7 +10,7 @@ const createProject = async (projectData) => {
   } catch (error) {
     // Handle errors
     console.error("Error creating the project:", error);
-    throw error; 
+    throw error;
   }
 };
 const getProjectList = async () => {
@@ -58,6 +58,32 @@ const updateProjectStatus = async (projectId, status) => {
     console.error("Error updating project status:", error);
   }
 };
+const getFavouriteProjectList = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:5000/projects/favourite"
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch project list:", error);
+    throw error;
+  }
+};
+const updateProjectFavourite = async (projectId, favourite) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:5000/projects/${projectId}`,
+      { favourite }
+    );
+    if (response.data.success) {
+      console.log("Project updated successfully");
+    } else {
+      console.error("Failed to update project:", response.data.message);
+    }
+  } catch (error) {
+    console.error("Error updating project :", error);
+  }
+};
 
 // Attach the functions to an object
 const ProjectManagement = {
@@ -66,6 +92,8 @@ const ProjectManagement = {
   deleteProject,
   updateProjectStatus,
   createProject,
+  updateProjectFavourite,
+  getFavouriteProjectList,
 };
 
 // Export the object

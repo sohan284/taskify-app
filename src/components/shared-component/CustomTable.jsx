@@ -25,13 +25,14 @@ import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { useAuthState } from "react-firebase-hooks/auth";
 import auth from "../../firebase.init";
 import UpdateProjectDialog from "./UpdateProjectDialog";
-import { FaRegEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { setResetProjects } from "../../store/features/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 
-const CustomTable = () => {
+const CustomTable = ({ API }) => {
   const dispatch = useDispatch();
   const resetProjects = useSelector((state) => state.project.resetProjects);
   const [user] = useAuthState(auth);
@@ -65,7 +66,7 @@ const CustomTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await ProjectManagement.getProjectList();
+        const result = await API();
         setMembers(result?.data);
       } catch (err) {
         setError(err);
@@ -158,6 +159,19 @@ const CustomTable = () => {
       console.error("Error updating the status:", error);
     }
   };
+  const handleFavourite = async (member, value, message) => {
+    const favourite = value;
+    try {
+      await ProjectManagement.updateProjectFavourite(member._id, favourite);
+      setMembers((prevMembers) =>
+        prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
+      );
+      dispatch(setResetProjects(true));
+      toast.success(`${message} Successfully`);
+    } catch (error) {
+      console.error("Error updating the favourite status:", error);
+    }
+  };
   return (
     <div>
       <Paper>
@@ -234,7 +248,7 @@ const CustomTable = () => {
             <TableBody className="text-nowrap">
               {members
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ?.map((member) => (
+                ?.map((member, index) => (
                   <TableRow key={member?.id}>
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -242,12 +256,38 @@ const CustomTable = () => {
                         onChange={() => handleSelect(member?.id)}
                       />
                     </TableCell>
-                    {visibleColumns?.id && <TableCell>{member?.id}</TableCell>}
+                    {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
                     {visibleColumns?.title && (
                       <TableCell>
-                        <p className="text-[#5b6edd] font-semibold">
-                          {member?.title}
-                        </p>
+                        <div className="flex">
+                          <p className="mr-3 text-[#5b6edd] font-semibold">
+                            {member?.title}
+                          </p>
+                          {member?.favourite ? (
+                            <FaStar
+                              onClick={() =>
+                                handleFavourite(
+                                  member,
+                                  false,
+                                  "Remove from Favourite"
+                                )
+                              }
+                              className="mt-1 text-[orange] mr-3 text-[15px]"
+                            />
+                          ) : (
+                            <FaRegStar
+                              onClick={() =>
+                                handleFavourite(
+                                  member,
+                                  true,
+                                  "Added to favourite"
+                                )
+                              }
+                              className="mt-1 text-[orange] mr-3 text-[15px]"
+                            />
+                          )}
+                          <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
+                        </div>
                       </TableCell>
                     )}
                     {visibleColumns?.users && (
@@ -267,7 +307,7 @@ const CustomTable = () => {
                               ))
                             : "No users"}
                           <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
+                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2]"
                             onClick={() => handleOpenDialog(member)}
                           >
                             <FaRegEdit />
@@ -297,12 +337,12 @@ const CustomTable = () => {
                               </div>
                             ))
                           ) : (
-                            <div className="text-white rounded-md px-1 flex flex-col justify-center font-medium h-7 bg-[#3f51b5]">
+                            <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
                               NOT ASSIGNED
                             </div>
                           )}
                           <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center pt-1 pl-1 hover:bg-[#3f51b5] hover:text-white text-[#3f51b5]"
+                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2]"
                             onClick={() => handleOpenDialog(member)}
                           >
                             <FaRegEdit />

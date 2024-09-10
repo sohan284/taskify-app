@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import CustomTable from "../shared-component/CustomTable";
+import ProjectManagement from "../../service/Project";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -85,11 +86,11 @@ export default function ProjectsTasksTab() {
         <h1 className="text-xl font-bold text-gray-500">
           {"Admin's Projects"}
         </h1>
-        <CustomTable />
+        <CustomTable API={ProjectManagement.getProjectList} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <h1 className="text-xl font-bold text-gray-500">{"Admin's Tasks"}</h1>
-        <CustomTable />
+        <CustomTable API={ProjectManagement.getProjectList} />
       </CustomTabPanel>
     </Box>
   );
