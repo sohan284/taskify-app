@@ -7,7 +7,10 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
 import { IoGridSharp } from "react-icons/io5";
+import { useState } from "react";
+import CreateProjectDialog from "../components/ProjectsPage/CreateProjectDialog";
 const ProjectsPage = () => {
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   function handleClick(event) {
     event.preventDefault();
@@ -38,6 +41,9 @@ const ProjectsPage = () => {
       List
     </Link>,
   ];
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <div className="lg:ml-64 mt-20 sm:ml-64">
       <div className="flex justify-between">
@@ -47,7 +53,10 @@ const ProjectsPage = () => {
           </Breadcrumbs>
         </Stack>
         <div className="mt-6 flex h-8">
-          <div className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white">
+          <div
+            onClick={() => setOpen(true)}
+            className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white"
+          >
             <IoMdAdd />
           </div>
           <div className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 rounded hover:text-xl text-white">
@@ -58,6 +67,7 @@ const ProjectsPage = () => {
       <div>
         <CustomTable />
       </div>
+      <CreateProjectDialog open={open} onClose={handleClose} />
     </div>
   );
 };

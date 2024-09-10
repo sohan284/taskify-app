@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import dayjs from "dayjs";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -15,25 +16,24 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setResetProjects } from "../../store/features/projectSlice";
 
-const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
-  const [formData, setFormData] = useState({});
+const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (project) {
-      setFormData({
-        ...project,
-        startsAt: project.startsAt ? dayjs(project.startsAt) : null,
-        endsAt: project.endsAt ? dayjs(project.endsAt) : null,
-      });
-    }
-  }, [project]);
+  const [formData, setFormData] = useState({
+    title: "",
+    status: "",
+    priority: "",
+    budget: "",
+    startsAt: null,
+    endsAt: null,
+    users: [],
+    clients: [],
+    tags: [],
+  });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -44,24 +44,25 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
     setFormData((prev) => ({ ...prev, [name]: date }));
   };
 
-  const handleSave = () => {
-    const { _id, ...updateData } = formData;
-    const formattedUpdateData = {
-      ...updateData,
+  const handleCreate = () => {
+    const newProject = {
+      ...formData,
       startsAt: formData.startsAt
-        ? formData.startsAt.format("YYYY-MM-DD")
+        ? dayjs(formData.startsAt).format("YYYY-MM-DD")
         : null,
-      endsAt: formData.endsAt ? formData.endsAt.format("YYYY-MM-DD") : null,
+      endsAt: formData.endsAt
+        ? dayjs(formData.endsAt).format("YYYY-MM-DD")
+        : null,
     };
-    ProjectManagement.updateProject(_id, formattedUpdateData)
+
+    ProjectManagement.createProject(newProject)
       .then((response) => {
-        toast.success("Project Updated Successfully");
-        onSave(formData);
+        toast.success("Project Created Successfully");
         onClose();
         dispatch(setResetProjects(true));
       })
       .catch((error) => {
-        console.error("Error updating the project:", error);
+        toast.error(`${error}`);
       });
   };
 
@@ -76,7 +77,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
       }}
       onClose={onClose}
     >
-      <DialogTitle>Update Project</DialogTitle>
+      <DialogTitle>Create Project</DialogTitle>
       <DialogContent>
         <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
@@ -84,20 +85,27 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
             <TextField
               autoFocus
               margin="dense"
+              placeholder="Enter project title"
               name="title"
               type="text"
               fullWidth
-              value={formData.title || ""}
+              value={formData.title}
               onChange={handleChange}
+              required
             />
           </FormControl>
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">STATUS</p>
             <Select
               name="status"
-              value={formData.status || ""}
+              value={formData.status}
               onChange={handleChange}
+              displayEmpty
+              placeholder="Select status"
             >
+              <MenuItem value="" disabled>
+                Select status
+              </MenuItem>
               <MenuItem value="started">Started</MenuItem>
               <MenuItem value="on going">On Going</MenuItem>
               <MenuItem value="default">Default</MenuItem>
@@ -111,9 +119,14 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
             <p className="text-xs mt-2 text-gray-500">PRIORITY</p>
             <Select
               name="priority"
-              value={formData.priority || ""}
+              value={formData.priority}
               onChange={handleChange}
+              displayEmpty
+              placeholder="Select priority"
             >
+              <MenuItem value="" disabled>
+                Select priority
+              </MenuItem>
               <MenuItem value="High">High</MenuItem>
               <MenuItem value="Medium">Medium</MenuItem>
               <MenuItem value="Low">Low</MenuItem>
@@ -127,8 +140,10 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
               name="budget"
               type="text"
               fullWidth
-              value={formData.budget || ""}
+              placeholder="Enter budget"
+              value={formData.budget}
               onChange={handleChange}
+              required
             />
           </FormControl>
         </div>
@@ -142,7 +157,9 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
                 format="DD-MM-YYYY"
                 value={formData.startsAt || null}
                 onChange={(newDate) => handleDateChange("startsAt", newDate)}
-                renderInput={(params) => <TextField {...params} />}
+                renderInput={(params) => (
+                  <TextField {...params} placeholder="Select start date" />
+                )}
               />
             </LocalizationProvider>
           </FormControl>
@@ -153,7 +170,9 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
                 format="DD-MM-YYYY"
                 value={formData.endsAt || null}
                 onChange={(newDate) => handleDateChange("endsAt", newDate)}
-                renderInput={(params) => <TextField {...params} />}
+                renderInput={(params) => (
+                  <TextField {...params} placeholder="Select end date" />
+                )}
               />
             </LocalizationProvider>
           </FormControl>
@@ -163,14 +182,19 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={project?.users || []}
-          getOptionLabel={(option) => option.name}
-          value={formData.users || []}
+          options={[]} // Replace with your users options if needed
+          getOptionLabel={(option) => option.name || ""}
+          value={formData.users}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
           }}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Users" />
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Select Users"
+              placeholder="Select users"
+            />
           )}
         />
 
@@ -178,14 +202,19 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={project?.clients || []}
-          getOptionLabel={(option) => option.name}
-          value={formData.clients || []}
+          options={[]} // Replace with your clients options if needed
+          getOptionLabel={(option) => option.name || ""}
+          value={formData.clients}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, clients: newValue }));
           }}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Clients" />
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Select Clients"
+              placeholder="Select clients"
+            />
           )}
         />
 
@@ -195,12 +224,17 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
           multiple
           options={["design", "website", "development", "marketing"]}
           getOptionLabel={(option) => option}
-          value={formData.tags || []}
+          value={formData.tags}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, tags: newValue }));
           }}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Tags" />
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Select Tags"
+              placeholder="Select tags"
+            />
           )}
         />
       </DialogContent>
@@ -220,9 +254,9 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
             backgroundColor: "#3f51b5",
           }}
           className="bg-[#3f51b5]"
-          onClick={handleSave}
+          onClick={handleCreate}
         >
-          Update
+          Create
         </Button>
       </DialogActions>
     </Dialog>
@@ -230,38 +264,10 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
 };
 
 // Define prop types
-UpdateProjectDialog.propTypes = {
+CreateProjectDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  project: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    status: PropTypes.string,
-    priority: PropTypes.string,
-    budget: PropTypes.string,
-    startsAt: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    endsAt: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    users: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        image: PropTypes.string,
-      })
-    ),
-    clients: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        image: PropTypes.string,
-      })
-    ),
-    tags: PropTypes.arrayOf(PropTypes.string),
-  }),
   onSave: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
-// Define default props (if necessary)
-UpdateProjectDialog.defaultProps = {
-  project: null,
-};
-
-export default UpdateProjectDialog;
+export default CreateProjectDialog;

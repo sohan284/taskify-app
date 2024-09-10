@@ -18,7 +18,6 @@ import {
   MenuItem,
   NativeSelect,
 } from "@mui/material";
-import DashboardManagement from "../../service/Dashboard";
 
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GoCopy } from "react-icons/go";
@@ -28,8 +27,13 @@ import auth from "../../firebase.init";
 import UpdateProjectDialog from "./UpdateProjectDialog";
 import { FaRegEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
+import ProjectManagement from "../../service/Project";
+import { setResetProjects } from "../../store/features/projectSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const CustomTable = () => {
+  const dispatch = useDispatch();
+  const resetProjects = useSelector((state) => state.project.resetProjects);
   const [user] = useAuthState(auth);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -61,18 +65,19 @@ const CustomTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await DashboardManagement.getProjectList();
+        const result = await ProjectManagement.getProjectList();
         setMembers(result?.data);
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
         setUpdateProjects(false);
+        dispatch(setResetProjects(false));
       }
     };
 
     fetchData();
-  }, [updateProjects]);
+  }, [resetProjects]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -129,9 +134,9 @@ const CustomTable = () => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    DashboardManagement.deleteProject(id)
+    ProjectManagement.deleteProject(id)
       .then((response) => {
-        setUpdateProjects(true);
+        dispatch(setResetProjects(true));
         handleClose();
         toast.success("Project Delete Successfully");
       })
@@ -142,7 +147,7 @@ const CustomTable = () => {
   const handleStatusChange = async (e, member) => {
     const updatedStatus = e.target.value;
     try {
-      await DashboardManagement.updateProjectStatus(member._id, updatedStatus);
+      await ProjectManagement.updateProjectStatus(member._id, updatedStatus);
       setMembers((prevMembers) =>
         prevMembers.map((m) =>
           m.id === member.id ? { ...m, status: updatedStatus } : m
