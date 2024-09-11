@@ -54,7 +54,7 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
       endsAt: formData.endsAt ? formData.endsAt.format("YYYY-MM-DD") : null,
     };
     ProjectManagement.updateProject(_id, formattedUpdateData)
-      .then((response) => {
+      .then(() => {
         toast.success("Project Updated Successfully");
         onSave(formData);
         onClose();

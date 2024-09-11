@@ -58,32 +58,7 @@ const updateTaskStatus = async (taskId, status) => {
     console.error("Error updating task status:", error);
   }
 };
-const getFavouriteTaskList = async () => {
-  try {
-    const response = await axios.get(
-      "http://localhost:5000/tasks/favourite"
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Failed to fetch task list:", error);
-    throw error;
-  }
-};
-const updateTaskFavourite = async (taskId, favourite) => {
-  try {
-    const response = await axios.put(
-      `http://localhost:5000/tasks/${taskId}`,
-      { favourite }
-    );
-    if (response.data.success) {
-      console.log("Task updated successfully");
-    } else {
-      console.error("Failed to update task:", response.data.message);
-    }
-  } catch (error) {
-    console.error("Error updating task :", error);
-  }
-};
+
 
 // Attach the functions to an object
 const TaskManagement = {
@@ -92,8 +67,6 @@ const TaskManagement = {
   deleteTask,
   updateTaskStatus,
   createTask,
-  updateTaskFavourite,
-  getFavouriteTaskList,
 };
 
 // Export the object

@@ -14,21 +14,19 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
-  Select,
-  MenuItem,
   NativeSelect,
 } from "@mui/material";
-
+import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { useAuthState } from "react-firebase-hooks/auth";
 import auth from "../../firebase.init";
 import { toast } from "react-toastify";
-import ProjectManagement from "../../service/Project";
-import { setResetProjects } from "../../store/features/projectSlice";
+import TaskManagement from "../../service/Task";
+import { setResetProjects} from "../../store/features/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import UpdateTaskDialog from "./UpdateTasksDialog";
 import Loading from "../../shared/Loading";
@@ -42,7 +40,7 @@ const TasksTable = ({ API }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [visibleColumns] = useState({
     id: true,
     title: true,
@@ -58,7 +56,6 @@ const TasksTable = ({ API }) => {
   });
   const [open, setOpen] = useState(false);
   const [memberId, setMemberId] = useState(null);
-  const [updateProjects, setUpdateProjects] = useState(false);
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -73,7 +70,6 @@ const TasksTable = ({ API }) => {
         setError(err);
       } finally {
         setLoading(false);
-        setUpdateProjects(false);
         dispatch(setResetProjects(false));
       }
     };
@@ -116,14 +112,14 @@ const TasksTable = ({ API }) => {
     setPage(0);
   };
 
-  const handleOpenDialog = (project) => {
-    setSelectedProject(project);
+  const handleOpenDialog = (task) => {
+    setSelectedTask(task);
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSelectedProject(null);
+    setSelectedTask(null);
   };
 
   const handleSaveDialog = () => {};
@@ -136,20 +132,21 @@ const TasksTable = ({ API }) => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    ProjectManagement.deleteProject(id)
-      .then((response) => {
+    TaskManagement.deleteTask(id)
+      .then(() => {
         dispatch(setResetProjects(true));
         handleClose();
-        toast.success("Project Delete Successfully");
+        toast.success("Task Delete Successfully");
       })
       .catch((error) => {
-        console.error("Error deleting the project:", error);
+        console.error("Error deleting the task:", error);
       });
   };
   const handleStatusChange = async (e, member) => {
+    console.log(e.target.value)
     const updatedStatus = e.target.value;
     try {
-      await ProjectManagement.updateProjectStatus(member._id, updatedStatus);
+      await TaskManagement.updateTaskStatus(member._id, updatedStatus);
       setMembers((prevMembers) =>
         prevMembers.map((m) =>
           m.id === member.id ? { ...m, status: updatedStatus } : m
@@ -159,19 +156,6 @@ const TasksTable = ({ API }) => {
       toast.success("Status Updated Successfully");
     } catch (error) {
       console.error("Error updating the status:", error);
-    }
-  };
-  const handleFavourite = async (member, value, message) => {
-    const favourite = value;
-    try {
-      await ProjectManagement.updateProjectFavourite(member._id, favourite);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
-      );
-      dispatch(setResetProjects(true));
-      toast.success(`${message} Successfully`);
-    } catch (error) {
-      console.error("Error updating the favourite status:", error);
     }
   };
   return (
@@ -249,7 +233,7 @@ const TasksTable = ({ API }) => {
             <TableBody className="text-nowrap">
               {members
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ?.map((member, index) => (
+                ?.map((member) => (
                   <TableRow key={member?.id}>
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -263,29 +247,6 @@ const TasksTable = ({ API }) => {
                           <p className="mr-3 text-[#5b6edd] font-semibold">
                             {member?.title}
                           </p>
-                          {member?.favourite ? (
-                            <FaStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  false,
-                                  "Remove from Favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          ) : (
-                            <FaRegStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  true,
-                                  "Added to favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          )}
                           <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
                         </div>
                       </TableCell>
@@ -493,7 +454,7 @@ const TasksTable = ({ API }) => {
         />
       </Paper>
 
-      {/* Use UpdateProjectDialog component */}
+      {/* Use UpdateTaskDialog component */}
       {/* delete dialog  */}
       <Dialog
         open={open}
@@ -502,7 +463,7 @@ const TasksTable = ({ API }) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Are you sure want to delete this project ?"}
+          {"Are you sure want to delete this task ?"}
         </DialogTitle>
 
         <DialogActions>
@@ -515,11 +476,13 @@ const TasksTable = ({ API }) => {
       <UpdateTaskDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        project={selectedProject}
+        task={selectedTask}
         onSave={handleSaveDialog}
       />
     </div>
   );
 };
-
+TasksTable.propTypes = {
+  API: PropTypes
+};
 export default TasksTable;

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -17,12 +17,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
-import ProjectManagement from "../../service/Project";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setResetProjects } from "../../store/features/projectSlice";
+import TaskManagement from "../../service/Task";
+import ProjectManagement from "../../service/Project";
 
 const CreateTaskDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
+  const [projects, setProjects] = useState(null)
   const [formData, setFormData] = useState({
     title: "",
     status: "",
@@ -35,7 +37,18 @@ const CreateTaskDialog = ({ open, onClose }) => {
     tags: [],
     favourite: true,
   });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // get projects
+        await ProjectManagement.getProjectList().then((res) => setProjects(res.data))
+      } catch (err) {
+        console.log(err)
+      }
+    };
 
+    fetchData();
+  }, []);
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -56,8 +69,8 @@ const CreateTaskDialog = ({ open, onClose }) => {
         : null,
     };
 
-    ProjectManagement.createProject(newProject)
-      .then((response) => {
+    TaskManagement.createTask(newProject)
+      .then(() => {
         toast.success("Project Created Successfully");
         onClose();
         dispatch(setResetProjects(true));
@@ -78,23 +91,24 @@ const CreateTaskDialog = ({ open, onClose }) => {
       }}
       onClose={onClose}
     >
-      <DialogTitle>Create Project</DialogTitle>
+      <DialogTitle>Create Task</DialogTitle>
       <DialogContent>
+        <FormControl fullWidth margin="dense">
+          <p className="text-xs text-gray-500">TITLE</p>
+          <TextField
+            autoFocus
+            margin="dense"
+            placeholder="Enter project title"
+            name="title"
+            type="text"
+            fullWidth
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+        </FormControl>
         <div className="grid grid-cols-2 gap-5">
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs text-gray-500">TITLE</p>
-            <TextField
-              autoFocus
-              margin="dense"
-              placeholder="Enter project title"
-              name="title"
-              type="text"
-              fullWidth
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </FormControl>
+
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">STATUS</p>
             <Select
@@ -113,9 +127,6 @@ const CreateTaskDialog = ({ open, onClose }) => {
               <MenuItem value="in review">In Review</MenuItem>
             </Select>
           </FormControl>
-        </div>
-
-        <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">PRIORITY</p>
             <Select
@@ -134,6 +145,29 @@ const CreateTaskDialog = ({ open, onClose }) => {
               <MenuItem value="Critical">Critical</MenuItem>
             </Select>
           </FormControl>
+        </div>
+        <FormControl fullWidth margin="dense">
+          <p className="text-xs mt-2 text-gray-500">SELECT PROJECT</p>
+          <Select
+            name="project"
+            value={formData.priority}
+            onChange={handleChange}
+            displayEmpty
+            placeholder="Select Project"
+          >
+            <MenuItem value="" disabled>
+              Select Project
+            </MenuItem>
+            {projects?.map(project =>
+              <MenuItem key={project?._id} value="High">{project?.title}</MenuItem>
+            )
+
+            }
+
+
+          </Select>
+        </FormControl>
+        <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs text-gray-500">BUDGET</p>
             <TextField

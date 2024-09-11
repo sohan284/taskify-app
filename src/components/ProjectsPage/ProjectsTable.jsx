@@ -137,7 +137,7 @@ const ProjectsTable = ({ API }) => {
   };
   const handleDelete = (id) => {
     ProjectManagement.deleteProject(id)
-      .then((response) => {
+      .then(() => {
         dispatch(setResetProjects(true));
         handleClose();
         toast.success("Project Delete Successfully");

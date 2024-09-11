@@ -3,7 +3,6 @@ import CustomCard from "../components/DashboardPage/CustomCard";
 import CustomChart from "../components/DashboardPage/CustomChart";
 import EventsTab from "../components/DashboardPage/EventsTab";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
-import DashboardManagement from "../service/Dashboard";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
 import { setResetProjects } from "../store/features/projectSlice";
