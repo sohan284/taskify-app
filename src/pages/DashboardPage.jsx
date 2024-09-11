@@ -8,6 +8,7 @@ import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
 import { setResetProjects } from "../store/features/projectSlice";
 import Loading from "../shared/Loading";
+import TaskManagement from "../service/Task";
 
 function DashboardPage() {
   const dispatch = useDispatch();
@@ -15,22 +16,20 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [projectCount, setProjectCount] = useState(null);
+  const [taskCount, setTaskCount] = useState(null);
   const [chartDetails, setChartDetails] = useState([]);
   let cardDetails = [
     {
-      _id: "66dbda4e634dfb28c415b5c8",
       title: "Projects",
       total: projectCount,
       color: "#70d100",
     },
     {
-      _id: "66dbda4e634dfb28c415b5c9",
       title: "Tasks",
-      total: 463,
+      total: taskCount,
       color: "#852bfa",
     },
     {
-      _id: "66dbda4e634dfb28c415b5ca",
       title: "Users",
       total: 75,
       color: "#ebb400",
@@ -46,33 +45,47 @@ function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await ProjectManagement.getProjectList();
-        const projects = result?.data || [];
+        // get projects
+        const projectResult = await ProjectManagement.getProjectList();
+        const projects = projectResult?.data || [];
 
         setProjectCount(projects.length);
 
         // Aggregate data for the charts
-        const statusCounts = projects.reduce((acc, project) => {
-          const status = project.status; // Assuming `status` is a field in your project data
+        const projectsCounts = projects.reduce((acc, project) => {
+          const status = project.status;
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         }, {});
+        const projectLabels = Object.keys(projectsCounts);
+        const projectSeries = Object.values(projectsCounts);
 
-        const statusLabels = Object.keys(statusCounts);
-        const statusSeries = Object.values(statusCounts);
+        // get tasks
+        const TaskResult = await TaskManagement.getTaskList();
+        const tasks = TaskResult?.data || [];
+
+        setTaskCount(tasks.length);
+
+        const taskCounts = tasks.reduce((acc, task) => {
+          const status = task.status;
+          acc[status] = (acc[status] || 0) + 1;
+          return acc;
+        }, {});
+        const taskLabels = Object.keys(taskCounts);
+        const taskSeries = Object.values(taskCounts);
 
         // Update chartDetails based on the transformed data
         setChartDetails([
           {
             title: "Project Statistics",
-            series: statusSeries,
-            labels: statusLabels,
+            series: projectSeries,
+            labels: projectLabels,
             colors: ["#70d100", "#00b9d1", "#ebb400", "#852bfa"], // Customize this as needed
           },
           {
             title: "Task Statistics",
-            series: [20, 50, 38, 28], // Placeholder for task data; update as needed
-            labels: ["Started", "Default", "On Going", "In Review"],
+            series: taskSeries,
+            labels: taskLabels,
             colors: ["#ebb400", "#852bfa", "#00b9d1", "#70d100"],
           },
           {

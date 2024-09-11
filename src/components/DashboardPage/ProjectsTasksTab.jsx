@@ -8,6 +8,7 @@ import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurned
 import ProjectsTable from "../ProjectsPage/ProjectsTable";
 import ProjectManagement from "../../service/Project";
 import TasksTable from "../TasksPage/TasksTable";
+import TaskManagement from "../../service/Task";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -91,7 +92,7 @@ export default function ProjectsTasksTab() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <h1 className="text-xl font-bold text-gray-500">{"Admin's Tasks"}</h1>
-        <TasksTable API={ProjectManagement.getProjectList} />
+        <TasksTable API={TaskManagement.getTaskList} />
       </CustomTabPanel>
     </Box>
   );

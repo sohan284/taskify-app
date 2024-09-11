@@ -10,6 +10,8 @@ import { IoGridSharp } from "react-icons/io5";
 import { useState } from "react";
 import CreateProjectDialog from "../components/ProjectsPage/CreateProjectDialog";
 import ProjectManagement from "../service/Project";
+import TasksTable from "../components/TasksPage/TasksTable";
+import TaskManagement from "../service/Task";
 const TasksPage = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -63,7 +65,7 @@ const TasksPage = () => {
         </div>
       </div>
       <div>
-        <ProjectsTable API={ProjectManagement.getProjectList} />
+        <TasksTable API={TaskManagement.getTaskList} />
       </div>
       <CreateProjectDialog open={open} onClose={handleClose} />
     </div>
