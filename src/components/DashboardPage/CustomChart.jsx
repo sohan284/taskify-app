@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import { MdOutlineBusinessCenter } from "react-icons/md";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
@@ -46,9 +46,9 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
         {labels?.map((label, index) => (
           <div className="flex justify-between my-2" key={index}>
             {title === "Project Statistics" ? (
-              <WorkOutlineIcon
+              <MdOutlineBusinessCenter
                 style={{ color: colors[index] || "#000" }} // Ensures a fallback color if undefined
-                className="bg-[#ebe3ff] rounded p-0.5"
+                className="bg-[#ebe3ff] rounded p-0.5 text-2xl"
               />
             ) : (
               <AssignmentTurnedInOutlinedIcon
