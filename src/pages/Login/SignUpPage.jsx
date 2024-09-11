@@ -8,10 +8,13 @@ import {
 } from "react-firebase-hooks/auth";
 import auth from "../../firebase.init";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setCreateUser } from "../../store/features/userSlice";
 
 function SignUpPage() {
   const [signInWithGoogle, googleLoading, googleError] =
     useSignInWithGoogle(auth);
+    const dispatch = useDispatch();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,6 +59,7 @@ function SignUpPage() {
 
     createUserWithEmailAndPassword(email, password)
       .then(() => {
+        dispatch(setCreateUser(true))
         navigate("/"); // Navigate to home page after successful sign-up
       })
       .catch((err) => {
@@ -66,6 +70,7 @@ function SignUpPage() {
   const handleGoogleSignIn = () => {
     signInWithGoogle()
       .then(() => {
+        dispatch(setCreateUser(true))
         navigate("/"); // Navigate to home page after successful Google sign-in
       })
       .catch((err) => {

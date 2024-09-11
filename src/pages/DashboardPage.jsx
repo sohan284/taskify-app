@@ -8,14 +8,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { setResetProjects } from "../store/features/projectSlice";
 import Loading from "../shared/Loading";
 import TaskManagement from "../service/Task";
+import auth from "../firebase.init";
+import { useAuthState } from "react-firebase-hooks/auth";
+import UserManagement from "../service/User";
+import { setCreateUser } from "../store/features/userSlice";
 
 function DashboardPage() {
+  const [user] = useAuthState(auth);
   const dispatch = useDispatch();
   const resetProjects = useSelector((state) => state.project.resetProjects);
+  const createUser = useSelector((state) => state.user.createUser);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [projectCount, setProjectCount] = useState(null);
   const [taskCount, setTaskCount] = useState(null);
+  const [userCount, setUserCount] = useState(null);
   const [chartDetails, setChartDetails] = useState([]);
   let cardDetails = [
     {
@@ -30,7 +37,7 @@ function DashboardPage() {
     },
     {
       title: "Users",
-      total: 75,
+      total: userCount,
       color: "#ebb400",
     },
     {
@@ -94,6 +101,18 @@ function DashboardPage() {
             colors: ["#00b9d1", "#70d100", "#ebb400", "#852bfa"],
           },
         ]);
+        UserManagement.getUserList().then(res=>setUserCount(res.data.length))
+        if (user) {
+          const userData = {
+            email: user?.email,
+            photoURL: user?.photoURL || "",
+            displayName: user?.displayName || "",
+          };
+         if(createUser){
+          UserManagement.upsertUser(userData).then(()=> dispatch(setCreateUser(false)))
+         }
+          console.log("User data posted successfully");
+        }
       } catch (err) {
         setError(err);
       } finally {
