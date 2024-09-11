@@ -39,7 +39,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   return (
     <div className="">
       <p className="text-lg font-medium font m-5 text-gray-500">{title}</p>
-      <div id="chart">
+      <div className="w-96" id="chart">
         <ReactApexChart options={options} series={series} type="donut" />
       </div>
       <div className="m-5 text-gray-400 font-medium">

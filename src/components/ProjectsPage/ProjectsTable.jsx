@@ -31,8 +31,9 @@ import { setResetProjects } from "../../store/features/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import Loading from "../../shared/Loading";
 
-const CustomTable = ({ API }) => {
+const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const resetProjects = useSelector((state) => state.project.resetProjects);
   const [user] = useAuthState(auth);
@@ -80,7 +81,7 @@ const CustomTable = ({ API }) => {
     fetchData();
   }, [resetProjects]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><Loading/></div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
@@ -154,6 +155,7 @@ const CustomTable = ({ API }) => {
           m.id === member.id ? { ...m, status: updatedStatus } : m
         )
       );
+      dispatch(setResetProjects(true));
       toast.success("Status Updated Successfully");
     } catch (error) {
       console.error("Error updating the status:", error);
@@ -522,4 +524,4 @@ const CustomTable = ({ API }) => {
   );
 };
 
-export default CustomTable;
+export default ProjectsTable;

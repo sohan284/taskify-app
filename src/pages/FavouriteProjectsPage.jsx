@@ -1,4 +1,4 @@
-import CustomTable from "../components/shared-component/CustomTable";
+import ProjectsTable from "../components/ProjectsPage/ProjectsTable";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
@@ -66,7 +66,7 @@ const FavouriteProjectsPage = () => {
         </div>
       </div>
       <div>
-        <CustomTable API={ProjectManagement.getFavouriteProjectList} />
+        <ProjectsTable API={ProjectManagement.getFavouriteProjectList} />
       </div>
       <CreateProjectDialog open={open} onClose={handleClose} />
     </div>

@@ -112,7 +112,7 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{ color: "black", justifyContent: "flex-start" }}
-            onClick={() => handleNavigate("/")}
+            onClick={() => handleNavigate("/tasks")}
           >
             <AssignmentTurnedInOutlinedIcon
               style={{ color: "3f51b5" }}

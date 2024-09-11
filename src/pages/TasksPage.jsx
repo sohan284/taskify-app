@@ -10,7 +10,7 @@ import { IoGridSharp } from "react-icons/io5";
 import { useState } from "react";
 import CreateProjectDialog from "../components/ProjectsPage/CreateProjectDialog";
 import ProjectManagement from "../service/Project";
-const ProjectsPage = () => {
+const TasksPage = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   function handleClick(event) {
@@ -36,10 +36,7 @@ const ProjectsPage = () => {
       href="/projects"
       onClick={() => handleClick("/projects")}
     >
-      Projects
-    </Link>,
-    <Link style={{ fontWeight: 500 }} underline="none" key="2" color="inherit">
-      List
+     Tasks
     </Link>,
   ];
   const handleClose = () => {
@@ -73,4 +70,4 @@ const ProjectsPage = () => {
   );
 };
 
-export default ProjectsPage;
+export default TasksPage;
