@@ -7,7 +7,7 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import { Button, Divider, Menu, MenuItem } from "@mui/material";
+import { Button, Collapse, Divider, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { RiHome8Line } from "react-icons/ri";
@@ -17,6 +17,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined"; // Added import for the dropdown arrow icon
+import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 const drawerWidth = 240;
 
@@ -30,7 +31,7 @@ function SideBar(props) {
   const open = Boolean(anchorEl);
   const projectsMenuOpen = Boolean(projectsMenuAnchorEl);
   const [isClosing, setIsClosing] = useState(false);
-
+  const [collapseProjects, setCollapseProjects] = useState(false);
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -58,10 +59,6 @@ function SideBar(props) {
     setAnchorEl(null);
   };
 
-  const handleProjectsMenuClick = (event) => {
-    setProjectsMenuAnchorEl(event.currentTarget);
-  };
-
   const handleProjectsMenuClose = () => {
     setProjectsMenuAnchorEl(null);
   };
@@ -70,6 +67,11 @@ function SideBar(props) {
     auth.signOut().then(() => {
       navigate("/login");
     });
+  };
+  const handleCollapse = () => {
+    if (collapseProjects == true) {
+      setCollapseProjects(false);
+    } else setCollapseProjects(true);
   };
 
   const drawer = (
@@ -84,7 +86,11 @@ function SideBar(props) {
         <div className="flex flex-col">
           <Button
             className="flex items-center w-full"
-            style={{ color: "black", justifyContent: "flex-start" }}
+            style={{
+              fontWeight: "600",
+              color: "#666666",
+              justifyContent: "flex-start",
+            }}
             onClick={() => handleNavigate("/")}
           >
             <RiHome8Line
@@ -95,8 +101,12 @@ function SideBar(props) {
           </Button>
           <Button
             className="flex items-center w-full"
-            style={{ color: "black", justifyContent: "flex-start" }}
-            onClick={handleProjectsMenuClick}
+            style={{
+              fontWeight: "600",
+              color: "#666666",
+              justifyContent: "flex-start",
+            }}
+            onClick={(event) => handleCollapse(event)}
           >
             <BusinessCenterOutlinedIcon
               style={{ color: "lightgreen" }}
@@ -105,13 +115,35 @@ function SideBar(props) {
             Projects
             <span className="ml-auto">
               <IconButton size="small">
-                <ExpandMoreOutlinedIcon />
+                {collapseProjects ? (
+                  <ExpandMoreOutlinedIcon />
+                ) : (
+                  <KeyboardArrowRightOutlinedIcon />
+                )}
               </IconButton>
             </span>
           </Button>
+
+          <Collapse in={collapseProjects} timeout="auto" unmountOnExit>
+            <div className="ml-8 text-[#666666]">
+              <MenuItem onClick={() => handleNavigate("/projects")}>
+                Manage Projects
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigate("/projects/favourite")}>
+                Favorite Projects
+              </MenuItem>
+              <MenuItem onClick={() => handleNavigate("/projects")}>
+                Tags
+              </MenuItem>
+            </div>
+          </Collapse>
           <Button
-            className="flex items-center w-full"
-            style={{ color: "black", justifyContent: "flex-start" }}
+            className="flex  items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#666666",
+              justifyContent: "flex-start",
+            }}
             onClick={() => handleNavigate("/tasks")}
           >
             <AssignmentTurnedInOutlinedIcon
