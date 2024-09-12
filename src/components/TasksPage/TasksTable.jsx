@@ -20,8 +20,6 @@ import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
-import { useAuthState } from "react-firebase-hooks/auth";
-import auth from "../../firebase.init";
 import { toast } from "react-toastify";
 import TaskManagement from "../../service/Task";
 import { setResetProjects} from "../../store/features/projectSlice";
@@ -30,11 +28,10 @@ import { FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import UpdateTaskDialog from "./UpdateTasksDialog";
 import Loading from "../../shared/Loading";
-
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const resetProjects = useSelector((state) => state.project.resetProjects);
-  const [user] = useAuthState(auth);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -251,24 +248,37 @@ const TasksTable = ({ API }) => {
                         </div>
                       </TableCell>
                     )}
-                    {visibleColumns?.users && (
+                   {visibleColumns?.users && (
                       <TableCell>
-                        <div className="flex">
+                        <div className="flex items-center">
                           {Array.isArray(member?.users)
                             ? member?.users.map((el, index) => (
-                                <div className="h-8 w-8" key={index}>
-                                  {user?.photoURL && (
-                                    <img
-                                      className="rounded-full"
-                                      src={user?.photoURL}
-                                      alt={el?.name}
-                                    />
+                                <div key={index}>
+                                  {el?.photoURL ? (
+                                    <div className="w-8 h-8 -ml-2">
+                                      <img
+                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                        src={el?.photoURL}
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                                      {" "}
+                                      <AccountCircleIcon
+                                        className="bg-[#5a6fe2] rounded-full"
+                                        style={{
+                                          color: "white",
+                                          fontSize: 30,
+                                          marginLeft: -10,
+                                        }}
+                                      />
+                                    </div>
                                   )}
                                 </div>
                               ))
                             : "No users"}
                           <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2]"
+                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
                             onClick={() => handleOpenDialog(member)}
                           >
                             <FaRegEdit />
@@ -276,23 +286,32 @@ const TasksTable = ({ API }) => {
                         </div>
                       </TableCell>
                     )}
+
                     {visibleColumns?.clients && (
                       <TableCell>
-                        <div className="flex">
+                        <div className="relative flex items-center">
                           {Array.isArray(member?.clients) &&
                           member?.clients.length > 0 ? (
                             member?.clients.map((el, index) => (
-                              <div className="h-8 w-8" key={index}>
+                              <div key={index}>
                                 {el?.photoURL ? (
-                                  <img
-                                    className="rounded-full"
-                                    src={el?.photoURL}
-                                    alt={el?.name}
-                                  />
+                                  <div className="w-8 h-8 -ml-2">
+                                    <img
+                                      className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                      src={el?.photoURL}
+                                    />
+                                  </div>
                                 ) : (
-                                  <div className="rounded-full border h-8 w-8 flex items-center justify-center">
-                                    <span>{el?.name?.charAt(0)}</span>{" "}
-                                    {/* Display first letter of name if image is not available */}
+                                  <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                                    {" "}
+                                    <AccountCircleIcon
+                                      className="bg-[#5a6fe2] rounded-full"
+                                      style={{
+                                        color: "white",
+                                        fontSize: 30,
+                                        marginLeft: -10,
+                                      }}
+                                    />
                                   </div>
                                 )}
                               </div>
@@ -303,7 +322,7 @@ const TasksTable = ({ API }) => {
                             </div>
                           )}
                           <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2]"
+                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
                             onClick={() => handleOpenDialog(member)}
                           >
                             <FaRegEdit />

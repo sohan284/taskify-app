@@ -12,6 +12,7 @@ import auth from "../firebase.init";
 import { useAuthState } from "react-firebase-hooks/auth";
 import UserManagement from "../service/User";
 import { setCreateUser } from "../store/features/userSlice";
+import TodoManagement from "../service/Todo";
 
 function DashboardPage() {
   const [user] = useAuthState(auth);
@@ -24,6 +25,8 @@ function DashboardPage() {
   const [taskCount, setTaskCount] = useState(null);
   const [userCount, setUserCount] = useState(null);
   const [chartDetails, setChartDetails] = useState([]);
+  const [todosSeries, setTodosSeries] = useState([]); // Default value for todos series
+
   let cardDetails = [
     {
       title: "Projects",
@@ -43,7 +46,7 @@ function DashboardPage() {
     {
       _id: "66dbda4e634dfb28c415b5cb",
       title: "Clients",
-      total: 34,
+      total: userCount,
       color: "#00b9d1",
     },
   ];
@@ -51,7 +54,7 @@ function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // get projects
+        // Get projects
         const projectResult = await ProjectManagement.getProjectList();
         const projects = projectResult?.data || [];
 
@@ -66,9 +69,9 @@ function DashboardPage() {
         const projectLabels = Object.keys(projectsCounts);
         const projectSeries = Object.values(projectsCounts);
 
-        // get tasks
-        const TaskResult = await TaskManagement.getTaskList();
-        const tasks = TaskResult?.data || [];
+        // Get tasks
+        const taskResult = await TaskManagement.getTaskList();
+        const tasks = taskResult?.data || [];
 
         setTaskCount(tasks.length);
 
@@ -80,7 +83,10 @@ function DashboardPage() {
         const taskLabels = Object.keys(taskCounts);
         const taskSeries = Object.values(taskCounts);
 
-        // Update chartDetails based on the transformed data
+        // Get todos
+        await TodoManagement.getTodosList().then((res) =>
+          setTodosSeries([res.statusCount.trueCount, res.statusCount.falseCount])
+        );
         setChartDetails([
           {
             title: "Project Statistics",
@@ -96,21 +102,27 @@ function DashboardPage() {
           },
           {
             title: "Todos Overview",
-            series: [20, 50, 38, 28], // Placeholder for todo data; update as needed
-            labels: ["Apples", "Oranges", "Bananas"],
-            colors: ["#00b9d1", "#70d100", "#ebb400", "#852bfa"],
+            series: todosSeries, // Updated todosSeries
+            labels: ["Done", "Pending"],
+            colors: ["#57bb29", "#df3b3b"],
           },
         ]);
-        UserManagement.getUserList().then(res=>setUserCount(res.data.length))
+
+        UserManagement.getUserList().then((res) =>
+          setUserCount(res.data.length)
+        );
+
         if (user) {
           const userData = {
             email: user?.email,
             photoURL: user?.photoURL || "",
             displayName: user?.displayName || "",
           };
-         if(createUser){
-          UserManagement.upsertUser(userData).then(()=> dispatch(setCreateUser(false)))
-         }
+          if (createUser) {
+            UserManagement.upsertUser(userData).then(() =>
+              dispatch(setCreateUser(false))
+            );
+          }
           console.log("User data posted successfully");
         }
       } catch (err) {
@@ -122,7 +134,7 @@ function DashboardPage() {
     };
 
     fetchData();
-  }, [resetProjects, dispatch]);
+  }, [resetProjects, dispatch, user, createUser]);
 
   return (
     <div className="lg:ml-64 mt-20 sm:ml-64">
@@ -134,7 +146,7 @@ function DashboardPage() {
         <div>Error loading data: {error.message}</div>
       ) : (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mx-3">
+          <div className="grid grid-cols-2 text-[#df3b3b] lg:grid-cols-4 gap-5 mx-3">
             {cardDetails?.length > 0 ? (
               cardDetails.map((detail) => (
                 <div key={detail.title}>
