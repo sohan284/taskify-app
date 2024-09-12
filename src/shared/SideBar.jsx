@@ -88,7 +88,7 @@ function SideBar(props) {
             className="flex items-center w-full"
             style={{
               fontWeight: "600",
-              color: "#666666",
+              color: "#888888",
               justifyContent: "flex-start",
             }}
             onClick={() => handleNavigate("/")}
@@ -103,7 +103,7 @@ function SideBar(props) {
             className="flex items-center w-full"
             style={{
               fontWeight: "600",
-              color: "#666666",
+              color: "#888888",
               justifyContent: "flex-start",
             }}
             onClick={(event) => handleCollapse(event)}
@@ -125,7 +125,7 @@ function SideBar(props) {
           </Button>
 
           <Collapse in={collapseProjects} timeout="auto" unmountOnExit>
-            <div className="ml-8 text-[#666666]">
+            <div className="ml-8 text-[#888888]">
               <MenuItem onClick={() => handleNavigate("/projects")}>
                 Manage Projects
               </MenuItem>
@@ -141,7 +141,7 @@ function SideBar(props) {
             className="flex  items-center w-full"
             style={{
               fontWeight: "600",
-              color: "#666666",
+              color: "#888888",
               justifyContent: "flex-start",
             }}
             onClick={() => handleNavigate("/tasks")}

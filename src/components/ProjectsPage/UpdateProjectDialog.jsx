@@ -20,13 +20,15 @@ import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
 import { setResetProjects } from "../../store/features/projectSlice";
+import UserManagement from "../../service/User";
 
 const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
-
+  const [users, setUsers] = useState([]);
   useEffect(() => {
     if (project) {
+      UserManagement.getUserList().then((res) => setUsers(res?.data));
       setFormData({
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,
@@ -54,7 +56,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
       endsAt: formData.endsAt ? formData.endsAt.format("YYYY-MM-DD") : null,
     };
     ProjectManagement.updateProject(_id, formattedUpdateData)
-      .then((response) => {
+      .then(() => {
         toast.success("Project Updated Successfully");
         onSave(formData);
         onClose();
@@ -163,14 +165,19 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={project?.users || []}
-          getOptionLabel={(option) => option.name}
-          value={formData.users || []}
+          options={users} // Use the fetched users list
+          getOptionLabel={(option) => option.displayName || option?.email} // Assuming the user has a 'name' property
+          value={formData.users}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
           }}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Users" />
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Select Users"
+              placeholder="Select users"
+            />
           )}
         />
 
@@ -178,8 +185,8 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={project?.clients || []}
-          getOptionLabel={(option) => option.name}
+          options={users}
+          getOptionLabel={(option) => option.displayName}
           value={formData.clients || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, clients: newValue }));

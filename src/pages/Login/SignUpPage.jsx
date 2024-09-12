@@ -6,16 +6,17 @@ import {
   useCreateUserWithEmailAndPassword,
   useSignInWithGoogle,
 } from "react-firebase-hooks/auth";
+import { updateProfile } from "firebase/auth"; // Import updateProfile to set displayName
 import auth from "../../firebase.init";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setCreateUser } from "../../store/features/userSlice";
 
 function SignUpPage() {
-  const [signInWithGoogle, googleLoading, googleError] =
-    useSignInWithGoogle(auth);
-    const dispatch = useDispatch();
+  const [signInWithGoogle, googleLoading] = useSignInWithGoogle(auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cPassword, setCPassword] = useState("");
@@ -34,10 +35,10 @@ function SignUpPage() {
     return password.length >= 6;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     setErrorMsg(null); // Clear any previous errors
 
-    if (!email || !password || !cPassword) {
+    if (!name || !email || !password || !cPassword) {
       setErrorMsg("All fields are required.");
       return;
     }
@@ -57,20 +58,28 @@ function SignUpPage() {
       return;
     }
 
-    createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        dispatch(setCreateUser(true))
-        navigate("/"); // Navigate to home page after successful sign-up
-      })
-      .catch((err) => {
-        setErrorMsg(err.message);
-      });
+    try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        email,
+        password
+      );
+
+      // Update the user's profile with displayName
+      await updateProfile(userCredential.user, { displayName: name });
+
+      // Dispatch user creation status and navigate to the homepage
+      dispatch(setCreateUser(true));
+      navigate("/");
+    } catch (err) {
+      setErrorMsg(err.message);
+    }
   };
 
   const handleGoogleSignIn = () => {
     signInWithGoogle()
       .then(() => {
-        dispatch(setCreateUser(true))
+        dispatch(setCreateUser(true));
         navigate("/"); // Navigate to home page after successful Google sign-in
       })
       .catch((err) => {
@@ -93,6 +102,16 @@ function SignUpPage() {
           Welcome to Taskify!
         </h2>
         <p className="text-gray-500 mt-1">Sign up for an account</p>
+        <TextField
+          label="Your Name"
+          size="small"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{
+            marginTop: 40,
+          }}
+          className="w-full text-sm"
+        />
         <TextField
           label="Your Email"
           size="small"
@@ -170,11 +189,11 @@ function SignUpPage() {
           </Alert>
         )}
 
-        {googleError && (
+        {/* {googleError && (
           <Alert severity="error" className="mt-4">
             {googleError.message}
           </Alert>
-        )}
+        )} */}
       </div>
     </div>
   );

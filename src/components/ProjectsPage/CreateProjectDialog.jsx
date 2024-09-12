@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
@@ -18,11 +18,16 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setResetProjects } from "../../store/features/projectSlice";
+import UserManagement from "../../service/User";
+import Loading from "../../shared/Loading";
 
 const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
+  const [users, setUsers] = useState([]); // Users fetched from API
+  const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     status: "",
@@ -30,11 +35,27 @@ const CreateProjectDialog = ({ open, onClose }) => {
     budget: "",
     startsAt: null,
     endsAt: null,
-    users: [],
+    users: [], // Selected users
     clients: [],
     tags: [],
     favourite: true,
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await UserManagement.getUserList();
+        setUsers(response.data); // Set the user list
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+        dispatch(setResetProjects(false));
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -57,7 +78,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
     };
 
     ProjectManagement.createProject(newProject)
-      .then((response) => {
+      .then(() => {
         toast.success("Project Created Successfully");
         onClose();
         dispatch(setResetProjects(true));
@@ -66,14 +87,20 @@ const CreateProjectDialog = ({ open, onClose }) => {
         toast.error(`${error}`);
       });
   };
+  if (loading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
 
   return (
     <Dialog
       open={open}
       PaperProps={{
         style: {
-          width: "80%", // Adjust the width as needed
-          maxWidth: "800px", // Optional: set a maximum width
+          width: "80%",
+          maxWidth: "800px",
         },
       }}
       onClose={onClose}
@@ -183,8 +210,8 @@ const CreateProjectDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={[]} // Replace with your users options if needed
-          getOptionLabel={(option) => option.name || ""}
+          options={users} // Use the fetched users list
+          getOptionLabel={(option) => option.displayName || option?.email} // Assuming the user has a 'name' property
           value={formData.users}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
@@ -203,8 +230,8 @@ const CreateProjectDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={[]} // Replace with your clients options if needed
-          getOptionLabel={(option) => option.name || ""}
+          options={users}
+          getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, clients: newValue }));
@@ -264,11 +291,9 @@ const CreateProjectDialog = ({ open, onClose }) => {
   );
 };
 
-// Define prop types
 CreateProjectDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
 };
 
 export default CreateProjectDialog;
