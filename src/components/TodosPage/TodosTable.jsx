@@ -14,6 +14,7 @@ import PropTypes from "prop-types";
 import TodoManagement from "../../service/Todo";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/projectSlice";
+import Loading from "../../shared/Loading";
 
 const TodosTable = ({ todos, setTodos }) => {
   const dispatch = useDispatch();
@@ -109,7 +110,7 @@ const TodosTable = ({ todos, setTodos }) => {
           ) : (
             <TableRow>
               <TableCell colSpan={3} align="center">
-                No todos available.
+                <Loading />
               </TableCell>
             </TableRow>
           )}

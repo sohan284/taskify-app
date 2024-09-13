@@ -26,7 +26,7 @@ import ProjectManagement from "../../service/Project";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-import Loading from "../../shared/Loading";
+// import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
 const ProjectsTable = ({ API }) => {
@@ -77,7 +77,7 @@ const ProjectsTable = ({ API }) => {
   if (loading)
     return (
       <div>
-        <Loading />
+        {/* <Loading /> */}
       </div>
     );
   if (error) return <div>Error: {error.message}</div>;

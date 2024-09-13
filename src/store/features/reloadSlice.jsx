@@ -3,7 +3,6 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   reloadPage: false,
   resetTodos: false,
-  reloadPage: false,
   resetTasks: false,
 };
 const reloadSlice = createSlice({
