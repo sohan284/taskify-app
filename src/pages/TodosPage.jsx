@@ -8,10 +8,10 @@ import TodoManagement from "../service/Todo";
 import TodosTable from "../components/TodosPage/TodosTable";
 import CreateTodosDialog from "../components/TodosPage/CreateTodosDialog";
 import { useDispatch, useSelector } from "react-redux";
-import { setReloadPages } from "../store/features/projectSlice";
+import { setReloadPage } from "../store/features/projectSlice";
 
 const TodosPage = () => {
-  const reloadPages = useSelector((state) => state.reload.reloadPages);
+  const reloadPage = useSelector((state) => state.reload.reloadPage);
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
@@ -52,8 +52,8 @@ const TodosPage = () => {
 
   useEffect(() => {
     TodoManagement.getTodosList().then((res) => setTodos(res?.data));
-    dispatch(setReloadPages(false));
-  }, [reloadPages]);
+    dispatch(setReloadPage(false));
+  }, [reloadPage]);
 
   return (
     <div className="lg:ml-64 mt-20 sm:ml-64">

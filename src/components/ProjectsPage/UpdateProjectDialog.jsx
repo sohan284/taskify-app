@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
-import { setReloadPages } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 
 const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
@@ -60,7 +60,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         toast.success("Project Updated Successfully");
         onSave(formData);
         onClose();
-        dispatch(setReloadPages(true));
+        dispatch(setReloadPage(true));
       })
       .catch((error) => {
         console.error("Error updating the project:", error);

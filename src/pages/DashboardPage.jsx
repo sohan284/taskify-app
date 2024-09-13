@@ -5,7 +5,7 @@ import EventsTab from "../components/DashboardPage/EventsTab";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
-import { setReloadPages } from "../store/features/projectSlice";
+import { setReloadPage } from "../store/features/projectSlice";
 import Loading from "../shared/Loading";
 import TaskManagement from "../service/Task";
 import auth from "../firebase.init";
@@ -126,7 +126,7 @@ function DashboardPage() {
         setError(err);
       } finally {
         setLoading(false);
-        dispatch(setReloadPages(false));
+        dispatch(setReloadPage(false));
       }
     };
 

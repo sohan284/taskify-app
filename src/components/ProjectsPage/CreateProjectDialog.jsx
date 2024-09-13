@@ -19,7 +19,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
-import { setReloadPages } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import Loading from "../../shared/Loading";
 
@@ -50,7 +50,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
         console.log(err);
       } finally {
         setLoading(false);
-        dispatch(setReloadPages(false));
+        dispatch(setReloadPage(false));
       }
     };
 
@@ -81,7 +81,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
       .then(() => {
         toast.success("Project Created Successfully");
         onClose();
-        dispatch(setReloadPages(true));
+        dispatch(setReloadPage(true));
       })
       .catch((error) => {
         toast.error(`${error}`);

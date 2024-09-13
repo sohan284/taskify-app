@@ -13,14 +13,14 @@ import moment from "moment";
 import PropTypes from "prop-types";
 import TodoManagement from "../../service/Todo";
 import { useDispatch } from "react-redux";
-import { setReloadPages } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/projectSlice";
 
 const TodosTable = ({ todos, setTodos }) => {
   const dispatch = useDispatch();
   const updateTodoStatus = async (id, status) => {
     try {
       await TodoManagement.updateTodoStatus(id, { status }).then(() =>
-        dispatch(setReloadPages(true))
+        dispatch(setReloadPage(true))
       );
       setTodos((prevTodos) =>
         prevTodos.map((todo) => (todo._id === id ? { ...todo, status } : todo))

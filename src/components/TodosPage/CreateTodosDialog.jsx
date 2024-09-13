@@ -14,7 +14,7 @@ import {
 
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setReloadPages } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/projectSlice";
 import { IoMdClose } from "react-icons/io";
 import TodoManagement from "../../service/Todo";
 const CreateTodosDialog = ({ open, onClose }) => {
@@ -48,7 +48,7 @@ const CreateTodosDialog = ({ open, onClose }) => {
           status: false,
           date: new Date(),
         });
-        dispatch(setReloadPages(true));
+        dispatch(setReloadPage(true));
       })
       .catch((error) => {
         toast.error(`${error}`);

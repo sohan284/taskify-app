@@ -18,7 +18,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setReloadPages } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/reloadSlice";
 import TaskManagement from "../../service/Task";
 import ProjectManagement from "../../service/Project";
 
@@ -75,7 +75,7 @@ const CreateTaskDialog = ({ open, onClose }) => {
       .then(() => {
         toast.success("Project Created Successfully");
         onClose();
-        dispatch(setReloadPages(true));
+        dispatch(setReloadPage(true));
       })
       .catch((error) => {
         toast.error(`${error}`);
