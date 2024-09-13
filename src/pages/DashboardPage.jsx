@@ -25,7 +25,6 @@ function DashboardPage() {
   const [taskCount, setTaskCount] = useState(null);
   const [userCount, setUserCount] = useState(null);
   const [chartDetails, setChartDetails] = useState([]);
-  const [todosSeries, setTodosSeries] = useState([]); // Default value for todos series
 
   let cardDetails = [
     {
@@ -57,7 +56,6 @@ function DashboardPage() {
         // Get projects
         const projectResult = await ProjectManagement.getProjectList();
         const projects = projectResult?.data || [];
-
         setProjectCount(projects.length);
 
         // Aggregate data for the charts
@@ -72,7 +70,6 @@ function DashboardPage() {
         // Get tasks
         const taskResult = await TaskManagement.getTaskList();
         const tasks = taskResult?.data || [];
-
         setTaskCount(tasks.length);
 
         const taskCounts = tasks.reduce((acc, task) => {
@@ -84,15 +81,16 @@ function DashboardPage() {
         const taskSeries = Object.values(taskCounts);
 
         // Get todos
-        await TodoManagement.getTodosList().then((res) =>
-          setTodosSeries([res.statusCount.trueCount, res.statusCount.falseCount])
-        );
+        const todosResult = await TodoManagement.getTodosList();
+        const { trueCount, falseCount } = todosResult.statusCount;
+        const todosSeries = [trueCount, falseCount];
+
         setChartDetails([
           {
             title: "Project Statistics",
             series: projectSeries,
             labels: projectLabels,
-            colors: ["#70d100", "#00b9d1", "#ebb400", "#852bfa"], // Customize this as needed
+            colors: ["#70d100", "#00b9d1", "#ebb400", "#852bfa"],
           },
           {
             title: "Task Statistics",
@@ -102,15 +100,15 @@ function DashboardPage() {
           },
           {
             title: "Todos Overview",
-            series: todosSeries, // Updated todosSeries
+            series: todosSeries, // Use the updated todos series
             labels: ["Done", "Pending"],
             colors: ["#57bb29", "#df3b3b"],
           },
         ]);
 
-        UserManagement.getUserList().then((res) =>
-          setUserCount(res.data.length)
-        );
+        // Get users
+        const userResult = await UserManagement.getUserList();
+        setUserCount(userResult.data.length);
 
         if (user) {
           const userData = {
@@ -119,9 +117,8 @@ function DashboardPage() {
             displayName: user?.displayName || "",
           };
           if (createUser) {
-            UserManagement.upsertUser(userData).then(() =>
-              dispatch(setCreateUser(false))
-            );
+            await UserManagement.upsertUser(userData);
+            dispatch(setCreateUser(false));
           }
           console.log("User data posted successfully");
         }
@@ -134,7 +131,7 @@ function DashboardPage() {
     };
 
     fetchData();
-  }, [resetProjects, dispatch, user, createUser]);
+  }, [resetProjects, dispatch]);
 
   return (
     <div className="lg:ml-64 mt-20 sm:ml-64">

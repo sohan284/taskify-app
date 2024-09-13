@@ -7,6 +7,7 @@ import SignUpPage from "./pages/Login/SignUpPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import FavouriteProjectsPage from "./pages/FavouriteProjectsPage";
 import TasksPage from "./pages/TasksPage";
+import TodosPage from "./pages/TodosPage";
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/favourite" element={<FavouriteProjectsPage />} />
-        <Route path="/tasks" element={<TasksPage/>} />
+        <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/todos" element={<TodosPage />} />
       </Route>
       <Route path="/login" element={<LoginPage />}></Route>
       <Route path="/signup" element={<SignUpPage />}></Route>

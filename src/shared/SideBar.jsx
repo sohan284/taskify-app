@@ -19,6 +19,8 @@ import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined"; // Added import for the dropdown arrow icon
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
+import { FcTodoList } from "react-icons/fc";
+
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -27,9 +29,7 @@ function SideBar(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [projectsMenuAnchorEl, setProjectsMenuAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const projectsMenuOpen = Boolean(projectsMenuAnchorEl);
   const [isClosing, setIsClosing] = useState(false);
   const [collapseProjects, setCollapseProjects] = useState(false);
   const handleDrawerClose = () => {
@@ -57,10 +57,6 @@ function SideBar(props) {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleProjectsMenuClose = () => {
-    setProjectsMenuAnchorEl(null);
   };
 
   const handleSignOut = () => {
@@ -152,34 +148,21 @@ function SideBar(props) {
             />
             Tasks
           </Button>
-          <Menu
-            anchorEl={projectsMenuAnchorEl}
-            open={projectsMenuOpen}
-            onClose={handleProjectsMenuClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "left",
+          <Button
+            className="flex  items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#888888",
+              justifyContent: "flex-start",
             }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "left",
-            }}
-            PaperProps={{
-              style: {
-                width: "200px", // Set the width to match the button
-              },
-            }}
+            onClick={() => handleNavigate("/todos")}
           >
-            <MenuItem onClick={() => handleNavigate("/projects")}>
-              Manage Projects
-            </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/projects/favourite")}>
-              Favorite Projects
-            </MenuItem>
-            <MenuItem onClick={() => handleNavigate("/projects")}>
-              Tags
-            </MenuItem>
-          </Menu>
+            <FcTodoList
+              style={{ color: "3f51b5", fontSize: "24" }}
+              className="mr-4"
+            />
+            Todos
+          </Button>
         </div>
       </div>
     </div>
