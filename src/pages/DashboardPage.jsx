@@ -5,7 +5,7 @@ import EventsTab from "../components/DashboardPage/EventsTab";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
-import { setResetProjects } from "../store/features/projectSlice";
+import { setReloadPages } from "../store/features/projectSlice";
 import Loading from "../shared/Loading";
 import TaskManagement from "../service/Task";
 import auth from "../firebase.init";
@@ -17,7 +17,7 @@ import TodoManagement from "../service/Todo";
 function DashboardPage() {
   const [user] = useAuthState(auth);
   const dispatch = useDispatch();
-  const resetProjects = useSelector((state) => state.project.resetProjects);
+  const reloadPage = useSelector((state) => state.reload.reloadPage);
   const createUser = useSelector((state) => state.user.createUser);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -126,12 +126,12 @@ function DashboardPage() {
         setError(err);
       } finally {
         setLoading(false);
-        dispatch(setResetProjects(false));
+        dispatch(setReloadPages(false));
       }
     };
 
     fetchData();
-  }, [resetProjects, dispatch]);
+  }, [reloadPage, dispatch]);
 
   return (
     <div className="lg:ml-64 mt-20 sm:ml-64">

@@ -13,14 +13,14 @@ import moment from "moment";
 import PropTypes from "prop-types";
 import TodoManagement from "../../service/Todo";
 import { useDispatch } from "react-redux";
-import { setResetProjects } from "../../store/features/projectSlice";
+import { setReloadPages } from "../../store/features/projectSlice";
 
 const TodosTable = ({ todos, setTodos }) => {
   const dispatch = useDispatch();
   const updateTodoStatus = async (id, status) => {
     try {
       await TodoManagement.updateTodoStatus(id, { status }).then(() =>
-        dispatch(setResetProjects(true))
+        dispatch(setReloadPages(true))
       );
       setTodos((prevTodos) =>
         prevTodos.map((todo) => (todo._id === id ? { ...todo, status } : todo))
@@ -120,7 +120,7 @@ const TodosTable = ({ todos, setTodos }) => {
 };
 
 TodosTable.propTypes = {
-    setTodos: PropTypes.any,
+  setTodos: PropTypes.any,
   todos: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

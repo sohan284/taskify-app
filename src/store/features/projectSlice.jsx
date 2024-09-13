@@ -1,16 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  resetProjects: false,
+  reloadPages: false,
 };
 const projectSlice = createSlice({
   name: "project",
   initialState,
   reducers: {
-    setResetProjects: (state, action) => {
-      state.resetProjects = action.payload;
+    setReloadPages: (state, action) => {
+      state.reloadPages = action.payload;
     },
   },
 });
-export const { setResetProjects } = projectSlice.actions;
+export const { setReloadPages } = projectSlice.actions;
 export default projectSlice.reducer;

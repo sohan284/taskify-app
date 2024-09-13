@@ -18,13 +18,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setResetProjects } from "../../store/features/projectSlice";
+import { setReloadPages } from "../../store/features/projectSlice";
 import TaskManagement from "../../service/Task";
 import ProjectManagement from "../../service/Project";
 
 const CreateTaskDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
-  const [projects, setProjects] = useState(null)
+  const [projects, setProjects] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     status: "",
@@ -41,9 +41,11 @@ const CreateTaskDialog = ({ open, onClose }) => {
     const fetchData = async () => {
       try {
         // get projects
-        await ProjectManagement.getProjectList().then((res) => setProjects(res.data))
+        await ProjectManagement.getProjectList().then((res) =>
+          setProjects(res.data)
+        );
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     };
 
@@ -73,7 +75,7 @@ const CreateTaskDialog = ({ open, onClose }) => {
       .then(() => {
         toast.success("Project Created Successfully");
         onClose();
-        dispatch(setResetProjects(true));
+        dispatch(setReloadPages(true));
       })
       .catch((error) => {
         toast.error(`${error}`);
@@ -108,7 +110,6 @@ const CreateTaskDialog = ({ open, onClose }) => {
           />
         </FormControl>
         <div className="grid grid-cols-2 gap-5">
-
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">STATUS</p>
             <Select
@@ -158,13 +159,11 @@ const CreateTaskDialog = ({ open, onClose }) => {
             <MenuItem value="" disabled>
               Select Project
             </MenuItem>
-            {projects?.map(project =>
-              <MenuItem key={project?._id} value="High">{project?.title}</MenuItem>
-            )
-
-            }
-
-
+            {projects?.map((project) => (
+              <MenuItem key={project?._id} value="High">
+                {project?.title}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <div className="grid grid-cols-2 gap-5">

@@ -23,7 +23,7 @@ import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import UpdateProjectDialog from "./UpdateProjectDialog";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
-import { setResetProjects } from "../../store/features/projectSlice";
+import { setReloadPages } from "../../store/features/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
@@ -31,7 +31,7 @@ import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
-  const resetProjects = useSelector((state) => state.project.resetProjects);
+  const reloadPages = useSelector((state) => state.reload.reloadPages);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,12 +67,12 @@ const ProjectsTable = ({ API }) => {
         setError(err);
       } finally {
         setLoading(false);
-        dispatch(setResetProjects(false));
+        dispatch(setReloadPages(false));
       }
     };
 
     fetchData();
-  }, [resetProjects]);
+  }, [reloadPages]);
 
   if (loading)
     return (
@@ -136,7 +136,7 @@ const ProjectsTable = ({ API }) => {
   const handleDelete = (id) => {
     ProjectManagement.deleteProject(id)
       .then(() => {
-        dispatch(setResetProjects(true));
+        dispatch(setReloadPages(true));
         handleClose();
         toast.success("Project Delete Successfully");
       })
@@ -153,7 +153,7 @@ const ProjectsTable = ({ API }) => {
           m.id === member.id ? { ...m, status: updatedStatus } : m
         )
       );
-      dispatch(setResetProjects(true));
+      dispatch(setReloadPages(true));
       toast.success("Status Updated Successfully");
     } catch (error) {
       console.error("Error updating the status:", error);
@@ -166,7 +166,7 @@ const ProjectsTable = ({ API }) => {
       setMembers((prevMembers) =>
         prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
       );
-      dispatch(setResetProjects(true));
+      dispatch(setReloadPages(true));
       toast.success(`${message} Successfully`);
     } catch (error) {
       console.error("Error updating the favourite status:", error);
@@ -387,18 +387,18 @@ const ProjectsTable = ({ API }) => {
                               member?.status === "default"
                                 ? "#ff260056"
                                 : member?.status === "started"
-                                  ? "#7737c056"
-                                  : member?.status === "on going"
-                                    ? "#3777c056"
-                                    : "#ffd00056",
+                                ? "#7737c056"
+                                : member?.status === "on going"
+                                ? "#3777c056"
+                                : "#ffd00056",
                             color:
                               member?.status === "default"
                                 ? "red"
                                 : member?.status === "started"
-                                  ? "#ae00ff"
-                                  : member?.status === "on going"
-                                    ? "#00aeff"
-                                    : "#ff9900",
+                                ? "#ae00ff"
+                                : member?.status === "on going"
+                                ? "#00aeff"
+                                : "#ff9900",
                           }}
                           disableUnderline={true}
                           value={member?.status}

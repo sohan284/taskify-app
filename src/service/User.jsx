@@ -3,7 +3,7 @@ import axios from "axios";
 const upsertUser = async (userData) => {
   try {
     const response = await axios.post(
-      `http://localhost:5000/users`,
+      `https://taskify-server-iota.vercel.app/users`,
       userData
     );
     return response.data;
@@ -13,21 +13,22 @@ const upsertUser = async (userData) => {
     throw error;
   }
 };
-const getUserList = async ()=>{
-    try {
-        const response = await axios.get("http://localhost:5000/users");
-        return response.data;
-      } catch (error) {
-        console.error("Failed to fetch task list:", error);
-        throw error;
-      }
-}
-
+const getUserList = async () => {
+  try {
+    const response = await axios.get(
+      "https://taskify-server-iota.vercel.app/users"
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch task list:", error);
+    throw error;
+  }
+};
 
 // Attach the functions to an object
 const UserManagement = {
- upsertUser,
- getUserList,
+  upsertUser,
+  getUserList,
 };
 
 // Export the object

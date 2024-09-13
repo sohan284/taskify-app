@@ -1,10 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import project from "./features/projectSlice";
+import reload from "./features/reloadSlice";
 import user from './features/userSlice'
 
 const createReducer = () => (state, action) => {
   const combinedReducer = combineReducers({
-    project,
+    reload,
     user,
   });
 

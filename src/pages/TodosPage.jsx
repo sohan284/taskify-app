@@ -4,15 +4,14 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
-import { IoGridSharp } from "react-icons/io5";
 import TodoManagement from "../service/Todo";
 import TodosTable from "../components/TodosPage/TodosTable";
 import CreateTodosDialog from "../components/TodosPage/CreateTodosDialog";
 import { useDispatch, useSelector } from "react-redux";
-import { setResetProjects } from "../store/features/projectSlice";
+import { setReloadPages } from "../store/features/projectSlice";
 
 const TodosPage = () => {
-  const resetProjects = useSelector((state) => state.project.resetProjects);
+  const reloadPages = useSelector((state) => state.reload.reloadPages);
   const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
@@ -53,8 +52,8 @@ const TodosPage = () => {
 
   useEffect(() => {
     TodoManagement.getTodosList().then((res) => setTodos(res?.data));
-    dispatch(setResetProjects(false));
-  }, [resetProjects]);
+    dispatch(setReloadPages(false));
+  }, [reloadPages]);
 
   return (
     <div className="lg:ml-64 mt-20 sm:ml-64">

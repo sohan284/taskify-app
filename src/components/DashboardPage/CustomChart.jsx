@@ -5,16 +5,16 @@ import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurned
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
 import { IoMdAdd } from "react-icons/io";
-import { IoGridSharp } from "react-icons/io5";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { FaRegEdit } from "react-icons/fa";
+import { FaList, FaRegEdit } from "react-icons/fa";
 import TodoManagement from "../../service/Todo";
 import { useDispatch, useSelector } from "react-redux";
-import { setResetProjects } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/reloadSlice";
 import CreateTodosDialog from "../TodosPage/CreateTodosDialog";
 import { toast } from "react-toastify";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
 const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   CustomChart.propTypes = {
@@ -24,8 +24,9 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
     labels: PropTypes.array,
   };
 
-  const resetProjects = useSelector((state) => state.project.resetProjects);
+  const reloadPage = useSelector((state) => state.reload.reloadPage);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [todos, setTodos] = useState([]);
   const [options] = useState({
@@ -57,12 +58,12 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
       } catch (err) {
         console.log(err);
       } finally {
-        dispatch(setResetProjects(false));
+        dispatch(setReloadPage(false));
       }
     };
 
     fetchData();
-  }, [resetProjects]);
+  }, [reloadPage]);
 
   // Calculate the total series values
   const totalSeries = Array.isArray(series)
@@ -72,7 +73,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   const updateTodoStatus = async (id, status) => {
     try {
       await TodoManagement.updateTodoStatus(id, { status }).then(() =>
-        dispatch(setResetProjects(true))
+        dispatch(setReloadPage(true))
       );
       setTodos((prevTodos) =>
         prevTodos.map((todo) => (todo._id === id ? { ...todo, status } : todo))
@@ -91,7 +92,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   const handleDeleteTodos = (id) => {
     TodoManagement.deleteTodos(id)
       .then(() => {
-        dispatch(setResetProjects(true));
+        dispatch(setReloadPage(true));
         handleClose();
         toast.success("Todos Delete Successfully");
       })
@@ -108,8 +109,8 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
             <div className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white">
               <IoMdAdd onClick={() => setOpen(true)} />
             </div>
-            <div className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 rounded hover:text-xl text-white">
-              <IoGridSharp />
+            <div className="bg-[#6479f3] text-xs mr-5 px-3 pt-2.5 rounded hover:text-sm text-white">
+              <FaList onClick={() => navigate("/todos")} />
             </div>
           </div>
           <CreateTodosDialog open={open} onClose={handleClose} />
@@ -122,7 +123,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
       </div>
       {title === "Todos Overview" ? (
         <div className="ml-10 my-5">
-          {todos.slice(0,5).map((todo, index) => (
+          {todos.slice(0, 5).map((todo, index) => (
             <div key={index}>
               <div className="text-[gray] flex justify-between w-[50%]">
                 <FormControlLabel

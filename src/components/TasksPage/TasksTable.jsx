@@ -22,7 +22,7 @@ import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { toast } from "react-toastify";
 import TaskManagement from "../../service/Task";
-import { setResetProjects} from "../../store/features/projectSlice";
+import { setReloadPages } from "../../store/features/projectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
@@ -31,7 +31,7 @@ import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
-  const resetProjects = useSelector((state) => state.project.resetProjects);
+  const reloadPages = useSelector((state) => state.reload.reloadPages);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,14 +67,19 @@ const TasksTable = ({ API }) => {
         setError(err);
       } finally {
         setLoading(false);
-        dispatch(setResetProjects(false));
+        dispatch(setReloadPages(false));
       }
     };
 
     fetchData();
-  }, [resetProjects]);
+  }, [reloadPages]);
 
-  if (loading) return <div><Loading/></div>;
+  if (loading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
@@ -131,7 +136,7 @@ const TasksTable = ({ API }) => {
   const handleDelete = (id) => {
     TaskManagement.deleteTask(id)
       .then(() => {
-        dispatch(setResetProjects(true));
+        dispatch(setReloadPages(true));
         handleClose();
         toast.success("Task Delete Successfully");
       })
@@ -140,7 +145,7 @@ const TasksTable = ({ API }) => {
       });
   };
   const handleStatusChange = async (e, member) => {
-    console.log(e.target.value)
+    console.log(e.target.value);
     const updatedStatus = e.target.value;
     try {
       await TaskManagement.updateTaskStatus(member._id, updatedStatus);
@@ -149,7 +154,7 @@ const TasksTable = ({ API }) => {
           m.id === member.id ? { ...m, status: updatedStatus } : m
         )
       );
-      dispatch(setResetProjects(true));
+      dispatch(setReloadPages(true));
       toast.success("Status Updated Successfully");
     } catch (error) {
       console.error("Error updating the status:", error);
@@ -248,7 +253,7 @@ const TasksTable = ({ API }) => {
                         </div>
                       </TableCell>
                     )}
-                   {visibleColumns?.users && (
+                    {visibleColumns?.users && (
                       <TableCell>
                         <div className="flex items-center">
                           {Array.isArray(member?.users)
@@ -502,6 +507,6 @@ const TasksTable = ({ API }) => {
   );
 };
 TasksTable.propTypes = {
-  API: PropTypes
+  API: PropTypes,
 };
 export default TasksTable;

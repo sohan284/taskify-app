@@ -3,7 +3,7 @@ import axios from "axios";
 const createTask = async (taskData) => {
   try {
     const response = await axios.post(
-      `http://localhost:5000/tasks`,
+      `https://taskify-server-iota.vercel.app/tasks`,
       taskData
     );
     return response.data;
@@ -15,7 +15,9 @@ const createTask = async (taskData) => {
 };
 const getTaskList = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/tasks");
+    const response = await axios.get(
+      "https://taskify-server-iota.vercel.app/tasks"
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to fetch task list:", error);
@@ -25,7 +27,7 @@ const getTaskList = async () => {
 const updateTask = async (id, data) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/tasks/${id}`,
+      `https://taskify-server-iota.vercel.app/tasks/${id}`,
       data
     ); // Replace with your API endpoint
     return response.data;
@@ -36,7 +38,9 @@ const updateTask = async (id, data) => {
 };
 const deleteTask = async (id) => {
   try {
-    const response = await axios.delete(`http://localhost:5000/tasks/${id}`); // Replace with your API endpoint
+    const response = await axios.delete(
+      `https://taskify-server-iota.vercel.app/tasks/${id}`
+    ); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update task list:", error);
@@ -46,7 +50,7 @@ const deleteTask = async (id) => {
 const updateTaskStatus = async (taskId, status) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/tasks/${taskId}`,
+      `https://taskify-server-iota.vercel.app/tasks/${taskId}`,
       { status }
     );
     if (response.data.success) {
@@ -58,7 +62,6 @@ const updateTaskStatus = async (taskId, status) => {
     console.error("Error updating task status:", error);
   }
 };
-
 
 // Attach the functions to an object
 const TaskManagement = {

@@ -3,7 +3,7 @@ import axios from "axios";
 const createProject = async (projectData) => {
   try {
     const response = await axios.post(
-      `http://localhost:5000/projects`,
+      `https://taskify-server-iota.vercel.app/projects`,
       projectData
     );
     return response.data;
@@ -15,7 +15,9 @@ const createProject = async (projectData) => {
 };
 const getProjectList = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/projects");
+    const response = await axios.get(
+      "https://taskify-server-iota.vercel.app/projects"
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to fetch project list:", error);
@@ -25,7 +27,7 @@ const getProjectList = async () => {
 const updateProject = async (id, data) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/projects/${id}`,
+      `https://taskify-server-iota.vercel.app/projects/${id}`,
       data
     ); // Replace with your API endpoint
     return response.data;
@@ -36,7 +38,9 @@ const updateProject = async (id, data) => {
 };
 const deleteProject = async (id) => {
   try {
-    const response = await axios.delete(`http://localhost:5000/projects/${id}`); // Replace with your API endpoint
+    const response = await axios.delete(
+      `https://taskify-server-iota.vercel.app/projects/${id}`
+    ); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update project list:", error);
@@ -46,7 +50,7 @@ const deleteProject = async (id) => {
 const updateProjectStatus = async (projectId, status) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/projects/${projectId}`,
+      `https://taskify-server-iota.vercel.app/projects/${projectId}`,
       { status }
     );
     if (response.data.success) {
@@ -61,7 +65,7 @@ const updateProjectStatus = async (projectId, status) => {
 const getFavouriteProjectList = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:5000/projects/favourite"
+      "https://taskify-server-iota.vercel.app/projects/favourite"
     );
     return response.data;
   } catch (error) {
@@ -72,7 +76,7 @@ const getFavouriteProjectList = async () => {
 const updateProjectFavourite = async (projectId, favourite) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/projects/${projectId}`,
+      `https://taskify-server-iota.vercel.app/projects/${projectId}`,
       { favourite }
     );
     if (response.data.success) {

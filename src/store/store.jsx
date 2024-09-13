@@ -1,11 +1,11 @@
 
 
 import { configureStore } from "@reduxjs/toolkit";
-import project from "./features/projectSlice";
+import reload from "./features/reloadSlice";
 import user from './features/userSlice'
 const store = configureStore({
   reducer: {
-    project: project,
+    reload: reload,
     user:user,
   },
 });

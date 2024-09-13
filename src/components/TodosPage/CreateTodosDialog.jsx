@@ -14,7 +14,7 @@ import {
 
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setResetProjects } from "../../store/features/projectSlice";
+import { setReloadPages } from "../../store/features/projectSlice";
 import { IoMdClose } from "react-icons/io";
 import TodoManagement from "../../service/Todo";
 const CreateTodosDialog = ({ open, onClose }) => {
@@ -48,7 +48,7 @@ const CreateTodosDialog = ({ open, onClose }) => {
           status: false,
           date: new Date(),
         });
-        dispatch(setResetProjects(true));
+        dispatch(setReloadPages(true));
       })
       .catch((error) => {
         toast.error(`${error}`);
@@ -106,7 +106,7 @@ const CreateTodosDialog = ({ open, onClose }) => {
               <MenuItem value="High">High</MenuItem>
               <MenuItem value="Medium">Medium</MenuItem>
               <MenuItem value="Low">Low</MenuItem>
-             </Select>
+            </Select>
           </FormControl>
           <FormControl fullWidth margin="dense">
             <p className="text-xs text-gray-500">DESCRIPTION</p>
