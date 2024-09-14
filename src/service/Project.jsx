@@ -13,10 +13,10 @@ const createProject = async (projectData) => {
     throw error;
   }
 };
-const getProjectList = async () => {
+const getProjectList = async (status = "", user = "") => {
   try {
     const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/projects"
+      `https://taskify-server-iota.vercel.app/projects?status=${status}&user=${user}`
     );
     return response.data;
   } catch (error) {

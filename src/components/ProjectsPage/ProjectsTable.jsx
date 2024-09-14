@@ -29,9 +29,13 @@ import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 // import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
+import StatusFilter from "./StatusFilter";
+import { setFilter } from "../../store/features/projectSlice";
+import UserFilter from "./UserFilter";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const filter = useSelector((state) => state.project.filter);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +57,8 @@ const ProjectsTable = ({ API }) => {
   });
   const [open, setOpen] = useState(false);
   const [memberId, setMemberId] = useState(null);
-
+  const [statusFilter, setStatusFilter] = useState("");
+  const [userFilter, setUserFilter] = useState("");
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -61,25 +66,21 @@ const ProjectsTable = ({ API }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await API();
+        const result = await API(statusFilter,userFilter);
         setMembers(result?.data);
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
         dispatch(setReloadPage(false));
+        dispatch(setFilter(false));
       }
     };
 
     fetchData();
-  }, [reloadPage]);
+  }, [reloadPage, filter]);
 
-  if (loading)
-    return (
-      <div>
-        {/* <Loading /> */}
-      </div>
-    );
+  if (loading) return <div>{/* <Loading /> */}</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
@@ -172,8 +173,37 @@ const ProjectsTable = ({ API }) => {
       console.error("Error updating the favourite status:", error);
     }
   };
+  const handleStatusFilter = (event) => {
+    if (event.target.value === "Select Status") {
+      setStatusFilter("");
+    } else {
+      setStatusFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
+  const handleUserFilter = (event) => {
+    console.log(event.target.value);
+    if (event.target.value === "Select User") {
+      setUserFilter("");
+    } else {
+      setUserFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
   return (
     <div>
+      <div className="grid grid-cols-3 gap-5">
+        {/* status filter  */}
+        <StatusFilter
+          statusFilter={statusFilter}
+          handleStatusFilter={handleStatusFilter}
+        />
+        <UserFilter
+          userFilter={userFilter}
+          handleUserFilter={handleUserFilter}
+        />
+      </div>
+
       <Paper>
         <div style={{ margin: "10px" }}>
           <Button
@@ -508,7 +538,7 @@ const ProjectsTable = ({ API }) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={members.length}
+          count={members?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

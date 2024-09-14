@@ -25,27 +25,8 @@ function CustomTabPanel(props) {
     </div>
   );
 }
-function CustomTabPanel2(props) {
-  const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
 CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-CustomTabPanel2.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
@@ -85,7 +66,7 @@ export default function ProjectsTasksTab() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <h1 className="text-xl font-bold text-gray-500">
+        <h1 className="text-xl font-bold text-gray-500 mb-5">
           {"Admin's Projects"}
         </h1>
         <ProjectsTable API={ProjectManagement.getProjectList} />
