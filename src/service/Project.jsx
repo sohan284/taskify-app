@@ -13,10 +13,37 @@ const createProject = async (projectData) => {
     throw error;
   }
 };
-const getProjectList = async (status = "", user = "") => {
+const getProjectList = async (
+  status = "",
+  user = "",
+  client = "",
+  start_date_from = "",
+  start_date_to = "",
+  end_date_from = "",
+  end_date_to = ""
+) => {
   try {
     const response = await axios.get(
-      `https://taskify-server-iota.vercel.app/projects?status=${status}&user=${user}`
+      `https://taskify-server-iota.vercel.app/projects?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch project list:", error);
+    throw error;
+  }
+};
+const getFavouriteProjectList = async (
+  status = "",
+  user = "",
+  client = "",
+  start_date_from = "",
+  start_date_to = "",
+  end_date_from = "",
+  end_date_to = ""
+) => {
+  try {
+    const response = await axios.get(
+      `https://taskify-server-iota.vercel.app/projects/favourite?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}`
     );
     return response.data;
   } catch (error) {
@@ -62,17 +89,7 @@ const updateProjectStatus = async (projectId, status) => {
     console.error("Error updating project status:", error);
   }
 };
-const getFavouriteProjectList = async () => {
-  try {
-    const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/projects/favourite"
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Failed to fetch project list:", error);
-    throw error;
-  }
-};
+
 const updateProjectFavourite = async (projectId, favourite) => {
   try {
     const response = await axios.put(

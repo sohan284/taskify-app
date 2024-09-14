@@ -186,7 +186,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
           className="mt-10"
           multiple
           options={users}
-          getOptionLabel={(option) => option.displayName}
+          getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, clients: newValue }));

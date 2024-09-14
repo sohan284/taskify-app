@@ -32,6 +32,8 @@ import { setReloadPage } from "../../store/features/reloadSlice";
 import StatusFilter from "./StatusFilter";
 import { setFilter } from "../../store/features/projectSlice";
 import UserFilter from "./UserFilter";
+import ClientFilter from "./ClientFilter";
+import DateFilter from "./DateFilter";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -59,6 +61,9 @@ const ProjectsTable = ({ API }) => {
   const [memberId, setMemberId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [userFilter, setUserFilter] = useState("");
+  const [clientFilter, setClientFilter] = useState("");
+  const [startDates, setStartDates] = useState([]);
+  const [endDates, setEndDates] = useState([]);
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -66,7 +71,15 @@ const ProjectsTable = ({ API }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await API(statusFilter,userFilter);
+        const result = await API(
+          statusFilter,
+          userFilter,
+          clientFilter,
+          startDates[0],
+          startDates[1],
+          endDates[0],
+          endDates[1]
+        );
         setMembers(result?.data);
       } catch (err) {
         setError(err);
@@ -173,6 +186,8 @@ const ProjectsTable = ({ API }) => {
       console.error("Error updating the favourite status:", error);
     }
   };
+
+  //  status filter
   const handleStatusFilter = (event) => {
     if (event.target.value === "Select Status") {
       setStatusFilter("");
@@ -181,8 +196,8 @@ const ProjectsTable = ({ API }) => {
     }
     dispatch(setFilter(true));
   };
+  //  user filter
   const handleUserFilter = (event) => {
-    console.log(event.target.value);
     if (event.target.value === "Select User") {
       setUserFilter("");
     } else {
@@ -190,9 +205,30 @@ const ProjectsTable = ({ API }) => {
     }
     dispatch(setFilter(true));
   };
+
+  // client filter
+  const handleClientFilter = (event) => {
+    if (event.target.value === "Select Client") {
+      setClientFilter("");
+    } else {
+      setClientFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
   return (
     <div>
       <div className="grid grid-cols-3 gap-5">
+        <DateFilter
+          dates={startDates}
+          setDates={setStartDates}
+          placeHolder="Start Between"
+        />
+
+        <DateFilter
+          dates={endDates}
+          setDates={setEndDates}
+          placeHolder="End Between"
+        />
         {/* status filter  */}
         <StatusFilter
           statusFilter={statusFilter}
@@ -201,6 +237,10 @@ const ProjectsTable = ({ API }) => {
         <UserFilter
           userFilter={userFilter}
           handleUserFilter={handleUserFilter}
+        />
+        <ClientFilter
+          clientFilter={clientFilter}
+          handleClientFilter={handleClientFilter}
         />
       </div>
 
