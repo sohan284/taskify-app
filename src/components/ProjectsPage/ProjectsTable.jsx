@@ -29,12 +29,12 @@ import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 // import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
-import StatusFilter from "./StatusFilter";
+import StatusFilter from "../shared-component/StatusFilter";
 import { setFilter } from "../../store/features/projectSlice";
-import UserFilter from "./UserFilter";
-import ClientFilter from "./ClientFilter";
-import DateFilter from "./DateFilter";
-import SearchFilter from "./SearchFilter";
+import UserFilter from "../shared-component/UserFilter";
+import ClientFilter from "../shared-component/ClientFilter";
+import DateFilter from "../shared-component/DateFilter";
+import SearchFilter from "../shared-component/SearchFilter";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);

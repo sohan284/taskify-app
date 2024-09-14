@@ -20,13 +20,25 @@ import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/projectSlice";
+import UserManagement from "../../service/User";
 
 const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
+  const [users, setUsers] = useState([]);
 
+  // useEffect(() => {
+  //   if (project) {
+  //     setFormData({
+  //       ...project,
+  //       startsAt: project.startsAt ? dayjs(project.startsAt) : null,
+  //       endsAt: project.endsAt ? dayjs(project.endsAt) : null,
+  //     });
+  //   }
+  // }, [project]);
   useEffect(() => {
     if (project) {
+      UserManagement.getUserList().then((res) => setUsers(res?.data));
       setFormData({
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,

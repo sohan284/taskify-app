@@ -22,16 +22,23 @@ import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { toast } from "react-toastify";
 import TaskManagement from "../../service/Task";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { FaRegEdit } from "react-icons/fa";
+import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-import UpdateTaskDialog from "./UpdateTasksDialog";
-import Loading from "../../shared/Loading";
+// import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { setReloadPage } from "../../store/features/reloadSlice";
+import { setFilter } from "../../store/features/projectSlice";
+import UpdateTaskDialog from "./UpdateTasksDialog";
+import DateFilter from "../shared-component/DateFilter";
+import UserFilter from "../shared-component/UserFilter";
+import ClientFilter from "../shared-component/ClientFilter";
+import SearchFilter from "../shared-component/SearchFilter";
+import StatusFilter from "../shared-component/StatusFilter";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const filter = useSelector((state) => state.project.filter);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +60,12 @@ const TasksTable = ({ API }) => {
   });
   const [open, setOpen] = useState(false);
   const [memberId, setMemberId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [userFilter, setUserFilter] = useState("");
+  const [clientFilter, setClientFilter] = useState("");
+  const [startDates, setStartDates] = useState([]);
+  const [endDates, setEndDates] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -61,25 +74,30 @@ const TasksTable = ({ API }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await API();
+        const result = await API(
+          statusFilter,
+          userFilter,
+          clientFilter,
+          startDates[0],
+          startDates[1],
+          endDates[0],
+          endDates[1],
+          searchQuery
+        );
         setMembers(result?.data);
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
         dispatch(setReloadPage(false));
+        dispatch(setFilter(false));
       }
     };
 
     fetchData();
-  }, [reloadPage]);
+  }, [reloadPage, filter]);
 
-  if (loading)
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
+  if (loading) return <div>{/* <Loading /> */}</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
@@ -114,8 +132,8 @@ const TasksTable = ({ API }) => {
     setPage(0);
   };
 
-  const handleOpenDialog = (task) => {
-    setSelectedTask(task);
+  const handleOpenDialog = (project) => {
+    setSelectedTask(project);
     setDialogOpen(true);
   };
 
@@ -141,11 +159,10 @@ const TasksTable = ({ API }) => {
         toast.success("Task Delete Successfully");
       })
       .catch((error) => {
-        console.error("Error deleting the task:", error);
+        console.error("Error deleting the project:", error);
       });
   };
   const handleStatusChange = async (e, member) => {
-    console.log(e.target.value);
     const updatedStatus = e.target.value;
     try {
       await TaskManagement.updateTaskStatus(member._id, updatedStatus);
@@ -160,44 +177,118 @@ const TasksTable = ({ API }) => {
       console.error("Error updating the status:", error);
     }
   };
+  const handleFavourite = async (member, value, message) => {
+    const favourite = value;
+    try {
+      await TaskManagement.updateTaskFavourite(member._id, favourite);
+      setMembers((prevMembers) =>
+        prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
+      );
+      dispatch(setReloadPage(true));
+      toast.success(`${message} Successfully`);
+    } catch (error) {
+      console.error("Error updating the favourite status:", error);
+    }
+  };
+
+  //  status filter
+  const handleStatusFilter = (event) => {
+    if (event.target.value === "Select Status") {
+      setStatusFilter("");
+    } else {
+      setStatusFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
+  //  user filter
+  const handleUserFilter = (event) => {
+    if (event.target.value === "Select User") {
+      setUserFilter("");
+    } else {
+      setUserFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
+
+  // client filter
+  const handleClientFilter = (event) => {
+    if (event.target.value === "Select Client") {
+      setClientFilter("");
+    } else {
+      setClientFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
   return (
     <div>
-      <Paper>
-        <div style={{ margin: "10px" }}>
-          <Button
-            variant="contained"
-            onClick={handleDeleteSelected}
-            disabled={selectedIds?.length === 0}
-            sx={{
-              marginRight: "10px",
-              backgroundColor: "white",
-              border: "1px solid #FF474C",
-              color: "#FF474C",
-              "&:hover": {
-                backgroundColor: "#FF474C",
-                color: "white",
-              },
-            }}
-          >
-            <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleSaveVisibility}
-            sx={{
-              backgroundColor: "white",
-              border: "1px solid #3f51b5",
-              color: "#3f51b5",
-              "&:hover": {
-                backgroundColor: "#3f51b5",
-                color: "white",
-              },
-            }}
-          >
-            <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
-          </Button>
-        </div>
+      <div className="grid grid-cols-3 gap-5">
+        <DateFilter
+          dates={startDates}
+          setDates={setStartDates}
+          placeHolder="Start Between"
+        />
 
+        <DateFilter
+          dates={endDates}
+          setDates={setEndDates}
+          placeHolder="End Between"
+        />
+        {/* status filter  */}
+        <StatusFilter
+          statusFilter={statusFilter}
+          handleStatusFilter={handleStatusFilter}
+        />
+        <UserFilter
+          userFilter={userFilter}
+          handleUserFilter={handleUserFilter}
+        />
+        <ClientFilter
+          clientFilter={clientFilter}
+          handleClientFilter={handleClientFilter}
+        />
+      </div>
+
+      <Paper>
+        <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
+          <div className="flex h-10 text-nowrap">
+            <Button
+              variant="contained"
+              onClick={handleDeleteSelected}
+              disabled={selectedIds?.length === 0}
+              sx={{
+                marginRight: "10px",
+                backgroundColor: "white",
+                border: "1px solid #FF474C",
+                color: "#FF474C",
+                "&:hover": {
+                  backgroundColor: "#FF474C",
+                  color: "white",
+                },
+              }}
+            >
+              <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSaveVisibility}
+              sx={{
+                backgroundColor: "white",
+                border: "1px solid #3f51b5",
+                color: "#3f51b5",
+                "&:hover": {
+                  backgroundColor: "#3f51b5",
+                  color: "white",
+                },
+              }}
+            >
+              <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
+            </Button>
+          </div>
+          <SearchFilter
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        </div>
         <TableContainer>
           <Table
             sx={{
@@ -220,6 +311,7 @@ const TasksTable = ({ API }) => {
                     onChange={handleSelectAll}
                   />
                 </TableCell>
+                {visibleColumns?.id && <TableCell>ID</TableCell>}
                 {visibleColumns?.title && <TableCell>TITLE</TableCell>}
                 {visibleColumns?.users && <TableCell>USERS</TableCell>}
                 {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
@@ -235,7 +327,7 @@ const TasksTable = ({ API }) => {
             <TableBody className="text-nowrap">
               {members
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ?.map((member) => (
+                ?.map((member, index) => (
                   <TableRow key={member?.id}>
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -243,12 +335,36 @@ const TasksTable = ({ API }) => {
                         onChange={() => handleSelect(member?.id)}
                       />
                     </TableCell>
+                    {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
                     {visibleColumns?.title && (
                       <TableCell>
                         <div className="flex">
                           <p className="mr-3 text-[#5b6edd] font-semibold">
                             {member?.title}
                           </p>
+                          {member?.favourite ? (
+                            <FaStar
+                              onClick={() =>
+                                handleFavourite(
+                                  member,
+                                  false,
+                                  "Remove from Favourite"
+                                )
+                              }
+                              className="mt-1 text-[orange] mr-3 text-[15px]"
+                            />
+                          ) : (
+                            <FaRegStar
+                              onClick={() =>
+                                handleFavourite(
+                                  member,
+                                  true,
+                                  "Added to favourite"
+                                )
+                              }
+                              className="mt-1 text-[orange] mr-3 text-[15px]"
+                            />
+                          )}
                           <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
                         </div>
                       </TableCell>
@@ -335,6 +451,7 @@ const TasksTable = ({ API }) => {
                         </div>
                       </TableCell>
                     )}
+
                     {visibleColumns?.status && (
                       <TableCell>
                         <NativeSelect
@@ -470,7 +587,7 @@ const TasksTable = ({ API }) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={members.length}
+          count={members?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -487,7 +604,7 @@ const TasksTable = ({ API }) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Are you sure want to delete this task ?"}
+          {"Are you sure want to delete this project ?"}
         </DialogTitle>
 
         <DialogActions>
@@ -500,13 +617,13 @@ const TasksTable = ({ API }) => {
       <UpdateTaskDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        task={selectedTask}
+        project={selectedTask}
         onSave={handleSaveDialog}
       />
     </div>
   );
 };
 TasksTable.propTypes = {
-  API: PropTypes,
+  API: PropTypes.func.isRequired,
 };
 export default TasksTable;
