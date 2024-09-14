@@ -20,11 +20,12 @@ const getProjectList = async (
   start_date_from = "",
   start_date_to = "",
   end_date_from = "",
-  end_date_to = ""
+  end_date_to = "",
+  search = ""
 ) => {
   try {
     const response = await axios.get(
-      `https://taskify-server-iota.vercel.app/projects?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}`
+      `https://taskify-server-iota.vercel.app/projects?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {
@@ -39,11 +40,12 @@ const getFavouriteProjectList = async (
   start_date_from = "",
   start_date_to = "",
   end_date_from = "",
-  end_date_to = ""
+  end_date_to = "",
+  search = ""
 ) => {
   try {
     const response = await axios.get(
-      `https://taskify-server-iota.vercel.app/projects/favourite?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}`
+      `https://taskify-server-iota.vercel.app/projects/favourite?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {

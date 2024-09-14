@@ -20,8 +20,8 @@ const DateFilter = ({ setDates, placeHolder }) => {
   };
 
   return (
-    <Space direction="vertical" size={100}>
-      <RangePicker placeholder={placeHolder} onChange={handleChange} />
+    <Space direction="vertical">
+      <RangePicker className="w-full" placeholder={placeHolder} onChange={handleChange} />
     </Space>
   );
 };

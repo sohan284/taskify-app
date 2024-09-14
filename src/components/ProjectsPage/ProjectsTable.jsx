@@ -34,6 +34,7 @@ import { setFilter } from "../../store/features/projectSlice";
 import UserFilter from "./UserFilter";
 import ClientFilter from "./ClientFilter";
 import DateFilter from "./DateFilter";
+import SearchFilter from "./SearchFilter";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -64,6 +65,8 @@ const ProjectsTable = ({ API }) => {
   const [clientFilter, setClientFilter] = useState("");
   const [startDates, setStartDates] = useState([]);
   const [endDates, setEndDates] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -78,7 +81,8 @@ const ProjectsTable = ({ API }) => {
           startDates[0],
           startDates[1],
           endDates[0],
-          endDates[1]
+          endDates[1],
+          searchQuery,
         );
         setMembers(result?.data);
       } catch (err) {
@@ -245,41 +249,46 @@ const ProjectsTable = ({ API }) => {
       </div>
 
       <Paper>
-        <div style={{ margin: "10px" }}>
-          <Button
-            variant="contained"
-            onClick={handleDeleteSelected}
-            disabled={selectedIds?.length === 0}
-            sx={{
-              marginRight: "10px",
-              backgroundColor: "white",
-              border: "1px solid #FF474C",
-              color: "#FF474C",
-              "&:hover": {
-                backgroundColor: "#FF474C",
-                color: "white",
-              },
-            }}
-          >
-            <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleSaveVisibility}
-            sx={{
-              backgroundColor: "white",
-              border: "1px solid #3f51b5",
-              color: "#3f51b5",
-              "&:hover": {
-                backgroundColor: "#3f51b5",
-                color: "white",
-              },
-            }}
-          >
-            <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
-          </Button>
+        <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
+          <div className="flex h-10 text-nowrap">
+            <Button
+              variant="contained"
+              onClick={handleDeleteSelected}
+              disabled={selectedIds?.length === 0}
+              sx={{
+                marginRight: "10px",
+                backgroundColor: "white",
+                border: "1px solid #FF474C",
+                color: "#FF474C",
+                "&:hover": {
+                  backgroundColor: "#FF474C",
+                  color: "white",
+                },
+              }}
+            >
+              <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSaveVisibility}
+              sx={{
+                backgroundColor: "white",
+                border: "1px solid #3f51b5",
+                color: "#3f51b5",
+                "&:hover": {
+                  backgroundColor: "#3f51b5",
+                  color: "white",
+                },
+              }}
+            >
+              <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
+            </Button>
+          </div>
+          <SearchFilter
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
         </div>
-
         <TableContainer>
           <Table
             sx={{
