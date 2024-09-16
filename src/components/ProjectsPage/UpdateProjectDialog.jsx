@@ -10,6 +10,7 @@ import {
   Select,
   FormControl,
   MenuItem,
+  NativeSelect,
   Autocomplete,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -21,11 +22,15 @@ import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
+import StatusManagement from "../../service/Status";
 
 const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
+  const [statuses, setStatuses] = useState([]);
   const dispatch = useDispatch();
+  const [color, setColor] = useState([]);
   const [users, setUsers] = useState([]);
+
   useEffect(() => {
     if (project) {
       UserManagement.getUserList().then((res) => setUsers(res?.data));
@@ -33,6 +38,11 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,
         endsAt: project.endsAt ? dayjs(project.endsAt) : null,
+        status: project.status || {}, // Initialize status as an object
+      });
+      StatusManagement.getStatusList().then((res) => {
+        setStatuses(res.data);
+        setColor(res?.data[0]?.bgColor);
       });
     }
   }, [project]);
@@ -40,6 +50,17 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleStatusChange = (event) => {
+    const selectedStatus = statuses.find(
+      (status) => status.title === event.target.value
+    );
+    setFormData((prev) => ({
+      ...prev,
+      status: selectedStatus || {}, // Set the full status object
+    }));
+    setColor(selectedStatus.bgColor); // Change the color as per selected status
   };
 
   const handleDateChange = (name, date) => {
@@ -95,16 +116,34 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
           </FormControl>
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">STATUS</p>
-            <Select
+            <NativeSelect
               name="status"
-              value={formData.status || ""}
-              onChange={handleChange}
+              style={{
+                fontSize: "12px",
+                borderRadius: "5px",
+                height: "56px",
+                border: "1px solid gray",
+                textAlign: "center",
+                backgroundColor: color,
+              }}
+              onChange={handleStatusChange} // Change handler for status
+              disableUnderline={true}
+              value={formData.status?.title || ""} // Bind to formData.status.title
             >
-              <MenuItem value="started">Started</MenuItem>
-              <MenuItem value="on going">On Going</MenuItem>
-              <MenuItem value="default">Default</MenuItem>
-              <MenuItem value="in review">In Review</MenuItem>
-            </Select>
+              {statuses?.map((el) => (
+                <option
+                  key={el.title}
+                  style={{
+                    backgroundColor: el.bgColor,
+                    color: el.txColor,
+                    textAlign: "center",
+                  }}
+                  value={el.title}
+                >
+                  {el.title}
+                </option>
+              ))}
+            </NativeSelect>
           </FormControl>
         </div>
 
@@ -167,7 +206,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
           multiple
           options={users} // Use the fetched users list
           getOptionLabel={(option) => option.displayName || option?.email} // Assuming the user has a 'name' property
-          value={formData.users}
+          value={formData.users || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
           }}
@@ -236,39 +275,11 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   );
 };
 
-// Define prop types
 UpdateProjectDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  project: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    status: PropTypes.string,
-    priority: PropTypes.string,
-    budget: PropTypes.string,
-    startsAt: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    endsAt: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    users: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        image: PropTypes.string,
-      })
-    ),
-    clients: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        image: PropTypes.string,
-      })
-    ),
-    tags: PropTypes.arrayOf(PropTypes.string),
-  }),
+  project: PropTypes.object,
   onSave: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-};
-
-// Define default props (if necessary)
-UpdateProjectDialog.defaultProps = {
-  project: null,
 };
 
 export default UpdateProjectDialog;

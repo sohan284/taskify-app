@@ -13,6 +13,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import UserManagement from "../service/User";
 import { setCreateUser } from "../store/features/userSlice";
 import TodoManagement from "../service/Todo";
+import StatusManagement from "../service/Status";
 
 function DashboardPage() {
   const [user] = useAuthState(auth);
@@ -60,13 +61,23 @@ function DashboardPage() {
 
         // Aggregate data for the charts
         const projectsCounts = projects.reduce((acc, project) => {
-          const status = project.status;
+          // Access the status property of the status object
+          const status = project.status?.title;
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         }, {});
-        const projectLabels = Object.keys(projectsCounts);
-        const projectSeries = Object.values(projectsCounts);
 
+        let projectLabels = [];
+        let projectColors = [];
+        const statusResult = await StatusManagement.getStatusList();
+        statusResult.data.forEach((status) => {
+          projectColors.push(status.txColor);
+          projectLabels.push(status.title);
+        });
+        const projectSeries = projectLabels.map(
+          (label) => projectsCounts[label] || 0
+        );
+        console.log(projectSeries);
         // Get tasks
         const taskResult = await TaskManagement.getTaskList();
         const tasks = taskResult?.data || [];
@@ -90,7 +101,7 @@ function DashboardPage() {
             title: "Project Statistics",
             series: projectSeries,
             labels: projectLabels,
-            colors: ["#70d100", "#00b9d1", "#ebb400", "#852bfa"],
+            colors: projectColors,
           },
           {
             title: "Task Statistics",

@@ -35,6 +35,7 @@ import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
 import DateFilter from "../shared-component/DateFilter";
 import SearchFilter from "../shared-component/SearchFilter";
+import StatusManagement from "../../service/Status";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -66,6 +67,7 @@ const ProjectsTable = ({ API }) => {
   const [startDates, setStartDates] = useState([]);
   const [endDates, setEndDates] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statuses, setStatuses] = useState(null);
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -82,9 +84,11 @@ const ProjectsTable = ({ API }) => {
           startDates[1],
           endDates[0],
           endDates[1],
-          searchQuery,
+          searchQuery
         );
+
         setMembers(result?.data);
+        StatusManagement.getStatusList().then((res) => setStatuses(res.data));
       } catch (err) {
         setError(err);
       } finally {
@@ -163,7 +167,14 @@ const ProjectsTable = ({ API }) => {
       });
   };
   const handleStatusChange = async (e, member) => {
-    const updatedStatus = e.target.value;
+    console.log(statuses);
+    console.log(e.target.value);
+
+    const updatedStatus = statuses?.find(
+      (status) => status.title == e.target.value
+    );
+    console.log(updatedStatus);
+
     try {
       await ProjectManagement.updateProjectStatus(member._id, updatedStatus);
       setMembers((prevMembers) =>
@@ -191,15 +202,6 @@ const ProjectsTable = ({ API }) => {
     }
   };
 
-  //  status filter
-  const handleStatusFilter = (event) => {
-    if (event.target.value === "Select Status") {
-      setStatusFilter("");
-    } else {
-      setStatusFilter(event.target.value);
-    }
-    dispatch(setFilter(true));
-  };
   //  user filter
   const handleUserFilter = (event) => {
     if (event.target.value === "Select User") {
@@ -236,7 +238,7 @@ const ProjectsTable = ({ API }) => {
         {/* status filter  */}
         <StatusFilter
           statusFilter={statusFilter}
-          handleStatusFilter={handleStatusFilter}
+          setStatusFilter={setStatusFilter}
         />
         <UserFilter
           userFilter={userFilter}
@@ -462,67 +464,26 @@ const ProjectsTable = ({ API }) => {
                             height: "28px",
                             width: "200px",
                             textAlign: "center",
-                            backgroundColor:
-                              member?.status === "default"
-                                ? "#ff260056"
-                                : member?.status === "started"
-                                ? "#7737c056"
-                                : member?.status === "on going"
-                                ? "#3777c056"
-                                : "#ffd00056",
-                            color:
-                              member?.status === "default"
-                                ? "red"
-                                : member?.status === "started"
-                                ? "#ae00ff"
-                                : member?.status === "on going"
-                                ? "#00aeff"
-                                : "#ff9900",
+                            backgroundColor: member?.status?.bgColor,
+                            color: member?.status?.txColor,
                           }}
                           disableUnderline={true}
-                          value={member?.status}
+                          value={member?.status?.title}
                           onChange={(e) => handleStatusChange(e, member)}
                         >
-                          <option
-                            style={{
-                              backgroundColor: "#ff260056",
-                              color: "red",
-                              textAlign: "center",
-                            }}
-                            value="default"
-                          >
-                            Default
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#7737c056",
-                              color: "#ae00ff",
-                              textAlign: "center",
-                            }}
-                            value="started"
-                          >
-                            Started
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#3777c056",
-                              color: "#00aeff",
-                              textAlign: "center",
-                            }}
-                            value="on going"
-                          >
-                            On Going
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#ffd00056",
-                              color: "#ff9900",
-                              textAlign: "center",
-                            }}
-                            value="in review"
-                          >
-                            In Review
-                          </option>
+                          {statuses?.map((status) => (
+                            <option
+                              key={status._id}
+                              style={{
+                                backgroundColor: status.bgColor,
+                                color: status.txColor,
+                                textAlign: "center",
+                              }}
+                              value={status?.title || "Default"}
+                            >
+                              {status?.title || "Default"}
+                            </option>
+                          ))}
                         </NativeSelect>
                       </TableCell>
                     )}

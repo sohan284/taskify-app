@@ -1,7 +1,24 @@
 import { FormControl, MenuItem, Select } from "@mui/material";
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import StatusManagement from "../../service/Status";
+import { useDispatch } from "react-redux";
+import { setFilter } from "../../store/features/projectSlice";
 
-const StatusFilter = ({ statusFilter, handleStatusFilter }) => {
+const StatusFilter = ({ statusFilter, setStatusFilter }) => {
+  const dispatch = useDispatch();
+  const [statuses, setStatuses] = useState();
+  useEffect(() => {
+    StatusManagement.getStatusList().then((res) => setStatuses(res.data));
+  }, []);
+  const handleStatusFilter = (event) => {
+    if (event.target.value === "Select Status") {
+      setStatusFilter("");
+    } else {
+      setStatusFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
   return (
     <div>
       <FormControl fullWidth size="small">
@@ -18,24 +35,15 @@ const StatusFilter = ({ statusFilter, handleStatusFilter }) => {
           >
             Select Status
           </MenuItem>
-          <MenuItem style={{ color: "gray", fontSize: "14px" }} value="default">
-            Default
-          </MenuItem>
-          <MenuItem style={{ color: "gray", fontSize: "14px" }} value="started">
-            Started
-          </MenuItem>
-          <MenuItem
-            style={{ color: "gray", fontSize: "14px" }}
-            value="in review"
-          >
-            In Review
-          </MenuItem>
-          <MenuItem
-            style={{ color: "gray", fontSize: "14px" }}
-            value="on going"
-          >
-            On Going
-          </MenuItem>
+          {statuses?.map((status) => (
+            <MenuItem
+              key={status?.id}
+              style={{ color: "gray", fontSize: "14px" }}
+              value={status?.title}
+            >
+              {status?.title}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
     </div>
@@ -44,7 +52,7 @@ const StatusFilter = ({ statusFilter, handleStatusFilter }) => {
 
 StatusFilter.propTypes = {
   statusFilter: PropTypes.string.isRequired,
-  handleStatusFilter: PropTypes.func.isRequired,
+  setStatusFilter: PropTypes.string.isRequired,
 };
 
 export default StatusFilter;

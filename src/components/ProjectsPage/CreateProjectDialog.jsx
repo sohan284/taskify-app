@@ -64,20 +64,20 @@ const CreateProjectDialog = ({ open, onClose }) => {
   }, [dispatch]);
 
   const handleChange = (event) => {
+    const { name, value } = event.target;
     StatusManagement.getStatusList().then((res) => {
       // Find the matching status based on event value
       const selectedStatus = res.data.find((status) => status.title === value);
-  
       // If a matching status is found, set the background color
       if (selectedStatus) {
         setColor(selectedStatus.bgColor);
       }
-  
+
       // Set statuses and form data after fetching
       setStatuses(res.data);
+      
+      setFormData((prev) => ({ ...prev, [name]: selectedStatus }));
     });
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleDateChange = (name, date) => {
