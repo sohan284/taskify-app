@@ -252,7 +252,7 @@ const ProjectsTable = ({ API }) => {
 
       <Paper>
         <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
-          <div className="flex h-10 text-nowrap">
+          <div className="flex h-10 lg:text-nowrap overflow-auto" >
             <Button
               variant="contained"
               onClick={handleDeleteSelected}

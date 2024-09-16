@@ -145,7 +145,7 @@ function DashboardPage() {
   }, [reloadPage, dispatch]);
 
   return (
-    <div className="lg:ml-64 mt-20 sm:ml-64">
+    <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       {loading ? (
         <div>
           <Loading />

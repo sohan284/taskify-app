@@ -44,7 +44,7 @@ const FavouriteProjectsPage = () => {
     setOpen(false);
   };
   return (
-    <div className="lg:ml-64 mt-20 sm:ml-64">
+    <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       <div className="flex justify-between">
         <Stack className="py-5" spacing={2}>
           <Breadcrumbs separator="›" aria-label="breadcrumb">
