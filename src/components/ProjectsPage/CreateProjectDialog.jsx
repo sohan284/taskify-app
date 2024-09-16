@@ -12,6 +12,7 @@ import {
   FormControl,
   MenuItem,
   Autocomplete,
+  NativeSelect,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -22,11 +23,14 @@ import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import Loading from "../../shared/Loading";
+import StatusManagement from "../../service/Status";
 
 const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]); // Users fetched from API
   const [loading, setLoading] = useState(true);
+  const [statuses, setStatuses] = useState([]);
+  const [color, setColor] = useState([]);
   // const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -40,12 +44,14 @@ const CreateProjectDialog = ({ open, onClose }) => {
     tags: [],
     favourite: true,
   });
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await UserManagement.getUserList();
         setUsers(response.data); // Set the user list
+        await StatusManagement.getStatusList().then((res) => {
+          setStatuses(res.data), setColor(res?.data[0]?.bgColor);
+        });
       } catch (err) {
         console.log(err);
       } finally {
@@ -58,6 +64,18 @@ const CreateProjectDialog = ({ open, onClose }) => {
   }, [dispatch]);
 
   const handleChange = (event) => {
+    StatusManagement.getStatusList().then((res) => {
+      // Find the matching status based on event value
+      const selectedStatus = res.data.find((status) => status.title === value);
+  
+      // If a matching status is found, set the background color
+      if (selectedStatus) {
+        setColor(selectedStatus.bgColor);
+      }
+  
+      // Set statuses and form data after fetching
+      setStatuses(res.data);
+    });
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -124,21 +142,34 @@ const CreateProjectDialog = ({ open, onClose }) => {
           </FormControl>
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">STATUS</p>
-            <Select
+            <NativeSelect
               name="status"
-              value={formData.status}
+              style={{
+                fontSize: "12px",
+                borderRadius: "5px",
+                height: "56px",
+                border: "1px solid gray",
+                textAlign: "center",
+                backgroundColor: color,
+              }}
               onChange={handleChange}
-              displayEmpty
-              placeholder="Select status"
+              disableUnderline={true}
+              value={formData.status || ""} // Bind to formData.status
             >
-              <MenuItem value="" disabled>
-                Select status
-              </MenuItem>
-              <MenuItem value="started">Started</MenuItem>
-              <MenuItem value="on going">On Going</MenuItem>
-              <MenuItem value="default">Default</MenuItem>
-              <MenuItem value="in review">In Review</MenuItem>
-            </Select>
+              {statuses?.map((el) => (
+                <option
+                  key={el.title}
+                  style={{
+                    backgroundColor: el.bgColor,
+                    color: el.txColor,
+                    textAlign: "center",
+                  }}
+                  value={el.title} // Set the value to the status title
+                >
+                  {el.title}
+                </option>
+              ))}
+            </NativeSelect>
           </FormControl>
         </div>
 

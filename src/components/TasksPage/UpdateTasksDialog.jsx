@@ -26,7 +26,7 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
-
+  console.log(users);
   // useEffect(() => {
   //   if (project) {
   //     setFormData({

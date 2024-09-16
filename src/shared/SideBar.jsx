@@ -20,6 +20,7 @@ import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined"; // 
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
+import { IoGrid } from "react-icons/io5";
 
 const drawerWidth = 240;
 
@@ -147,6 +148,18 @@ function SideBar(props) {
               className="mr-4"
             />
             Tasks
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#888888",
+              justifyContent: "flex-start",
+            }}
+            onClick={() => handleNavigate("/statuses")}
+          >
+            <IoGrid style={{ color: "" }} className="mr-5 ml-1" />
+            Statuses
           </Button>
           <Button
             className="flex  items-center w-full"
