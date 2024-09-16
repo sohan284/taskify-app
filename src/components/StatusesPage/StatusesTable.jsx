@@ -23,6 +23,7 @@ import { setReloadPage } from "../../store/features/reloadSlice";
 import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
 import UpdateStatusDialog from "./UpdateStatusDialog";
+import Loading from "../../shared/Loading";
 const StatusesTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -63,7 +64,12 @@ const StatusesTable = () => {
     fetchData();
   }, [reloadPage, filter]);
 
-  if (loading) return <div>{/* <Loading /> */}</div>;
+  if (loading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
