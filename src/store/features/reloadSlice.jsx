@@ -4,6 +4,7 @@ const initialState = {
   reloadPage: false,
   resetTodos: false,
   resetTasks: false,
+  pendingTodos: 0,
 };
 const reloadSlice = createSlice({
   name: "reload",
@@ -15,7 +16,11 @@ const reloadSlice = createSlice({
     setResetTodos: (state, action) => {
       state.resetTodos = action.payload;
     },
+    setPendingTodos: (state, action) => {
+      state.pendingTodos = action.payload;
+    },
   },
 });
-export const { setReloadPage, setResetTodos } = reloadSlice.actions;
+export const { setReloadPage, setResetTodos, setPendingTodos } =
+  reloadSlice.actions;
 export default reloadSlice.reducer;

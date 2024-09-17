@@ -80,7 +80,9 @@ function SignUpPage() {
     signInWithGoogle()
       .then(() => {
         dispatch(setCreateUser(true));
-        navigate("/"); // Navigate to home page after successful Google sign-in
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
       })
       .catch((err) => {
         setErrorMsg(err.message);

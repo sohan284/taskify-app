@@ -8,9 +8,14 @@ import { IoGridSharp } from "react-icons/io5";
 import { useState } from "react";
 import CreateProjectDialog from "../components/ProjectsPage/CreateProjectDialog";
 import ProjectManagement from "../service/Project";
+import { useDispatch, useSelector } from "react-redux";
+import { setGridView } from "../store/features/projectSlice";
+import { FaList } from "react-icons/fa";
 const ProjectsPage = () => {
   const [open, setOpen] = useState(false);
+  const gridView = useSelector((state) => state.project.gridView);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   function handleClick(event) {
     event.preventDefault();
     navigate(`${event}`);
@@ -43,6 +48,9 @@ const ProjectsPage = () => {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleGridView = (value) => {
+    dispatch(setGridView(value));
+  };
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       <div className="flex justify-between">
@@ -58,9 +66,21 @@ const ProjectsPage = () => {
           >
             <IoMdAdd />
           </div>
-          <div className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 rounded hover:text-xl text-white">
-            <IoGridSharp />
-          </div>
+          {gridView ? (
+            <div
+              onClick={() => handleGridView(false)}
+              className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 rounded hover:text-xl text-white"
+            >
+              <FaList />
+            </div>
+          ) : (
+            <div
+              onClick={() => handleGridView(true)}
+              className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 rounded hover:text-xl text-white"
+            >
+              <IoGridSharp />
+            </div>
+          )}
         </div>
       </div>
       <div>

@@ -14,6 +14,7 @@ import UserManagement from "../service/User";
 import { setCreateUser } from "../store/features/userSlice";
 import TodoManagement from "../service/Todo";
 import StatusManagement from "../service/Status";
+import { setPendingTodos } from "../store/features/reloadSlice";
 
 function DashboardPage() {
   const [user] = useAuthState(auth);
@@ -95,7 +96,7 @@ function DashboardPage() {
         const todosResult = await TodoManagement.getTodosList();
         const { trueCount, falseCount } = todosResult.statusCount;
         const todosSeries = [trueCount, falseCount];
-
+        dispatch(setPendingTodos(falseCount));
         setChartDetails([
           {
             title: "Project Statistics",

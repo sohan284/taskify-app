@@ -30,16 +30,18 @@ import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import StatusFilter from "../shared-component/StatusFilter";
-import { setFilter } from "../../store/features/projectSlice";
+import { setFilter, setGridView } from "../../store/features/projectSlice";
 import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
 import DateFilter from "../shared-component/DateFilter";
 import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
+import GridTable from "./GridTable";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
+  const gridView = useSelector((state) => state.project.gridView);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +74,7 @@ const ProjectsTable = ({ API }) => {
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  console.log(gridView);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,6 +98,7 @@ const ProjectsTable = ({ API }) => {
         setLoading(false);
         dispatch(setReloadPage(false));
         dispatch(setFilter(false));
+        dispatch(setGridView(false));
       }
     };
 
@@ -252,7 +256,7 @@ const ProjectsTable = ({ API }) => {
 
       <Paper>
         <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
-          <div className="flex h-10 lg:text-nowrap overflow-auto" >
+          <div className="flex h-10 lg:text-nowrap overflow-auto">
             <Button
               variant="contained"
               onClick={handleDeleteSelected}
@@ -291,91 +295,146 @@ const ProjectsTable = ({ API }) => {
             setSearchQuery={setSearchQuery}
           />
         </div>
-        <TableContainer>
-          <Table
-            sx={{
-              border: "1px solid gray",
-              "& th, & td": { border: "1px solid #E0E5E5", color: "gray" },
-            }}
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={
-                      selectedIds?.length > 0 &&
-                      selectedIds?.length < members.length
-                    }
-                    checked={
-                      members?.length > 0 &&
-                      selectedIds.length === members.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                {visibleColumns?.id && <TableCell>ID</TableCell>}
-                {visibleColumns?.title && <TableCell>TITLE</TableCell>}
-                {visibleColumns?.users && <TableCell>USERS</TableCell>}
-                {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
-                {visibleColumns?.status && <TableCell>STATUS</TableCell>}
-                {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
-                {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
-                {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
-                {visibleColumns?.budget && <TableCell>BUDGET</TableCell>}
-                {visibleColumns?.tags && <TableCell>TAGS</TableCell>}
-                {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody className="text-nowrap">
-              {members
-                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ?.map((member, index) => (
-                  <TableRow key={member?.id}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedIds?.includes(member?.id)}
-                        onChange={() => handleSelect(member?.id)}
-                      />
-                    </TableCell>
-                    {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
-                    {visibleColumns?.title && (
-                      <TableCell>
-                        <div className="flex">
-                          <p className="mr-3 text-[#5b6edd] font-semibold">
-                            {member?.title}
-                          </p>
-                          {member?.favourite ? (
-                            <FaStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  false,
-                                  "Remove from Favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          ) : (
-                            <FaRegStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  true,
-                                  "Added to favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          )}
-                          <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
-                        </div>
+        {gridView ? (
+          <GridTable
+            members={members}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            selectedIds={selectedIds}
+            handleSelect={handleSelect}
+            visibleColumns={visibleColumns}
+            handleFavourite={handleFavourite}
+            handleOpenDialog={handleOpenDialog}
+            handleStatusChange={handleStatusChange}
+            statuses={statuses}
+            handleClickOpen={handleClickOpen}
+          />
+        ) : (
+          <TableContainer>
+            <Table
+              sx={{
+                border: "1px solid gray",
+                "& th, & td": { border: "1px solid #E0E5E5", color: "gray" },
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      indeterminate={
+                        selectedIds?.length > 0 &&
+                        selectedIds?.length < members.length
+                      }
+                      checked={
+                        members?.length > 0 &&
+                        selectedIds.length === members.length
+                      }
+                      onChange={handleSelectAll}
+                    />
+                  </TableCell>
+                  {visibleColumns?.id && <TableCell>ID</TableCell>}
+                  {visibleColumns?.title && <TableCell>TITLE</TableCell>}
+                  {visibleColumns?.users && <TableCell>USERS</TableCell>}
+                  {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
+                  {visibleColumns?.status && <TableCell>STATUS</TableCell>}
+                  {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
+                  {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
+                  {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
+                  {visibleColumns?.budget && <TableCell>BUDGET</TableCell>}
+                  {visibleColumns?.tags && <TableCell>TAGS</TableCell>}
+                  {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
+                </TableRow>
+              </TableHead>
+              <TableBody className="text-nowrap">
+                {members
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  ?.map((member, index) => (
+                    <TableRow key={member?.id}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedIds?.includes(member?.id)}
+                          onChange={() => handleSelect(member?.id)}
+                        />
                       </TableCell>
-                    )}
-                    {visibleColumns?.users && (
-                      <TableCell>
-                        <div className="flex items-center">
-                          {Array.isArray(member?.users)
-                            ? member?.users.map((el, index) => (
+                      {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
+                      {visibleColumns?.title && (
+                        <TableCell>
+                          <div className="flex">
+                            <p className="mr-3 text-[#5b6edd] font-semibold">
+                              {member?.title}
+                            </p>
+                            {member?.favourite ? (
+                              <FaStar
+                                onClick={() =>
+                                  handleFavourite(
+                                    member,
+                                    false,
+                                    "Remove from Favourite"
+                                  )
+                                }
+                                className="mt-1 text-[orange] mr-3 text-[15px]"
+                              />
+                            ) : (
+                              <FaRegStar
+                                onClick={() =>
+                                  handleFavourite(
+                                    member,
+                                    true,
+                                    "Added to favourite"
+                                  )
+                                }
+                                className="mt-1 text-[orange] mr-3 text-[15px]"
+                              />
+                            )}
+                            <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns?.users && (
+                        <TableCell>
+                          <div className="flex items-center">
+                            {Array.isArray(member?.users)
+                              ? member?.users.map((el, index) => (
+                                  <div key={index}>
+                                    {el?.photoURL ? (
+                                      <div className="w-8 h-8 -ml-2">
+                                        <img
+                                          className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                          src={el?.photoURL}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                                        {" "}
+                                        <AccountCircleIcon
+                                          className="bg-[#5a6fe2] rounded-full"
+                                          style={{
+                                            color: "white",
+                                            fontSize: 30,
+                                            marginLeft: -10,
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                ))
+                              : "No users"}
+                            <div
+                              className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
+                              onClick={() => handleOpenDialog(member)}
+                            >
+                              <FaRegEdit />
+                            </div>
+                          </div>
+                        </TableCell>
+                      )}
+
+                      {visibleColumns?.clients && (
+                        <TableCell>
+                          <div className="relative flex items-center">
+                            {Array.isArray(member?.clients) &&
+                            member?.clients.length > 0 ? (
+                              member?.clients.map((el, index) => (
                                 <div key={index}>
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
@@ -399,152 +458,113 @@ const ProjectsTable = ({ API }) => {
                                   )}
                                 </div>
                               ))
-                            : "No users"}
-                          <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                            onClick={() => handleOpenDialog(member)}
-                          >
-                            <FaRegEdit />
-                          </div>
-                        </div>
-                      </TableCell>
-                    )}
-
-                    {visibleColumns?.clients && (
-                      <TableCell>
-                        <div className="relative flex items-center">
-                          {Array.isArray(member?.clients) &&
-                          member?.clients.length > 0 ? (
-                            member?.clients.map((el, index) => (
-                              <div key={index}>
-                                {el?.photoURL ? (
-                                  <div className="w-8 h-8 -ml-2">
-                                    <img
-                                      className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
-                                      src={el?.photoURL}
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                                    {" "}
-                                    <AccountCircleIcon
-                                      className="bg-[#5a6fe2] rounded-full"
-                                      style={{
-                                        color: "white",
-                                        fontSize: 30,
-                                        marginLeft: -10,
-                                      }}
-                                    />
-                                  </div>
-                                )}
+                            ) : (
+                              <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
+                                NOT ASSIGNED
                               </div>
-                            ))
-                          ) : (
-                            <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
-                              NOT ASSIGNED
-                            </div>
-                          )}
-                          <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                            onClick={() => handleOpenDialog(member)}
-                          >
-                            <FaRegEdit />
-                          </div>
-                        </div>
-                      </TableCell>
-                    )}
-
-                    {visibleColumns?.status && (
-                      <TableCell>
-                        <NativeSelect
-                          name="status"
-                          style={{
-                            fontSize: "12px",
-                            borderRadius: "5px",
-                            height: "28px",
-                            width: "200px",
-                            textAlign: "center",
-                            backgroundColor: member?.status?.bgColor,
-                            color: member?.status?.txColor,
-                          }}
-                          disableUnderline={true}
-                          value={member?.status?.title}
-                          onChange={(e) => handleStatusChange(e, member)}
-                        >
-                          {statuses?.map((status) => (
-                            <option
-                              key={status._id}
-                              style={{
-                                backgroundColor: status.bgColor,
-                                color: status.txColor,
-                                textAlign: "center",
-                              }}
-                              value={status?.title || "Default"}
+                            )}
+                            <div
+                              className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
+                              onClick={() => handleOpenDialog(member)}
                             >
-                              {status?.title || "Default"}
-                            </option>
-                          ))}
-                        </NativeSelect>
-                      </TableCell>
-                    )}
-                    {visibleColumns?.priority && (
-                      <TableCell>{member?.priority}</TableCell>
-                    )}
-                    {visibleColumns?.startsAt && (
-                      <TableCell>{member?.startsAt}</TableCell>
-                    )}
-                    {visibleColumns?.endsAt && (
-                      <TableCell>{member?.endsAt}</TableCell>
-                    )}
-                    {visibleColumns?.budget && (
-                      <TableCell>{member?.budget}</TableCell>
-                    )}
-                    {visibleColumns?.tags && (
-                      <TableCell>
-                        {member?.tags?.join(", ") || "No tags"}
-                      </TableCell>
-                    )}
-                    {visibleColumns?.options && (
-                      <TableCell>
-                        <div className="flex justify-between">
-                          <FaRegEdit
+                              <FaRegEdit />
+                            </div>
+                          </div>
+                        </TableCell>
+                      )}
+
+                      {visibleColumns?.status && (
+                        <TableCell>
+                          <NativeSelect
+                            name="status"
                             style={{
-                              color: "#3f51b5",
-                              fontSize: "16px",
-                              marginRight: "20px",
+                              fontSize: "12px",
+                              borderRadius: "5px",
+                              height: "28px",
+                              width: "200px",
+                              textAlign: "center",
+                              backgroundColor: member?.status?.bgColor,
+                              color: member?.status?.txColor,
                             }}
-                            onClick={() => handleOpenDialog(member)}
-                          />
-                          <RiDeleteBinLine
-                            onClick={() => handleClickOpen(member?._id)}
-                            style={{
-                              color: "tomato",
-                              fontSize: "16px",
-                              marginRight: "20px",
-                            }}
-                          />
-                          <GoCopy
-                            style={{
-                              color: "orange",
-                              fontSize: "16px",
-                              marginRight: "20px",
-                            }}
-                          />
-                          <ErrorOutlineOutlinedIcon
-                            style={{
-                              color: "#3f51b5",
-                              fontSize: "18px",
-                              marginRight: "10px",
-                            }}
-                          />
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                            disableUnderline={true}
+                            value={member?.status?.title}
+                            onChange={(e) => handleStatusChange(e, member)}
+                          >
+                            {statuses?.map((status) => (
+                              <option
+                                key={status._id}
+                                style={{
+                                  backgroundColor: status.bgColor,
+                                  color: status.txColor,
+                                  textAlign: "center",
+                                }}
+                                value={status?.title || "Default"}
+                              >
+                                {status?.title || "Default"}
+                              </option>
+                            ))}
+                          </NativeSelect>
+                        </TableCell>
+                      )}
+                      {visibleColumns?.priority && (
+                        <TableCell>{member?.priority}</TableCell>
+                      )}
+                      {visibleColumns?.startsAt && (
+                        <TableCell>{member?.startsAt}</TableCell>
+                      )}
+                      {visibleColumns?.endsAt && (
+                        <TableCell>{member?.endsAt}</TableCell>
+                      )}
+                      {visibleColumns?.budget && (
+                        <TableCell>{member?.budget}</TableCell>
+                      )}
+                      {visibleColumns?.tags && (
+                        <TableCell>
+                          {member?.tags?.join(", ") || "No tags"}
+                        </TableCell>
+                      )}
+                      {visibleColumns?.options && (
+                        <TableCell>
+                          <div className="flex justify-between">
+                            <FaRegEdit
+                              style={{
+                                color: "#3f51b5",
+                                fontSize: "16px",
+                                marginRight: "20px",
+                              }}
+                              onClick={() => handleOpenDialog(member)}
+                            />
+                            <RiDeleteBinLine
+                              onClick={() => handleClickOpen(member?._id)}
+                              style={{
+                                color: "tomato",
+                                fontSize: "16px",
+                                marginRight: "20px",
+                              }}
+                            />
+                            <GoCopy
+                              style={{
+                                color: "orange",
+                                fontSize: "16px",
+                                marginRight: "20px",
+                              }}
+                            />
+                            <ErrorOutlineOutlinedIcon
+                              style={{
+                                color: "#3f51b5",
+                                fontSize: "18px",
+                                marginRight: "10px",
+                              }}
+                            />
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -555,6 +575,7 @@ const ProjectsTable = ({ API }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+      {/* grid table  */}
 
       {/* Use UpdateProjectDialog component */}
       {/* delete dialog  */}

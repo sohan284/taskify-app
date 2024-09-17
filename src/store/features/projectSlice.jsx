@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   reloadPage: false,
   filter: false,
+  gridView: false,
 };
 const projectSlice = createSlice({
   name: "project",
@@ -14,7 +15,10 @@ const projectSlice = createSlice({
     setFilter: (state, action) => {
       state.filter = action.payload;
     },
+    setGridView: (state, action) => {
+      state.gridView = action.payload;
+    },
   },
 });
-export const { setReloadPage, setFilter } = projectSlice.actions;
+export const { setReloadPage, setFilter, setGridView } = projectSlice.actions;
 export default projectSlice.reducer;

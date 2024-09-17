@@ -21,6 +21,8 @@ import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRig
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
 import { IoGrid } from "react-icons/io5";
+import { FaHandsClapping } from "react-icons/fa6";
+import { useSelector } from "react-redux";
 
 const drawerWidth = 240;
 
@@ -33,6 +35,7 @@ function SideBar(props) {
   const open = Boolean(anchorEl);
   const [isClosing, setIsClosing] = useState(false);
   const [collapseProjects, setCollapseProjects] = useState(false);
+  const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -175,6 +178,11 @@ function SideBar(props) {
               className="mr-4"
             />
             Todos
+            {pendingTodos > 0 && (
+              <p className="bg-[#fc2a2ad8] text-white ml-1 px-1.5 h-5 rounded">
+                {pendingTodos}
+              </p>
+            )}
           </Button>
         </div>
       </div>
@@ -208,7 +216,12 @@ function SideBar(props) {
           </IconButton>
           <div className="flex justify-between w-full">
             <p className="text-gray-400">Search</p>
-            <div>
+            <div className="flex">
+              <p className="mr-3 text-gray-500 flex">
+                Hi{" "}
+                <FaHandsClapping className="mx-1 mt-0.5  text-[orange] mr-2" />{" "}
+                Admin
+              </p>
               {user?.photoURL ? (
                 <img
                   className="w-7 h-7 shadow shadow-black rounded-full"
