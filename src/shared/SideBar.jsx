@@ -23,6 +23,8 @@ import { FcTodoList } from "react-icons/fc";
 import { IoGrid } from "react-icons/io5";
 import { FaHandsClapping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
+import { LuUsers2 } from "react-icons/lu";
+import { GrNotes } from "react-icons/gr";
 
 const drawerWidth = 240;
 
@@ -94,8 +96,8 @@ function SideBar(props) {
             onClick={() => handleNavigate("/")}
           >
             <RiHome8Line
-              style={{ color: "tomato" }}
-              className="mr-4 text-2xl"
+              style={{ color: "tomato", fontSize: "22" }}
+              className="mr-4 "
             />
             Dashboard
           </Button>
@@ -109,7 +111,7 @@ function SideBar(props) {
             onClick={(event) => handleCollapse(event)}
           >
             <BusinessCenterOutlinedIcon
-              style={{ color: "lightgreen" }}
+              style={{ color: "lightgreen", fontSize: "22" }}
               className="mr-4"
             />
             Projects
@@ -147,8 +149,8 @@ function SideBar(props) {
             onClick={() => handleNavigate("/tasks")}
           >
             <AssignmentTurnedInOutlinedIcon
-              style={{ color: "3f51b5" }}
-              className="mr-4"
+              style={{ color: "3f51b5", fontSize: "24" }}
+              className="mr-4 pr-0.5 py-0.5"
             />
             Tasks
           </Button>
@@ -174,7 +176,7 @@ function SideBar(props) {
             onClick={() => handleNavigate("/todos")}
           >
             <FcTodoList
-              style={{ color: "3f51b5", fontSize: "24" }}
+              style={{ color: "3f51b5", fontSize: "20" }}
               className="mr-4"
             />
             Todos
@@ -183,6 +185,36 @@ function SideBar(props) {
                 {pendingTodos}
               </p>
             )}
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#888888",
+              justifyContent: "flex-start",
+            }}
+            onClick={() => handleNavigate("/users")}
+          >
+            <LuUsers2
+              style={{ color: "orange", fontSize: "20" }}
+              className="mr-5"
+            />
+            Users
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#888888",
+              justifyContent: "flex-start",
+            }}
+            onClick={() => handleNavigate("/notes")}
+          >
+            <GrNotes
+              style={{ color: "3f51b5", fontSize: "16" }}
+              className="mr-6"
+            />
+            Notes
           </Button>
         </div>
       </div>

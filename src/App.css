@@ -1,3 +1,15 @@
  .user-image:hover { /* Moves image up by 10px */
     z-index: 9999; /* Ensure hovered image is on top */
   }
+  .quill-content h1 {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .quill-content ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  
+ 
+  
