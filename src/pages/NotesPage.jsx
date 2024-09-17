@@ -117,7 +117,7 @@ const NotesPage = () => {
                 overflow: "hidden", // To handle content overflow
               }}
             >
-              <div className="shadow-lg hover:-rotate-6">
+              <div className="shadow-lg hover:-rotate-6 hover:scale-105  transition-transform duration-300">
                 <div
                   className="flex justify-end pt-2 pr-2"
                   style={{ backgroundColor: note?.bgColor }}

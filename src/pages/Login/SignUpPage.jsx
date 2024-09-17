@@ -76,17 +76,16 @@ function SignUpPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    signInWithGoogle()
-      .then(() => {
-        dispatch(setCreateUser(true));
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      })
-      .catch((err) => {
-        setErrorMsg(err.message);
-      });
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      dispatch(setCreateUser(true));
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (err) {
+      setErrorMsg(err.message); // Show detailed error message
+    }
   };
 
   return (

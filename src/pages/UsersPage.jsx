@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
 import { useState } from "react";
 import CreateStatusesDialog from "../components/StatusesPage/CreateStatusesDialog";
-import StatusesTable from "../components/StatusesPage/StatusesTable";
+import UsersTable from "../components/UsersPage/UsersTable";
 const UsersPage = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ const UsersPage = () => {
         </div>
       </div>
       <div>
-        <StatusesTable />
+        <UsersTable />
       </div>
       <CreateStatusesDialog open={open} onClose={handleClose} />
     </div>
