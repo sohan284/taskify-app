@@ -14,6 +14,7 @@ import { setReloadPage } from "../store/features/reloadSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Loading from "../shared/Loading";
+import UpdateNotesDialog from "../components/NotesPage/UpdateNoteDialog";
 
 const NotesPage = () => {
   const [open, setOpen] = useState(false);
@@ -22,6 +23,8 @@ const NotesPage = () => {
   const navigate = useNavigate();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const dispatch = useDispatch();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState(null);
   function handleClick(event) {
     event.preventDefault();
     navigate(`${event}`);
@@ -60,6 +63,13 @@ const NotesPage = () => {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleOpenDialog = (note) => {
+    setSelectedNote(note);
+    setDialogOpen(true);
+  };
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
   const handleDeleteNote = (id) => {
     NoteManagement.deleteNote(id).then(
       () => dispatch(setReloadPage(true)),
@@ -90,7 +100,7 @@ const NotesPage = () => {
           </div>
         </div>
       </div>
-      <div className="p-5 relative flex flex-wrap mt-4 shadow-xl bg-slate-50 border-t">
+      <div className="p-5 relative grid grid-cols-3 mt-4 shadow-xl bg-slate-50 border-t">
         {notes?.map((note) => {
           // Rotate cards randomly
           const rotation =
@@ -99,49 +109,59 @@ const NotesPage = () => {
           return (
             <div
               key={note._id}
-              className="p-5"
+              className="p-5 "
               style={{
-                width: "30%", // Adjust as needed
+                // Adjust as needed
                 transform: rotation,
                 transformOrigin: "center center", // Ensures consistent rotation origin
                 overflow: "hidden", // To handle content overflow
               }}
             >
-              <div
-                className="flex justify-end pt-2 pr-2"
-                style={{ backgroundColor: note?.bgColor }}
-              >
-                <div className="bg-[#6479f3] hover:bg-[#3853eb] inline-block p-1 px-2 m-1 rounded text-white">
-                  <FaRegEdit />
-                </div>
-
+              <div className="shadow-lg hover:-rotate-6">
                 <div
-                  onClick={() => handleDeleteNote(note?._id)}
-                  className="bg-[#ee3a2d] m-1 text-lg p-1 px-2 rounded hover:bg-[red] text-white"
+                  className="flex justify-end pt-2 pr-2"
+                  style={{ backgroundColor: note?.bgColor }}
                 >
-                  <RiDeleteBinLine />
-                </div>
-              </div>
+                  <div
+                    onClick={() => handleOpenDialog(note)}
+                    className="bg-[#6479f3] hover:bg-[#3853eb] inline-block p-1 px-2 m-1 rounded text-white"
+                  >
+                    <FaRegEdit />
+                  </div>
 
-              <p className="p-5" style={{ backgroundColor: note?.bgColor }}>
-                {note?.title}
-              </p>
-              <div
-                dangerouslySetInnerHTML={{ __html: note?.description }}
-                className="quill-content px-5 overflow-auto"
-                style={{ backgroundColor: note?.bgColor }}
-              ></div>
-              <div
-                style={{ backgroundColor: note?.bgColor }}
-                className="text-blue-500 px-5 py-5 text-sm font-medium"
-              >
-                <p className="font-bold text-black">Created At:</p>{" "}
-                {moment(note?.createdAt).format("MMMM D, YYYY hh:mm:ss A")}
+                  <div
+                    onClick={() => handleDeleteNote(note?._id)}
+                    className="bg-[#ee3a2d] m-1 text-lg p-1 px-2 rounded hover:bg-[red] text-white"
+                  >
+                    <RiDeleteBinLine />
+                  </div>
+                </div>
+
+                <p className="p-5" style={{ backgroundColor: note?.bgColor }}>
+                  {note?.title}
+                </p>
+                <div
+                  dangerouslySetInnerHTML={{ __html: note?.description }}
+                  className="quill-content px-5 overflow-auto"
+                  style={{ backgroundColor: note?.bgColor }}
+                ></div>
+                <div
+                  style={{ backgroundColor: note?.bgColor }}
+                  className="text-blue-500 px-5 py-5 text-sm font-medium"
+                >
+                  <p className="font-bold text-black">Created At:</p>{" "}
+                  {moment(note?.createdAt).format("MMMM D, YYYY hh:mm:ss A")}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+      <UpdateNotesDialog
+        open={dialogOpen}
+        note={selectedNote}
+        onClose={handleCloseDialog}
+      />
 
       <CreateNotesDialog open={open} onClose={handleClose} />
     </div>
