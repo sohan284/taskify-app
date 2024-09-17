@@ -100,7 +100,7 @@ const NotesPage = () => {
           </div>
         </div>
       </div>
-      <div className="p-5 relative grid grid-cols-3 mt-4 shadow-xl bg-slate-50 border-t">
+      <div className="p-5 relative grid lg:grid-cols-3 mt-4 shadow-xl bg-slate-50 border-t">
         {notes?.map((note) => {
           // Rotate cards randomly
           const rotation =
