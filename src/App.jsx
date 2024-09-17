@@ -11,6 +11,7 @@ import TodosPage from "./pages/TodosPage";
 import StatusesPage from "./pages/StatusesPage";
 import UsersPage from "./pages/UsersPage";
 import NotesPage from "./pages/NotesPage";
+import CreateUsersPage from "./pages/CreateUserPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/statuses" element={<StatusesPage />} />
         <Route path="/todos" element={<TodosPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/users/create" element={<CreateUsersPage />} />
         <Route path="/notes" element={<NotesPage />} />
       </Route>
       <Route path="/login" element={<LoginPage />}></Route>

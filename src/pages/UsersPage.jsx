@@ -3,11 +3,9 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
-import { useState } from "react";
-import CreateStatusesDialog from "../components/StatusesPage/CreateStatusesDialog";
 import UsersTable from "../components/UsersPage/UsersTable";
 const UsersPage = () => {
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   function handleClick(event) {
     event.preventDefault();
@@ -35,9 +33,9 @@ const UsersPage = () => {
       Users
     </Link>,
   ];
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       <div className="flex justify-between">
@@ -48,7 +46,7 @@ const UsersPage = () => {
         </Stack>
         <div className="mt-6 flex h-8">
           <div
-            onClick={() => setOpen(true)}
+            onClick={() => navigate("/users/create")}
             className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white"
           >
             <IoMdAdd />
@@ -58,7 +56,7 @@ const UsersPage = () => {
       <div>
         <UsersTable />
       </div>
-      <CreateStatusesDialog open={open} onClose={handleClose} />
+      {/* <CreateUsersDialog open={open} onClose={handleClose} /> */}
     </div>
   );
 };

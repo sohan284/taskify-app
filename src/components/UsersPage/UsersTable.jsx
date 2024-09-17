@@ -37,11 +37,13 @@ const UsersTable = () => {
   const [statusId, setStatusId] = useState(null);
   const [visibleColumns] = useState({
     id: true,
-    title: true,
     displayName: true,
     email: true,
+    role: true,
     status: true,
     options: true,
+    phoneNumber: true,
+    assigned: true,
   });
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,9 +186,11 @@ const UsersTable = () => {
                   />
                 </TableCell>
                 {visibleColumns?.id && <TableCell>ID</TableCell>}
-                {visibleColumns?.title && <TableCell>USERS</TableCell>}
+                {visibleColumns?.displayName && <TableCell>USERS</TableCell>}
                 {visibleColumns?.role && <TableCell>ROLE</TableCell>}
-                {visibleColumns?.status && <TableCell>PHONE NUMBER</TableCell>}
+                {visibleColumns?.phoneNumber && (
+                  <TableCell>PHONE NUMBER</TableCell>
+                )}
                 {visibleColumns?.status && <TableCell>ASSIGNED</TableCell>}
                 {visibleColumns?.options && <TableCell>ACTIONS</TableCell>}
               </TableRow>
@@ -203,7 +207,7 @@ const UsersTable = () => {
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
-                    {visibleColumns?.title && (
+                    {visibleColumns?.displayName && (
                       <TableCell
                         style={{
                           width: "500px",
@@ -232,42 +236,42 @@ const UsersTable = () => {
                             <p className="mx-3 font-semibold text-md text-gray-600">
                               {user?.displayName}
                             </p>
-                            <p className="mx-3 font-medium text-xs">{user?.email}</p>
+                            <p className="mx-3 font-medium text-xs">
+                              {user?.email}
+                            </p>
                           </div>
                         </div>
                       </TableCell>
                     )}
-                    {visibleColumns?.user && (
+                    {visibleColumns?.role && (
+                      <TableCell>
+                        <p
+                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
+                        >
+                          {user?.role}
+                        </p>
+                      </TableCell>
+                    )}
+                    {visibleColumns?.phoneNumber && (
+                      <TableCell>
+                        <p
+                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
+                        >
+                          {user?.phoneNumber}
+                        </p>
+                      </TableCell>
+                    )}
+                    {visibleColumns?.assigned && (
                       <TableCell>
                         <p
                           style={{ backgroundColor: user.txColor }}
-                          className={` text-white inline p-1 px-2 rounded uppercase text-xs`}
+                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
                         >
                           {user?.title}
                         </p>
                       </TableCell>
                     )}
-                    {visibleColumns?.status && (
-                      <TableCell>
-                        <p
-                          style={{ backgroundColor: user.txColor }}
-                          className={` text-white inline p-1 px-2 rounded uppercase text-xs`}
-                        >
-                          {user?.title}
-                        </p>
-                      </TableCell>
-                    )}
-                    {visibleColumns?.status && (
-                      <TableCell>
-                        <p
-                          style={{ backgroundColor: status.txColor }}
-                          className={` text-white inline p-1 px-2 rounded uppercase text-xs`}
-                        >
-                          {status?.title}
-                        </p>
-                      </TableCell>
-                    )}
-
+                   
                     {visibleColumns?.options && (
                       <TableCell>
                         <div className="flex justify-evenly">

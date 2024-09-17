@@ -78,11 +78,8 @@ function SignUpPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      await signInWithGoogle().then(() => navigate("/"));
       dispatch(setCreateUser(true));
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
     } catch (err) {
       setErrorMsg(err.message); // Show detailed error message
     }
