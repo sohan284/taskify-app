@@ -368,7 +368,7 @@ const CreateUsersPage = () => {
                 >
                   <MenuItem value="Admin">Admin</MenuItem>
                   <MenuItem value="User">User</MenuItem>
-                  <MenuItem value="Manager">Manager</MenuItem>
+                  <MenuItem value="Member">Member</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

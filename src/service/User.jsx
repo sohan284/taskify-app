@@ -26,19 +26,32 @@ const getUserList = async () => {
 };
 const getSingleUser = async (id) => {
   try {
-    const response = await axios.get(`http://localhost:5000/users/${id}`);
+    const response = await axios.get(
+      `https://taskify-server-iota.vercel.app/users/${id}`
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to fetch User:", error);
     throw error;
   }
 };
-
+const deleteUser = async (id) => {
+  try {
+    const response = await axios.delete(
+      `https://taskify-server-iota.vercel.app/users/${id}`
+    ); // Replace with your API endpoint
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete :", error);
+    throw error;
+  }
+};
 // Attach the functions to an object
 const UserManagement = {
   upsertUser,
   getUserList,
   getSingleUser,
+  deleteUser,
 };
 
 // Export the object

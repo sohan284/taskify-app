@@ -10,9 +10,6 @@ import {
   Button,
   Paper,
   TablePagination,
-  Dialog,
-  DialogTitle,
-  DialogActions,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -21,12 +18,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaRegEdit } from "react-icons/fa";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import SearchFilter from "../shared-component/SearchFilter";
-import StatusManagement from "../../service/Status";
 import Loading from "../../shared/Loading";
 // import UpdateUserDialog from "./UpdateUserDialog";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import UserManagement from "../../service/User";
 import { useNavigate } from "react-router-dom";
+import DeleteDialog from "../../shared/DeleteDialog";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -35,7 +32,7 @@ const UsersTable = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [statusId, setStatusId] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [visibleColumns] = useState({
     id: true,
     displayName: true,
@@ -48,8 +45,6 @@ const UsersTable = () => {
   });
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  // const [dialogOpen, setDialogOpen] = useState(false);
-  // const [selectedStatus, setSelectedStatus] = useState(null);
   const navigate = useNavigate();
 
   // Pagination states
@@ -58,9 +53,9 @@ const UsersTable = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const result = await UserManagement.getUserList();
-        setUsers(result?.data);
+        await UserManagement.getUserList().then((res) => setUsers(res.data));
       } catch (err) {
         setError(err);
       } finally {
@@ -115,7 +110,7 @@ const UsersTable = () => {
   //   setSelectedStatus(null);
   // };
   const handleClickOpen = (id) => {
-    setStatusId(id);
+    setUserId(id);
     setOpen(true);
   };
 
@@ -123,7 +118,7 @@ const UsersTable = () => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    StatusManagement.deleteStatus(id)
+    UserManagement.deleteUser(id)
       .then(() => {
         dispatch(setReloadPage(true));
         handleClose();
@@ -216,7 +211,7 @@ const UsersTable = () => {
                           <div className="w-12">
                             {user?.photoURL ? (
                               <img
-                                className="rounded-full"
+                                className="rounded-full h-12 w-12"
                                 src={user?.photoURL}
                                 alt=""
                               />
@@ -231,8 +226,17 @@ const UsersTable = () => {
                             )}
                           </div>
                           <div>
-                            <p className="mx-3 font-semibold text-md text-gray-600">
-                              {user?.displayName}
+                            <p className="mx-3 font-semibold text-md flex text-gray-600">
+                              {user?.displayName}{" "}
+                              {user?.status ? (
+                                <p className="mx-1 uppercase text-xs py-0.5 bg-green-600 rounded text-white px-1">
+                                  Active
+                                </p>
+                              ) : (
+                                <p className="mx-1 uppercase text-xs py-0.5 bg-red-600 rounded text-white px-1">
+                                  Deactive
+                                </p>
+                              )}
                             </p>
                             <p className="mx-3 font-medium text-xs">
                               {user?.email}
@@ -244,7 +248,13 @@ const UsersTable = () => {
                     {visibleColumns?.role && (
                       <TableCell>
                         <p
-                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
+                          className={`  inline p-1 px-2 rounded uppercase font-medium text-xs ${
+                            user?.role === "Admin"
+                              ? "bg-blue-200 text-blue-700"
+                              : user?.role === "Member"
+                              ? "bg-green-200 text-green-800"
+                              : "bg-orange-200 text-orange-700?"
+                          }`}
                         >
                           {user?.role}
                         </p>
@@ -261,12 +271,15 @@ const UsersTable = () => {
                     )}
                     {visibleColumns?.assigned && (
                       <TableCell>
-                        <p
-                          style={{ backgroundColor: user.txColor }}
-                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
-                        >
-                          {user?.title}
-                        </p>
+                        <div className="flex flex-col">
+                          <p
+                            style={{ backgroundColor: user.txColor }}
+                            className={` bg-[#5a6fe2] w-12 text-center inline p-1 px-2 rounded-full text-white uppercase text-xs`}
+                          >
+                            {user?.projectCount}
+                          </p>
+                          <span className="text-xs">Projects</span>
+                        </div>
                       </TableCell>
                     )}
 
@@ -282,7 +295,7 @@ const UsersTable = () => {
                             onClick={() => navigate(`/users/${user?._id}`)}
                           />
                           <RiDeleteBinLine
-                            onClick={() => handleClickOpen(status?._id)}
+                            onClick={() => handleClickOpen(user?._id)}
                             style={{
                               color: "tomato",
                               fontSize: "16px",
@@ -307,28 +320,12 @@ const UsersTable = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <Dialog
+      <DeleteDialog
         open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Are you sure want to delete this Status ?"}
-        </DialogTitle>
-
-        <DialogActions>
-          <Button onClick={handleClose}>No</Button>
-          <Button onClick={() => handleDelete(statusId)} autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* <UpdateUserDialog
-        open={dialogOpen}
-        status={selectedStatus}
-        onClose={handleCloseDialog}
-      /> */}
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        id={userId}
+      />
     </div>
   );
 };

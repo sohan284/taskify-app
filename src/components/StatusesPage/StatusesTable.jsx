@@ -10,9 +10,6 @@ import {
   Button,
   Paper,
   TablePagination,
-  Dialog,
-  DialogTitle,
-  DialogActions,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -24,6 +21,7 @@ import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
 import UpdateStatusDialog from "./UpdateStatusDialog";
 import Loading from "../../shared/Loading";
+import DeleteDialog from "../../shared/DeleteDialog";
 const StatusesTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -253,23 +251,12 @@ const StatusesTable = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <Dialog
+      <DeleteDialog
         open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Are you sure want to delete this Status ?"}
-        </DialogTitle>
-
-        <DialogActions>
-          <Button onClick={handleClose}>No</Button>
-          <Button onClick={() => handleDelete(statusId)} autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        id={statusId}
+      />
       <UpdateStatusDialog
         open={dialogOpen}
         status={selectedStatus}

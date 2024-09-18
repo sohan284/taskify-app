@@ -11,9 +11,6 @@ import {
   Button,
   Paper,
   TablePagination,
-  Dialog,
-  DialogTitle,
-  DialogActions,
   NativeSelect,
 } from "@mui/material";
 import PropTypes from "prop-types";
@@ -35,6 +32,7 @@ import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
 import SearchFilter from "../shared-component/SearchFilter";
 import StatusFilter from "../shared-component/StatusFilter";
+import DeleteDialog from "../../shared/DeleteDialog";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -597,23 +595,12 @@ const TasksTable = ({ API }) => {
 
       {/* Use UpdateTaskDialog component */}
       {/* delete dialog  */}
-      <Dialog
+      <DeleteDialog
         open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Are you sure want to delete this project ?"}
-        </DialogTitle>
-
-        <DialogActions>
-          <Button onClick={handleClose}>No</Button>
-          <Button onClick={() => handleDelete(memberId)} autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        id={memberId}
+      />
       <UpdateTaskDialog
         open={dialogOpen}
         onClose={handleCloseDialog}

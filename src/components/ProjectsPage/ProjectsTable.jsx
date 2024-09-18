@@ -11,9 +11,6 @@ import {
   Button,
   Paper,
   TablePagination,
-  Dialog,
-  DialogTitle,
-  DialogActions,
   NativeSelect,
 } from "@mui/material";
 import PropTypes from "prop-types";
@@ -37,6 +34,7 @@ import DateFilter from "../shared-component/DateFilter";
 import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
 import GridTable from "./GridTable";
+import DeleteDialog from "../../shared/DeleteDialog";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -399,7 +397,7 @@ const ProjectsTable = ({ API }) => {
                                     {el?.photoURL ? (
                                       <div className="w-8 h-8 -ml-2">
                                         <img
-                                          className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                          className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 w-8 hover:transform hover:-translate-y-1"
                                           src={el?.photoURL}
                                         />
                                       </div>
@@ -439,7 +437,7 @@ const ProjectsTable = ({ API }) => {
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
                                       <img
-                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 hover:transform hover:-translate-y-1"
                                         src={el?.photoURL}
                                       />
                                     </div>
@@ -579,23 +577,12 @@ const ProjectsTable = ({ API }) => {
 
       {/* Use UpdateProjectDialog component */}
       {/* delete dialog  */}
-      <Dialog
+      <DeleteDialog
         open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Are you sure want to delete this project ?"}
-        </DialogTitle>
-
-        <DialogActions>
-          <Button onClick={handleClose}>No</Button>
-          <Button onClick={() => handleDelete(memberId)} autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleClose={handleClose}
+        handleDelete={handleDelete}
+        id={memberId}
+      />
       <UpdateProjectDialog
         open={dialogOpen}
         onClose={handleCloseDialog}

@@ -393,9 +393,9 @@ const UpdateUserPage = () => {
                 >
                   <MenuItem value="Admin">Admin</MenuItem>
                   <MenuItem value="User">User</MenuItem>
-                  <MenuItem value="Manager">Manager</MenuItem>
+                  <MenuItem value="Member">Member</MenuItem>
                 </Select>
-              </FormControl>
+              </FormControl>s
             </Grid>
 
             <Grid item xs={12} sm={6}>
