@@ -62,7 +62,6 @@ function DashboardPage() {
 
         // Aggregate data for the charts
         const projectsCounts = projects.reduce((acc, project) => {
-          // Access the status property of the status object
           const status = project.status?.title;
           acc[status] = (acc[status] || 0) + 1;
           return acc;
@@ -78,7 +77,7 @@ function DashboardPage() {
         const projectSeries = projectLabels.map(
           (label) => projectsCounts[label] || 0
         );
-        console.log(projectSeries);
+
         // Get tasks
         const taskResult = await TaskManagement.getTaskList();
         const tasks = taskResult?.data || [];
@@ -112,7 +111,7 @@ function DashboardPage() {
           },
           {
             title: "Todos Overview",
-            series: todosSeries, // Use the updated todos series
+            series: todosSeries,
             labels: ["Done", "Pending"],
             colors: ["#57bb29", "#df3b3b"],
           },
@@ -120,19 +119,27 @@ function DashboardPage() {
 
         // Get users
         const userResult = await UserManagement.getUserList();
-        setUserCount(userResult.data.length);
+        const users = userResult.data || [];
+        setUserCount(users.length);
+
+        // Check if the user already exists
+        const existingUser = users.find((u) => u.email === user?.email);
 
         if (user) {
           const userData = {
-            email: user?.email,
-            photoURL: user?.photoURL || "",
-            displayName: user?.displayName || "",
+            email: user.email,
+            photoURL: user.photoURL || "",
+            displayName: user.displayName || "",
           };
-          if (createUser) {
+
+          // Only create a new user if they do not exist
+          if (!existingUser && createUser) {
             await UserManagement.upsertUser(userData);
             dispatch(setCreateUser(false));
+            console.log("User data posted successfully");
+          } else {
+            console.log("User already exists, skipping creation.");
           }
-          console.log("User data posted successfully");
         }
       } catch (err) {
         setError(err);

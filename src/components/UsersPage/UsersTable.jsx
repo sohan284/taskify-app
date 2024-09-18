@@ -23,9 +23,10 @@ import { setReloadPage } from "../../store/features/reloadSlice";
 import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
 import Loading from "../../shared/Loading";
-import UpdateUserDialog from "./UpdateUserDialog";
+// import UpdateUserDialog from "./UpdateUserDialog";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import UserManagement from "../../service/User";
+import { useNavigate } from "react-router-dom";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -47,8 +48,9 @@ const UsersTable = () => {
   });
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  // const [dialogOpen, setDialogOpen] = useState(false);
+  // const [selectedStatus, setSelectedStatus] = useState(null);
+  const navigate = useNavigate();
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -108,14 +110,10 @@ const UsersTable = () => {
     setPage(0);
   };
 
-  const handleOpenDialog = (status) => {
-    setSelectedStatus(status);
-    setDialogOpen(true);
-  };
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setSelectedStatus(null);
-  };
+  // const handleCloseDialog = () => {
+  //   setDialogOpen(false);
+  //   setSelectedStatus(null);
+  // };
   const handleClickOpen = (id) => {
     setStatusId(id);
     setOpen(true);
@@ -271,7 +269,7 @@ const UsersTable = () => {
                         </p>
                       </TableCell>
                     )}
-                   
+
                     {visibleColumns?.options && (
                       <TableCell>
                         <div className="flex justify-evenly">
@@ -281,7 +279,7 @@ const UsersTable = () => {
                               fontSize: "16px",
                               marginRight: "20px",
                             }}
-                            onClick={() => handleOpenDialog(status)}
+                            onClick={() => navigate(`/users/${user?._id}`)}
                           />
                           <RiDeleteBinLine
                             onClick={() => handleClickOpen(status?._id)}
@@ -326,11 +324,11 @@ const UsersTable = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <UpdateUserDialog
+      {/* <UpdateUserDialog
         open={dialogOpen}
         status={selectedStatus}
         onClose={handleCloseDialog}
-      />
+      /> */}
     </div>
   );
 };

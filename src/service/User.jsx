@@ -20,7 +20,16 @@ const getUserList = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch task list:", error);
+    console.error("Failed to fetch user list:", error);
+    throw error;
+  }
+};
+const getSingleUser = async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:5000/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch User:", error);
     throw error;
   }
 };
@@ -29,6 +38,7 @@ const getUserList = async () => {
 const UserManagement = {
   upsertUser,
   getUserList,
+  getSingleUser,
 };
 
 // Export the object

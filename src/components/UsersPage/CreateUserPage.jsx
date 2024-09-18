@@ -15,14 +15,14 @@ import {
 } from "@mui/material";
 
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { setReloadPage } from "../store/features/reloadSlice";
 import { useNavigate } from "react-router-dom";
-import UserManagement from "../service/User";
+import UserManagement from "../../service/User";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const CreateUsersPage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [phone, setPhone] = useState(null);
   const [formData, setFormData] = useState({
     displayName: "",
     lastName: "",
@@ -55,7 +55,28 @@ const CreateUsersPage = () => {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, photoURL: e.target.files[0] });
+    const file = e.target.files[0]; // Get the selected file
+    if (file) {
+      // Check for image type and file size (e.g., max 5MB)
+      if (!file.type.startsWith("image/")) {
+        toast.warning("Please select an image file.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB
+        toast.warning("File size exceeds 5MB limit.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({
+          ...prev,
+          photoURL: reader.result, // Set the photoURL to the file's data URL
+        }));
+      };
+      reader.readAsDataURL(file); // Read the file as a data URL
+    }
   };
 
   const handleSubmit = (e) => {
@@ -66,6 +87,7 @@ const CreateUsersPage = () => {
   const handleCreate = () => {
     const newProject = {
       ...formData,
+      phoneNumber: phone,
     };
 
     UserManagement.upsertUser(newProject)
@@ -91,7 +113,7 @@ const CreateUsersPage = () => {
           requireEmailVerification: false,
           photoURL: null,
         });
-        dispatch(setReloadPage(true));
+        navigate("/users");
       })
       .catch((error) => {
         toast.error(`${error}`);
@@ -195,19 +217,14 @@ const CreateUsersPage = () => {
 
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth margin="dense">
-                <p className="text-xs text-gray-500">
-                  Country Code and Phone Number
-                </p>
-                <TextField
-                  placeholder="Phone Number"
-                  name="phoneNumber"
-                  type="tel"
-                  size="small"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: <span>{formData.countryCode}</span>,
-                  }}
+                <p className="text-xs text-gray-500">Phone Number</p>
+                <PhoneInput
+                  name="phone"
+                  className="border h-10 p-1 rounded border-gray-300"
+                  placeholder="Enter phone number"
+                  value={phone}
+                  onChange={setPhone}
+                  defaultCountry="BD" // Set default country
                 />
               </FormControl>
             </Grid>
@@ -392,6 +409,22 @@ const CreateUsersPage = () => {
                   size="small"
                 />
               </FormControl>
+              {formData.photoURL && (
+                <div className="mt-4">
+                  <p className="text-xs text-gray-500">Uploaded Image:</p>
+                  <img
+                    src={formData.photoURL}
+                    alt="Uploaded Preview"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      objectFit: "cover",
+                      borderRadius: "4px",
+                      margin: "5px",
+                    }}
+                  />
+                </div>
+              )}
             </Grid>
           </Grid>
         </form>
