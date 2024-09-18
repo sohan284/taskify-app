@@ -25,7 +25,7 @@ import { FaHandsClapping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
-
+import { SiGotomeeting } from "react-icons/si";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -166,6 +166,7 @@ function SideBar(props) {
             <IoGrid style={{ color: "" }} className="mr-5 ml-1" />
             Statuses
           </Button>
+
           <Button
             className="flex  items-center w-full"
             style={{
@@ -193,11 +194,23 @@ function SideBar(props) {
               color: "#888888",
               justifyContent: "flex-start",
             }}
+            onClick={() => handleNavigate("/meetings")}
+          >
+            <SiGotomeeting style={{ fontSize:'16', color: "lightgreen" }} className="mr-5 " />
+            Meetings
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#888888",
+              justifyContent: "flex-start",
+            }}
             onClick={() => handleNavigate("/users")}
           >
             <LuUsers2
               style={{ color: "orange", fontSize: "20" }}
-              className="mr-5"
+              className="mr-4"
             />
             Users
           </Button>
@@ -212,7 +225,7 @@ function SideBar(props) {
           >
             <GrNotes
               style={{ color: "3f51b5", fontSize: "16" }}
-              className="mr-6"
+              className="mr-5"
             />
             Notes
           </Button>
