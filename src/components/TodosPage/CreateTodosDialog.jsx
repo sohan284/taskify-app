@@ -2,7 +2,6 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -15,8 +14,8 @@ import {
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/projectSlice";
-import { IoMdClose } from "react-icons/io";
 import TodoManagement from "../../service/Todo";
+import CloseDialog from "../../shared/CloseDialog";
 const CreateTodosDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -66,15 +65,7 @@ const CreateTodosDialog = ({ open, onClose }) => {
       }}
       onClose={onClose}
     >
-      <div className="flex justify-between">
-        <DialogTitle>Create Todos</DialogTitle>
-        <IoMdClose
-          className="hover:bg-[#130b0b] shadow-xl rounded-lg"
-          onClick={onClose}
-          style={{ margin: "20", fontSize: "26", color: "gray" }}
-        />
-      </div>
-
+      <CloseDialog title="Update Todos" handleClose={onClose} />
       <DialogContent>
         <div className="grid grid-cols-1 gap-5">
           <FormControl fullWidth margin="dense">

@@ -6,10 +6,7 @@ import {
   DialogActions,
   Button,
   TextField,
-  Select,
   FormControl,
-  MenuItem,
-  NativeSelect,
   Autocomplete,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -17,18 +14,15 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
-import StatusManagement from "../../service/Status";
+import MeetingManagement from "../../service/Meeting";
 import CloseDialog from "../../shared/CloseDialog";
 
-const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
+const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
-  const [statuses, setStatuses] = useState([]);
   const dispatch = useDispatch();
-  const [color, setColor] = useState([]);
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -40,27 +34,12 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         endsAt: project.endsAt ? dayjs(project.endsAt) : null,
         status: project.status || {}, // Initialize status as an object
       });
-      StatusManagement.getStatusList().then((res) => {
-        setStatuses(res.data);
-        setColor(res?.data[0]?.bgColor);
-      });
     }
   }, [project]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleStatusChange = (event) => {
-    const selectedStatus = statuses.find(
-      (status) => status.title === event.target.value
-    );
-    setFormData((prev) => ({
-      ...prev,
-      status: selectedStatus || {}, // Set the full status object
-    }));
-    setColor(selectedStatus.bgColor); // Change the color as per selected status
   };
 
   const handleDateChange = (name, date) => {
@@ -76,9 +55,9 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         : null,
       endsAt: formData.endsAt ? formData.endsAt.format("YYYY-MM-DD") : null,
     };
-    ProjectManagement.updateProject(_id, formattedUpdateData)
+    MeetingManagement.updateMeeting(_id, formattedUpdateData)
       .then(() => {
-        toast.success("Project Updated Successfully");
+        toast.success("Meeting Updated Successfully");
         onSave(formData);
         onClose();
         dispatch(setReloadPage(true));
@@ -99,10 +78,10 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
       }}
       onClose={onClose}
     >
-      <CloseDialog title="Update Project" handleClose={onClose} />
+      <CloseDialog title="Update Meeting" handleClose={onClose} />
 
       <DialogContent>
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid  gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs text-gray-500">TITLE</p>
             <TextField
@@ -115,66 +94,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">STATUS</p>
-            <NativeSelect
-              name="status"
-              style={{
-                fontSize: "12px",
-                borderRadius: "5px",
-                height: "56px",
-                border: "1px solid gray",
-                textAlign: "center",
-                backgroundColor: color,
-              }}
-              onChange={handleStatusChange} // Change handler for status
-              disableUnderline={true}
-              value={formData.status?.title || ""} // Bind to formData.status.title
-            >
-              {statuses?.map((el) => (
-                <option
-                  key={el.title}
-                  style={{
-                    backgroundColor: el.bgColor,
-                    color: el.txColor,
-                    textAlign: "center",
-                  }}
-                  value={el.title}
-                >
-                  {el.title}
-                </option>
-              ))}
-            </NativeSelect>
-          </FormControl>
         </div>
-
-        <div className="grid grid-cols-2 gap-5">
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">PRIORITY</p>
-            <Select
-              name="priority"
-              value={formData.priority || ""}
-              onChange={handleChange}
-            >
-              <MenuItem value="High">High</MenuItem>
-              <MenuItem value="Medium">Medium</MenuItem>
-              <MenuItem value="Low">Low</MenuItem>
-              <MenuItem value="Critical">Critical</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs text-gray-500">BUDGET</p>
-            <TextField
-              margin="dense"
-              name="budget"
-              type="text"
-              fullWidth
-              value={formData.budget || ""}
-              onChange={handleChange}
-            />
-          </FormControl>
-        </div>
-
         <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">START DATE</p>
@@ -235,21 +155,6 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
             <TextField {...params} variant="outlined" label="Select Clients" />
           )}
         />
-
-        {/* Autocomplete for Tags */}
-        <Autocomplete
-          className="mt-10"
-          multiple
-          options={["design", "website", "development", "marketing"]}
-          getOptionLabel={(option) => option}
-          value={formData.tags || []}
-          onChange={(event, newValue) => {
-            setFormData((prev) => ({ ...prev, tags: newValue }));
-          }}
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Tags" />
-          )}
-        />
       </DialogContent>
       <DialogActions>
         <div className="border rounded-lg text-gray-600">
@@ -276,11 +181,11 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   );
 };
 
-UpdateProjectDialog.propTypes = {
+UpdateMeetingDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   project: PropTypes.object,
   onSave: PropTypes.func.isRequired,
 };
 
-export default UpdateProjectDialog;
+export default UpdateMeetingDialog;

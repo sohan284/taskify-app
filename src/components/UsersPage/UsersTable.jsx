@@ -24,6 +24,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import UserManagement from "../../service/User";
 import { useNavigate } from "react-router-dom";
 import DeleteDialog from "../../shared/DeleteDialog";
+import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -33,7 +34,7 @@ const UsersTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [visibleColumns] = useState({
+  const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     displayName: true,
     email: true,
@@ -152,10 +153,16 @@ const UsersTable = () => {
               <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
             </Button>
           </div>
-          <SearchFilter
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
+          <div className="flex">
+            <SearchFilter
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+            <ColumnVisibilityButton
+              visibleColumns={visibleColumns}
+              setVisibleColumns={setVisibleColumns}
+            />
+          </div>
         </div>
         <TableContainer>
           <Table

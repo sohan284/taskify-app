@@ -15,6 +15,7 @@ import CreateTodosDialog from "../TodosPage/CreateTodosDialog";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../shared/Loading";
 
 const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   CustomChart.propTypes = {
@@ -28,6 +29,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [todos, setTodos] = useState([]);
   const [options] = useState({
     chart: {
@@ -58,6 +60,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
       } catch (err) {
         console.log(err);
       } finally {
+        setLoading(false);
         dispatch(setReloadPage(false));
       }
     };
@@ -71,6 +74,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
     : 0;
 
   const updateTodoStatus = async (id, status) => {
+    setLoading(true);
     try {
       await TodoManagement.updateTodoStatus(id, { status }).then(() =>
         dispatch(setReloadPage(true))
@@ -90,6 +94,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
     setOpen(false);
   };
   const handleDeleteTodos = (id) => {
+    setLoading(true);
     TodoManagement.deleteTodos(id)
       .then(() => {
         dispatch(setReloadPage(true));
@@ -100,6 +105,13 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
         console.error("Error deleting the todos:", error);
       });
   };
+  if (loading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+
   return (
     <div className="">
       {title === "Todos Overview" ? (

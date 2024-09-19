@@ -11,30 +11,29 @@ import {
   Button,
   Paper,
   TablePagination,
-  NativeSelect,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GoCopy } from "react-icons/go";
-import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
+// import UpdateProjectDialog from "./UpdateProjectDialog";
 import { toast } from "react-toastify";
-import TaskManagement from "../../service/Task";
 import { useDispatch, useSelector } from "react-redux";
-import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { FaRegEdit } from "react-icons/fa";
 // import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
-import { setFilter } from "../../store/features/projectSlice";
-import UpdateTaskDialog from "./UpdateTasksDialog";
-import DateFilter from "../shared-component/DateFilter";
+import StatusFilter from "../shared-component/StatusFilter";
+import { setFilter, setGridView } from "../../store/features/projectSlice";
 import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
+import DateFilter from "../shared-component/DateFilter";
 import SearchFilter from "../shared-component/SearchFilter";
-import StatusFilter from "../shared-component/StatusFilter";
 import DeleteDialog from "../../shared/DeleteDialog";
+import UpdateMeetingDialog from "./UpdateMeetingDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
-const TasksTable = ({ API }) => {
+import MeetingManagement from "../../service/Meeting";
+import moment from "moment";
+const MeetingsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
@@ -43,18 +42,15 @@ const TasksTable = ({ API }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
     users: true,
     clients: true,
-    status: true,
-    priority: true,
     startsAt: true,
     endsAt: true,
-    budget: true,
-    tags: true,
+    status: true,
     options: true,
   });
   const [open, setOpen] = useState(false);
@@ -83,6 +79,7 @@ const TasksTable = ({ API }) => {
           endDates[1],
           searchQuery
         );
+
         setMembers(result?.data);
       } catch (err) {
         setError(err);
@@ -90,6 +87,7 @@ const TasksTable = ({ API }) => {
         setLoading(false);
         dispatch(setReloadPage(false));
         dispatch(setFilter(false));
+        dispatch(setGridView(false));
       }
     };
 
@@ -132,13 +130,13 @@ const TasksTable = ({ API }) => {
   };
 
   const handleOpenDialog = (project) => {
-    setSelectedTask(project);
+    setSelectedProject(project);
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSelectedTask(null);
+    setSelectedProject(null);
   };
 
   const handleSaveDialog = () => {};
@@ -151,54 +149,17 @@ const TasksTable = ({ API }) => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    TaskManagement.deleteTask(id)
+    MeetingManagement.deleteMeeting(id)
       .then(() => {
         dispatch(setReloadPage(true));
         handleClose();
-        toast.success("Task Delete Successfully");
+        toast.success("Project Delete Successfully");
       })
       .catch((error) => {
         console.error("Error deleting the project:", error);
       });
   };
-  const handleStatusChange = async (e, member) => {
-    const updatedStatus = e.target.value;
-    try {
-      await TaskManagement.updateTaskStatus(member._id, updatedStatus);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) =>
-          m.id === member.id ? { ...m, status: updatedStatus } : m
-        )
-      );
-      dispatch(setReloadPage(true));
-      toast.success("Status Updated Successfully");
-    } catch (error) {
-      console.error("Error updating the status:", error);
-    }
-  };
-  const handleFavourite = async (member, value, message) => {
-    const favourite = value;
-    try {
-      await TaskManagement.updateTaskFavourite(member._id, favourite);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
-      );
-      dispatch(setReloadPage(true));
-      toast.success(`${message} Successfully`);
-    } catch (error) {
-      console.error("Error updating the favourite status:", error);
-    }
-  };
 
-  //  status filter
-  const handleStatusFilter = (event) => {
-    if (event.target.value === "Select Status") {
-      setStatusFilter("");
-    } else {
-      setStatusFilter(event.target.value);
-    }
-    dispatch(setFilter(true));
-  };
   //  user filter
   const handleUserFilter = (event) => {
     if (event.target.value === "Select User") {
@@ -235,7 +196,7 @@ const TasksTable = ({ API }) => {
         {/* status filter  */}
         <StatusFilter
           statusFilter={statusFilter}
-          handleStatusFilter={handleStatusFilter}
+          setStatusFilter={setStatusFilter}
         />
         <UserFilter
           userFilter={userFilter}
@@ -249,7 +210,7 @@ const TasksTable = ({ API }) => {
 
       <Paper>
         <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
-          <div className="flex h-10 text-nowrap">
+          <div className="flex h-10 lg:text-nowrap overflow-auto">
             <Button
               variant="contained"
               onClick={handleDeleteSelected}
@@ -320,13 +281,10 @@ const TasksTable = ({ API }) => {
                 {visibleColumns?.title && <TableCell>TITLE</TableCell>}
                 {visibleColumns?.users && <TableCell>USERS</TableCell>}
                 {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
-                {visibleColumns?.status && <TableCell>STATUS</TableCell>}
-                {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
                 {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
-                {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
-                {visibleColumns?.budget && <TableCell>BUDGET</TableCell>}
-                {visibleColumns?.tags && <TableCell>TAGS</TableCell>}
-                {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
+                {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}{" "}
+                {visibleColumns?.status && <TableCell>STATUS</TableCell>}
+                {visibleColumns?.options && <TableCell>ACTIONS</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody className="text-nowrap">
@@ -344,33 +302,7 @@ const TasksTable = ({ API }) => {
                     {visibleColumns?.title && (
                       <TableCell>
                         <div className="flex">
-                          <p className="mr-3 text-[#5b6edd] font-semibold">
-                            {member?.title}
-                          </p>
-                          {member?.favourite ? (
-                            <FaStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  false,
-                                  "Remove from Favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          ) : (
-                            <FaRegStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  true,
-                                  "Added to favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          )}
-                          <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
+                          <p className="mr-3 font-medium">{member?.title}</p>{" "}
                         </div>
                       </TableCell>
                     )}
@@ -383,7 +315,7 @@ const TasksTable = ({ API }) => {
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
                                       <img
-                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 w-8 hover:transform hover:-translate-y-1"
                                         src={el?.photoURL}
                                       />
                                     </div>
@@ -423,7 +355,7 @@ const TasksTable = ({ API }) => {
                                 {el?.photoURL ? (
                                   <div className="w-8 h-8 -ml-2">
                                     <img
-                                      className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                      className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 hover:transform hover:-translate-y-1"
                                       src={el?.photoURL}
                                     />
                                   </div>
@@ -457,96 +389,22 @@ const TasksTable = ({ API }) => {
                       </TableCell>
                     )}
 
-                    {visibleColumns?.status && (
+                    {visibleColumns?.startsAt && (
                       <TableCell>
-                        <NativeSelect
-                          name="status"
-                          style={{
-                            fontSize: "12px",
-                            borderRadius: "5px",
-                            height: "28px",
-                            width: "200px",
-                            textAlign: "center",
-                            backgroundColor:
-                              member?.status === "default"
-                                ? "#ff260056"
-                                : member?.status === "started"
-                                ? "#7737c056"
-                                : member?.status === "on going"
-                                ? "#3777c056"
-                                : "#ffd00056",
-                            color:
-                              member?.status === "default"
-                                ? "red"
-                                : member?.status === "started"
-                                ? "#ae00ff"
-                                : member?.status === "on going"
-                                ? "#00aeff"
-                                : "#ff9900",
-                          }}
-                          disableUnderline={true}
-                          value={member?.status}
-                          onChange={(e) => handleStatusChange(e, member)}
-                        >
-                          <option
-                            style={{
-                              backgroundColor: "#ff260056",
-                              color: "red",
-                              textAlign: "center",
-                            }}
-                            value="default"
-                          >
-                            Default
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#7737c056",
-                              color: "#ae00ff",
-                              textAlign: "center",
-                            }}
-                            value="started"
-                          >
-                            Started
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#3777c056",
-                              color: "#00aeff",
-                              textAlign: "center",
-                            }}
-                            value="on going"
-                          >
-                            On Going
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#ffd00056",
-                              color: "#ff9900",
-                              textAlign: "center",
-                            }}
-                            value="in review"
-                          >
-                            In Review
-                          </option>
-                        </NativeSelect>
+                        {moment(member?.startsAt).format(
+                          "MMMM D, YYYY hh:mm:ss A"
+                        )}
                       </TableCell>
                     )}
-                    {visibleColumns?.priority && (
-                      <TableCell>{member?.priority}</TableCell>
+                    {visibleColumns?.endsAt && (
+                      <TableCell>
+                        {moment(member?.endsAt).format(
+                          "MMMM D, YYYY hh:mm:ss A"
+                        )}
+                      </TableCell>
                     )}
                     {visibleColumns?.startsAt && (
                       <TableCell>{member?.startsAt}</TableCell>
-                    )}
-                    {visibleColumns?.endsAt && (
-                      <TableCell>{member?.endsAt}</TableCell>
-                    )}
-                    {visibleColumns?.budget && (
-                      <TableCell>{member?.budget}</TableCell>
-                    )}
-                    {visibleColumns?.tags && (
-                      <TableCell>
-                        {member?.tags?.join(", ") || "No tags"}
-                      </TableCell>
                     )}
                     {visibleColumns?.options && (
                       <TableCell>
@@ -574,13 +432,6 @@ const TasksTable = ({ API }) => {
                               marginRight: "20px",
                             }}
                           />
-                          <ErrorOutlineOutlinedIcon
-                            style={{
-                              color: "#3f51b5",
-                              fontSize: "18px",
-                              marginRight: "10px",
-                            }}
-                          />
                         </div>
                       </TableCell>
                     )}
@@ -599,25 +450,22 @@ const TasksTable = ({ API }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-
-      {/* Use UpdateTaskDialog component */}
-      {/* delete dialog  */}
       <DeleteDialog
         open={open}
         handleClose={handleClose}
         handleDelete={handleDelete}
         id={memberId}
       />
-      <UpdateTaskDialog
+      <UpdateMeetingDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        project={selectedTask}
+        project={selectedProject}
         onSave={handleSaveDialog}
       />
     </div>
   );
 };
-TasksTable.propTypes = {
+MeetingsTable.propTypes = {
   API: PropTypes.func.isRequired,
 };
-export default TasksTable;
+export default MeetingsTable;

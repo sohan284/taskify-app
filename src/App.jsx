@@ -13,6 +13,7 @@ import UsersPage from "./pages/UsersPage";
 import NotesPage from "./pages/NotesPage";
 import CreateUsersPage from "./components/UsersPage/CreateUserPage";
 import UpdateUserPage from "./components/UsersPage/UpdateUserPage";
+import MeetingsPage from "./pages/MeetingsPage";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/users/create" element={<CreateUsersPage />} />
         <Route path="/users/:id" element={<UpdateUserPage />} />
         <Route path="/notes" element={<NotesPage />} />
+        <Route path="/meetings" element={<MeetingsPage />} />
       </Route>
       <Route path="/login" element={<LoginPage />}></Route>
       <Route path="/signup" element={<SignUpPage />}></Route>

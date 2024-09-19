@@ -2,7 +2,6 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -13,10 +12,9 @@ import {
 
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-
-import { IoMdClose } from "react-icons/io";
 import StatusManagement from "../../service/Status";
 import { setReloadPage } from "../../store/features/reloadSlice";
+import CloseDialog from "../../shared/CloseDialog";
 
 const CreateStatusesDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -86,14 +84,7 @@ const CreateStatusesDialog = ({ open, onClose }) => {
       }}
       onClose={onClose}
     >
-      <div className="flex justify-between">
-        <DialogTitle>Create Statuses</DialogTitle>
-        <IoMdClose
-          className="hover:bg-[#130b0b] shadow-xl rounded-lg"
-          onClick={onClose}
-          style={{ margin: "20", fontSize: "26", color: "gray" }}
-        />
-      </div>
+      <CloseDialog title="Create Status" handleClose={onClose} />
 
       <DialogContent>
         <div className="grid grid-cols-1 gap-5">

@@ -35,6 +35,8 @@ import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
 import GridTable from "./GridTable";
 import DeleteDialog from "../../shared/DeleteDialog";
+import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
+import moment from "moment";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -46,7 +48,7 @@ const ProjectsTable = ({ API }) => {
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [visibleColumns] = useState({
+  const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
     users: true,
@@ -288,10 +290,16 @@ const ProjectsTable = ({ API }) => {
               <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
             </Button>
           </div>
-          <SearchFilter
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
+          <div className="flex">
+            <SearchFilter
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+            <ColumnVisibilityButton
+              visibleColumns={visibleColumns}
+              setVisibleColumns={setVisibleColumns}
+            />
+          </div>
         </div>
         {gridView ? (
           <GridTable
@@ -508,10 +516,14 @@ const ProjectsTable = ({ API }) => {
                         <TableCell>{member?.priority}</TableCell>
                       )}
                       {visibleColumns?.startsAt && (
-                        <TableCell>{member?.startsAt}</TableCell>
+                        <TableCell>
+                          {moment(member?.startsAt).format("MMMM D, YYYY")}
+                        </TableCell>
                       )}
                       {visibleColumns?.endsAt && (
-                        <TableCell>{member?.endsAt}</TableCell>
+                        <TableCell>
+                          {moment(member?.endsAt).format("MMMM D, YYYY")}
+                        </TableCell>
                       )}
                       {visibleColumns?.budget && (
                         <TableCell>{member?.budget}</TableCell>

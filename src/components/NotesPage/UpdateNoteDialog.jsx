@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -12,11 +11,11 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { IoMdClose } from "react-icons/io";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import NoteManagement from "../../service/Note";
+import CloseDialog from "../../shared/CloseDialog";
 
 const UpdateNotesDialog = ({ open, onClose, note }) => {
   const [editorContent, setEditorContent] = useState("");
@@ -152,14 +151,7 @@ const UpdateNotesDialog = ({ open, onClose, note }) => {
       }}
       onClose={onClose}
     >
-      <div className="flex justify-between">
-        <DialogTitle>{note ? "Update Note" : "Create Note"}</DialogTitle>
-        <IoMdClose
-          className="hover:bg-[#130b0b] shadow-xl rounded-lg"
-          onClick={onClose}
-          style={{ margin: "20", fontSize: "26", color: "gray" }}
-        />
-      </div>
+      <CloseDialog title="Update Note" handleClose={onClose} />
 
       <DialogContent>
         <div className="grid grid-cols-1 gap-5">

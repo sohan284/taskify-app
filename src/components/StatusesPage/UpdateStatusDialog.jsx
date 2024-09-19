@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   TextField,
   Button,
   NativeSelect,
@@ -13,6 +12,7 @@ import {
 import StatusManagement from "../../service/Status";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
+import CloseDialog from "../../shared/CloseDialog";
 
 const UpdateStatusDialog = ({ open, onClose, status }) => {
   const dispatch = useDispatch();
@@ -86,7 +86,8 @@ const UpdateStatusDialog = ({ open, onClose, status }) => {
       open={open}
       onClose={onClose}
     >
-      <DialogTitle>Update Status</DialogTitle>
+      <CloseDialog title="Update Status" handleClose={onClose} />
+
       <DialogContent>
         <div className="grid grid-cols-1 gap-5">
           <FormControl fullWidth margin="dense">

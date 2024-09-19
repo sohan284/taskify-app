@@ -22,6 +22,7 @@ import StatusManagement from "../../service/Status";
 import UpdateStatusDialog from "./UpdateStatusDialog";
 import Loading from "../../shared/Loading";
 import DeleteDialog from "../../shared/DeleteDialog";
+import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 const StatusesTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -31,7 +32,7 @@ const StatusesTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusId, setStatusId] = useState(null);
-  const [visibleColumns] = useState({
+  const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
     status: true,
@@ -151,10 +152,16 @@ const StatusesTable = () => {
               <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
             </Button>
           </div>
-          <SearchFilter
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
+          <div className="flex">
+            <SearchFilter
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+            <ColumnVisibilityButton
+              visibleColumns={visibleColumns}
+              setVisibleColumns={setVisibleColumns}
+            />
+          </div>
         </div>
         <TableContainer>
           <Table
