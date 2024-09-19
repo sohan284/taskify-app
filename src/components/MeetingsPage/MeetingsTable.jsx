@@ -23,7 +23,7 @@ import { FaRegEdit } from "react-icons/fa";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import StatusFilter from "../shared-component/StatusFilter";
-import { setFilter, setGridView } from "../../store/features/projectSlice";
+import { setFilter } from "../../store/features/projectSlice";
 import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
 import DateFilter from "../shared-component/DateFilter";
@@ -33,6 +33,7 @@ import UpdateMeetingDialog from "./UpdateMeetingDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import MeetingManagement from "../../service/Meeting";
 import moment from "moment";
+import Loading from "../../shared/Loading";
 const MeetingsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -79,7 +80,6 @@ const MeetingsTable = ({ API }) => {
           endDates[1],
           searchQuery
         );
-
         setMembers(result?.data);
       } catch (err) {
         setError(err);
@@ -87,14 +87,18 @@ const MeetingsTable = ({ API }) => {
         setLoading(false);
         dispatch(setReloadPage(false));
         dispatch(setFilter(false));
-        dispatch(setGridView(false));
       }
     };
 
     fetchData();
   }, [reloadPage, filter]);
 
-  if (loading) return <div>{/* <Loading /> */}</div>;
+  if (loading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {

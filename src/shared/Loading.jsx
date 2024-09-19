@@ -1,10 +1,10 @@
-import { FadeLoader } from "react-spinners";
+import { PropagateLoader } from "react-spinners";
 
 const Loading = () => {
   return (
     <div>
-      <div className="flex justify-center mt-36 items-center">
-        <FadeLoader
+      <div className="flex justify-center my-36 items-center">
+        <PropagateLoader
           color="tomato"
           // size={100}
         />

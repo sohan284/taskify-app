@@ -17,14 +17,12 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
-import Loading from "../../shared/Loading";
 import MeetingManagement from "../../service/Meeting";
 import CloseDialog from "../../shared/CloseDialog";
 
 const CreateMeetingDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]); // Users fetched from API
-  const [loading, setLoading] = useState(true);
   // const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -46,7 +44,6 @@ const CreateMeetingDialog = ({ open, onClose }) => {
       } catch (err) {
         console.log(err);
       } finally {
-        setLoading(false);
         dispatch(setReloadPage(false));
       }
     };
@@ -83,12 +80,6 @@ const CreateMeetingDialog = ({ open, onClose }) => {
         toast.error(`${error}`);
       });
   };
-  if (loading)
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
 
   return (
     <Dialog
