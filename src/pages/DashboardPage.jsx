@@ -26,6 +26,7 @@ function DashboardPage() {
   const [projectCount, setProjectCount] = useState(null);
   const [taskCount, setTaskCount] = useState(null);
   const [userCount, setUserCount] = useState(null);
+  const [clientCount, setClientCount] = useState(null);
   const [chartDetails, setChartDetails] = useState([]);
 
   let cardDetails = [
@@ -47,7 +48,7 @@ function DashboardPage() {
     {
       _id: "66dbda4e634dfb28c415b5cb",
       title: "Clients",
-      total: userCount,
+      total: clientCount,
       color: "#00b9d1",
     },
   ];
@@ -55,34 +56,47 @@ function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get projects
-        const projectResult = await ProjectManagement.getProjectList();
-        const projects = projectResult?.data || [];
-        setProjectCount(projects.length);
+        setLoading(true); // Start loading
 
-        // Aggregate data for the charts
+        // Fetch all data concurrently
+        const [projectResult, taskResult, todosResult, userResult] =
+          await Promise.all([
+            ProjectManagement.getProjectList(),
+            TaskManagement.getTaskList(),
+            TodoManagement.getTodosList(),
+            UserManagement.getUserList(),
+          ]);
+
+        const projects = projectResult?.data || [];
+        const tasks = taskResult?.data || [];
+        const { trueCount, falseCount } = todosResult.statusCount;
+        const users = userResult.data || [];
+
+        // Set counts
+        setProjectCount(projects.length);
+        setTaskCount(tasks.length);
+        setUserCount(users.length);
+        setClientCount(
+          await UserManagement.getUserList("client").then(
+            (res) => res.data.length
+          )
+        );
+
+        // Aggregate data for projects
         const projectsCounts = projects.reduce((acc, project) => {
           const status = project.status?.title;
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         }, {});
 
-        let projectLabels = [];
-        let projectColors = [];
         const statusResult = await StatusManagement.getStatusList();
-        statusResult.data.forEach((status) => {
-          projectColors.push(status.txColor);
-          projectLabels.push(status.title);
-        });
+        const projectLabels = statusResult.data.map((status) => status.title);
+        const projectColors = statusResult.data.map((status) => status.txColor);
         const projectSeries = projectLabels.map(
           (label) => projectsCounts[label] || 0
         );
 
-        // Get tasks
-        const taskResult = await TaskManagement.getTaskList();
-        const tasks = taskResult?.data || [];
-        setTaskCount(tasks.length);
-
+        // Aggregate data for tasks
         const taskCounts = tasks.reduce((acc, task) => {
           const status = task.status;
           acc[status] = (acc[status] || 0) + 1;
@@ -91,11 +105,7 @@ function DashboardPage() {
         const taskLabels = Object.keys(taskCounts);
         const taskSeries = Object.values(taskCounts);
 
-        // Get todos
-        const todosResult = await TodoManagement.getTodosList();
-        const { trueCount, falseCount } = todosResult.statusCount;
-        const todosSeries = [trueCount, falseCount];
-        dispatch(setPendingTodos(falseCount));
+        // Set chart details
         setChartDetails([
           {
             title: "Project Statistics",
@@ -111,28 +121,24 @@ function DashboardPage() {
           },
           {
             title: "Todos Overview",
-            series: todosSeries,
+            series: [trueCount, falseCount],
             labels: ["Done", "Pending"],
             colors: ["#57bb29", "#df3b3b"],
           },
         ]);
 
-        // Get users
-        const userResult = await UserManagement.getUserList();
-        const users = userResult.data || [];
-        setUserCount(users.length);
+        // Dispatch pending todos count
+        dispatch(setPendingTodos(falseCount));
 
-        // Check if the user already exists
-        const existingUser = users.find((u) => u.email === user?.email);
-
+        // Check if the user already exists and create if not
         if (user) {
+          const existingUser = users.find((u) => u.email === user.email);
           const userData = {
             email: user.email,
             photoURL: user.photoURL || "",
             displayName: user.displayName || "",
           };
 
-          // Only create a new user if they do not exist
           if (!existingUser && createUser) {
             await UserManagement.upsertUser(userData);
             dispatch(setCreateUser(false));
@@ -155,7 +161,7 @@ function DashboardPage() {
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       {loading ? (
-        <div className="mt-[50%]">
+        <div className="mt-[80%]">
           <Loading />
         </div>
       ) : error ? (
