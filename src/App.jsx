@@ -17,6 +17,7 @@ import MeetingsPage from "./pages/MeetingsPage";
 import ClientsPage from "./pages/ClientsPage";
 import CreateClientPage from "./components/ClientsPage/CreateClientPage";
 import UpdateClientPage from "./components/ClientsPage/UpdateClientPage";
+import TagsPage from "./pages/TagsPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/favourite" element={<FavouriteProjectsPage />} />
+        <Route path="/projects/tags" element={<TagsPage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/statuses" element={<StatusesPage />} />
         <Route path="/todos" element={<TodosPage />} />

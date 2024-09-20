@@ -24,6 +24,7 @@ import UserManagement from "../../service/User";
 import Loading from "../../shared/Loading";
 import StatusManagement from "../../service/Status";
 import CloseDialog from "../../shared/CloseDialog";
+import TagManagement from "../../service/Tag";
 
 const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [statuses, setStatuses] = useState([]);
   const [color, setColor] = useState([]);
+  const [tags, setTags] = useState([]);
   // const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -48,18 +50,29 @@ const CreateProjectDialog = ({ open, onClose }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await UserManagement.getUserList();
-        setUsers(response.data);
-        const response2 = await UserManagement.getUserList("client");
-        setClients(response2.data);
-        await StatusManagement.getStatusList().then((res) => {
-          setStatuses(res.data), setColor(res?.data[0]?.bgColor);
-        });
+        setLoading(true); // Optional: start loading before the API calls
+
+        // Call all the APIs concurrently
+        const [userResponse, clientResponse, statusResponse, tagResponse] =
+          await Promise.all([
+            UserManagement.getUserList(),
+            UserManagement.getUserList("client"),
+            StatusManagement.getStatusList(),
+            TagManagement.getTagList(),
+          ]);
+
+        // Set the data from all API responses
+        setUsers(userResponse?.data);
+        setClients(clientResponse?.data);
+        setStatuses(statusResponse?.data);
+        setColor(statusResponse?.data[0]?.bgColor);
+        setTags(tagResponse?.data);
+        
       } catch (err) {
         console.log(err);
       } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
+        setLoading(false); // Finish loading after all API calls
+        dispatch(setReloadPage(false)); // Reset reload state
       }
     };
 
@@ -285,7 +298,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={["design", "website", "development", "marketing"]}
+          options={tags.map((tag) => tag.title)}
           getOptionLabel={(option) => option}
           value={formData.tags}
           onChange={(event, newValue) => {

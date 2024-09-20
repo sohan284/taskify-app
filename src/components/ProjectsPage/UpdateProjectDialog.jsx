@@ -23,7 +23,7 @@ import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import StatusManagement from "../../service/Status";
 import CloseDialog from "../../shared/CloseDialog";
-
+import TagManagement from "../../service/Tag";
 const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
   const [statuses, setStatuses] = useState([]);
@@ -31,20 +31,23 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const [color, setColor] = useState([]);
   const [users, setUsers] = useState([]);
   const [clients, setClients] = useState([]);
+  const [tags, setTags] = useState([]); // State for tags
 
   useEffect(() => {
     if (project) {
       UserManagement.getUserList().then((res) => setUsers(res?.data));
       UserManagement.getUserList("client").then((res) => setClients(res?.data));
+      StatusManagement.getStatusList().then((res) => {
+        setStatuses(res.data);
+        setColor(res?.data[0]?.bgColor);
+      });
+      TagManagement.getTagList().then((res) => setTags(res?.data)); // Fetch tags from API
       setFormData({
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,
         endsAt: project.endsAt ? dayjs(project.endsAt) : null,
         status: project.status || {}, // Initialize status as an object
-      });
-      StatusManagement.getStatusList().then((res) => {
-        setStatuses(res.data);
-        setColor(res?.data[0]?.bgColor);
+        tags: project.tags || [], // Set initial tags from project
       });
     }
   }, [project]);
@@ -242,14 +245,19 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={["design", "website", "development", "marketing"]}
-          getOptionLabel={(option) => option}
+          options={tags.map((tag) => tag.title)}
+          getOptionLabel={(option) => option.name || option} // Assuming the tag has a 'name' field
           value={formData.tags || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, tags: newValue }));
           }}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Tags" />
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Select Tags"
+              placeholder="Select tags"
+            />
           )}
         />
       </DialogContent>
