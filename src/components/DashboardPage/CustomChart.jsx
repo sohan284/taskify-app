@@ -42,7 +42,7 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
         breakpoint: 480,
         options: {
           chart: {
-            width: 200,
+            width: 320,
           },
           legend: {
             position: "bottom",
