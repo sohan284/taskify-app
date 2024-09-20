@@ -51,7 +51,9 @@ const updateTaskStatus = async (taskId, status) => {
   try {
     const response = await axios.put(
       `https://taskify-server-iota.vercel.app/tasks/${taskId}`,
-      { status }
+      {
+        status,
+      }
     );
     if (response.data.success) {
       console.log("Task status updated successfully");

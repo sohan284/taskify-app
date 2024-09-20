@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -19,6 +18,8 @@ import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import MeetingManagement from "../../service/Meeting";
 import CloseDialog from "../../shared/CloseDialog";
+
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
@@ -48,13 +49,21 @@ const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
 
   const handleSave = () => {
     const { _id, ...updateData } = formData;
+
+    console.log("Before formatting:", formData.startsAt, formData.endsAt); // Debugging to see if values are correct
+
     const formattedUpdateData = {
       ...updateData,
       startsAt: formData.startsAt
-        ? formData.startsAt.format("YYYY-MM-DD")
+        ? dayjs(formData.startsAt).format("YYYY-MM-DDTHH:mm:ss") // Ensure dayjs formatting properly
         : null,
-      endsAt: formData.endsAt ? formData.endsAt.format("YYYY-MM-DD") : null,
+      endsAt: formData.endsAt
+        ? dayjs(formData.endsAt).format("YYYY-MM-DDTHH:mm:ss")
+        : null,
     };
+
+    console.log("Formatted update data:", formattedUpdateData); // Debugging to check formatted data
+
     MeetingManagement.updateMeeting(_id, formattedUpdateData)
       .then(() => {
         toast.success("Meeting Updated Successfully");
@@ -81,7 +90,7 @@ const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
       <CloseDialog title="Update Meeting" handleClose={onClose} />
 
       <DialogContent>
-        <div className="grid  gap-5">
+        <div className="grid gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs text-gray-500">TITLE</p>
             <TextField
@@ -97,11 +106,10 @@ const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
         </div>
         <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">START DATE</p>
+            <p className="text-xs mt-2 text-gray-500">START DATE & TIME</p>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                views={["day"]}
-                format="DD-MM-YYYY"
+              <DateTimePicker
+                format="DD-MM-YYYY HH:mm"
                 value={formData.startsAt || null}
                 onChange={(newDate) => handleDateChange("startsAt", newDate)}
                 renderInput={(params) => <TextField {...params} />}
@@ -109,10 +117,10 @@ const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
             </LocalizationProvider>
           </FormControl>
           <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">END DATE</p>
+            <p className="text-xs mt-2 text-gray-500">END DATE & TIME</p>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                format="DD-MM-YYYY"
+              <DateTimePicker
+                format="DD-MM-YYYY HH:mm"
                 value={formData.endsAt || null}
                 onChange={(newDate) => handleDateChange("endsAt", newDate)}
                 renderInput={(params) => <TextField {...params} />}

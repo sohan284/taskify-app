@@ -27,7 +27,8 @@ import CloseDialog from "../../shared/CloseDialog";
 
 const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
-  const [users, setUsers] = useState([]); // Users fetched from API
+  const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statuses, setStatuses] = useState([]);
   const [color, setColor] = useState([]);
@@ -48,7 +49,9 @@ const CreateProjectDialog = ({ open, onClose }) => {
     const fetchData = async () => {
       try {
         const response = await UserManagement.getUserList();
-        setUsers(response.data); // Set the user list
+        setUsers(response.data);
+        const response2 = await UserManagement.getUserList("client");
+        setClients(response2.data);
         await StatusManagement.getStatusList().then((res) => {
           setStatuses(res.data), setColor(res?.data[0]?.bgColor);
         });
@@ -262,7 +265,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={users}
+          options={clients}
           getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients}
           onChange={(event, newValue) => {

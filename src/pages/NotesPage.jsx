@@ -41,14 +41,7 @@ const NotesPage = () => {
     >
       Home
     </Link>,
-    <Link
-      style={{ fontWeight: 500 }}
-      underline="hover"
-      key="2"
-      color="black"
-      href="/notes"
-      onClick={() => handleClick("/notes")}
-    >
+    <Link style={{ fontWeight: 500 }} underline="none" key="2" color="inherit">
       Notes
     </Link>,
   ];

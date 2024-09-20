@@ -3,13 +3,9 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
-import { IoGridSharp } from "react-icons/io5";
-import { useState } from "react";
-import TasksTable from "../components/TasksPage/TasksTable";
-import TaskManagement from "../service/Task";
-import CreateTaskDialog from "../components/TasksPage/CreateTaskDialog";
-const TasksPage = () => {
-  const [open, setOpen] = useState(false);
+import ClientsTable from "../components/ClientsPage/ClientsTable";
+const ClientsPage = () => {
+  // const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   function handleClick(event) {
     event.preventDefault();
@@ -27,12 +23,12 @@ const TasksPage = () => {
       Home
     </Link>,
     <Link style={{ fontWeight: 500 }} underline="none" key="2" color="inherit">
-      Tasks
+      Clients
     </Link>,
   ];
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       <div className="flex justify-between">
@@ -43,22 +39,19 @@ const TasksPage = () => {
         </Stack>
         <div className="mt-6 flex h-8">
           <div
-            onClick={() => setOpen(true)}
+            onClick={() => navigate("/clients/create")}
             className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white"
           >
             <IoMdAdd />
           </div>
-          <div className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 rounded hover:text-xl text-white">
-            <IoGridSharp />
-          </div>
         </div>
       </div>
       <div>
-        <TasksTable API={TaskManagement.getTaskList} />
+        <ClientsTable />
       </div>
-      <CreateTaskDialog open={open} onClose={handleClose} />
+      {/* <CreateUsersDialog open={open} onClose={handleClose} /> */}
     </div>
   );
 };
 
-export default TasksPage;
+export default ClientsPage;

@@ -22,14 +22,7 @@ const UsersPage = () => {
     >
       Home
     </Link>,
-    <Link
-      style={{ fontWeight: 500 }}
-      underline="hover"
-      key="2"
-      color="black"
-      href="/users"
-      onClick={() => handleClick("/users")}
-    >
+    <Link style={{ fontWeight: 500 }} underline="none" key="2" color="inherit">
       Users
     </Link>,
   ];

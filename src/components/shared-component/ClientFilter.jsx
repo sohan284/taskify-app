@@ -6,7 +6,7 @@ import UserManagement from "../../service/User";
 const ClientFilter = ({ clientFilter, handleClientFilter }) => {
   const [users, setUsers] = useState(null);
   useEffect(() => {
-    UserManagement.getUserList().then((res) => setUsers(res.data));
+    UserManagement.getUserList("client").then((res) => setUsers(res.data));
   }, []);
   return (
     <div>

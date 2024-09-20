@@ -12,7 +12,7 @@ const DeleteDialog = ({ open, handleClose, handleDelete, id }) => {
       aria-describedby="alert-dialog-description"
     >
       <div className="p-8 text-center">
-        <div className="flex justify-center text-8xl text-[#ff6347cc]">
+        <div className="flex justify-center text-8xl text-[#ff4a44ec]">
           <TiDeleteOutline />
         </div>
         <DialogTitle id="alert-dialog-title">
@@ -41,7 +41,7 @@ const DeleteDialog = ({ open, handleClose, handleDelete, id }) => {
               margin: "10px",
               fontSize: "16px",
               paddingInline: "30px",
-              backgroundColor: "#ff6347cc",
+              backgroundColor: "#ff4a44ec",
             }}
             onClick={() => handleDelete(id)}
             autoFocus

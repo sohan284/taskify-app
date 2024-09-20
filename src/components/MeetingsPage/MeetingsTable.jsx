@@ -11,6 +11,9 @@ import {
   Button,
   Paper,
   TablePagination,
+  MenuItem,
+  Select,
+  FormControl,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -22,7 +25,6 @@ import { FaRegEdit } from "react-icons/fa";
 // import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
-import StatusFilter from "../shared-component/StatusFilter";
 import { setFilter } from "../../store/features/projectSlice";
 import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
@@ -183,6 +185,14 @@ const MeetingsTable = ({ API }) => {
     }
     dispatch(setFilter(true));
   };
+  const handleStatusFilter = (event) => {
+    if (event.target.value === "Select Status") {
+      setStatusFilter("");
+    } else {
+      setStatusFilter(event.target.value);
+    }
+    dispatch(setFilter(true));
+  };
   return (
     <div>
       <div className="grid grid-cols-3 gap-5">
@@ -198,10 +208,37 @@ const MeetingsTable = ({ API }) => {
           placeHolder="End Between"
         />
         {/* status filter  */}
-        <StatusFilter
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-        />
+        <FormControl fullWidth size="small">
+          <Select
+            style={{ color: "gray" }}
+            className="w-full h-8"
+            value={statusFilter || "Select Status"}
+            defaultValue="Select Status"
+            onChange={handleStatusFilter}
+          >
+            <MenuItem
+              style={{ color: "gray", fontSize: "14px" }}
+              value="Select Status"
+            >
+              Select Status
+            </MenuItem>
+            <MenuItem
+              style={{ color: "gray", fontSize: "14px" }}
+              value="Ongoing"
+            >
+              Ongoing
+            </MenuItem>
+            <MenuItem
+              style={{ color: "gray", fontSize: "14px" }}
+              value="Yet to Start"
+            >
+              Yet to Start
+            </MenuItem>
+            <MenuItem style={{ color: "gray", fontSize: "14px" }} value="Ended">
+              Ended
+            </MenuItem>
+          </Select>
+        </FormControl>
         <UserFilter
           userFilter={userFilter}
           handleUserFilter={handleUserFilter}
@@ -408,7 +445,9 @@ const MeetingsTable = ({ API }) => {
                       </TableCell>
                     )}
                     {visibleColumns?.startsAt && (
-                      <TableCell>{member?.startsAt}</TableCell>
+                      <TableCell>
+                        {member?.status ? member?.status : "No Status"}
+                      </TableCell>
                     )}
                     {visibleColumns?.options && (
                       <TableCell>

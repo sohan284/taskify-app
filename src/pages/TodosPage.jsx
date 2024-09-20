@@ -34,14 +34,7 @@ const TodosPage = () => {
     >
       Home
     </Link>,
-    <Link
-      style={{ fontWeight: 400 }}
-      underline="hover"
-      key="2"
-      color="inherit"
-      href="/todos"
-      onClick={() => handleClick("/todos")}
-    >
+    <Link style={{ fontWeight: 500 }} underline="none" key="2" color="inherit">
       Todos
     </Link>,
   ];

@@ -391,11 +391,12 @@ const UpdateUserPage = () => {
                   onChange={handleChange}
                   size="small"
                 >
-                  <MenuItem value="Admin">Admin</MenuItem>
-                  <MenuItem value="User">User</MenuItem>
-                  <MenuItem value="Member">Member</MenuItem>
+                  <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="user">User</MenuItem>
+                  <MenuItem value="member">Member</MenuItem>
                 </Select>
-              </FormControl>s
+              </FormControl>
+              s
             </Grid>
 
             <Grid item xs={12} sm={6}>

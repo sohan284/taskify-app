@@ -1,12 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Button,
   TextField,
   FormControl,
   Grid,
-  Select,
-  MenuItem,
   FormControlLabel,
   Checkbox,
   Stack,
@@ -15,14 +13,14 @@ import {
 } from "@mui/material";
 
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import UserManagement from "../../service/User";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-
-const CreateUsersPage = () => {
-  const navigate = useNavigate();
+const UpdateClientPage = () => {
+  const { id } = useParams();
   const [phone, setPhone] = useState(null);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     displayName: "",
     lastName: "",
@@ -34,7 +32,7 @@ const CreateUsersPage = () => {
     confirmPassword: "",
     dateOfBirth: "",
     dateOfJoining: "",
-    role: "",
+    role: "client",
     address: "",
     city: "",
     state: "",
@@ -44,6 +42,31 @@ const CreateUsersPage = () => {
     requireEmailVerification: false,
     photoURL: null,
   });
+  useEffect(() => {
+    UserManagement.getSingleUser(id).then((res) => {
+      setFormData({
+        displayName: res.data.displayName,
+        lastName: res.data.lastName,
+        email: res.data.email,
+        company: res.data?.company,
+        countryCode: res.data.countryCode || "+1",
+        password: res.data.password,
+        confirmPassword: res.data.password,
+        dateOfBirth: res.data.dateOfBirth,
+        dateOfJoining: res.data.dateOfJoining,
+        role: res.data.role,
+        address: res.data.address,
+        city: res.data.city,
+        state: res.data.state,
+        country: res.data.country,
+        zipCode: res.data.zipCode,
+        status: res.data.status,
+        requireEmailVerification: res.data.requireEmailVerification,
+        photoURL: res.data.photoURL,
+      });
+      setPhone(res.data.phoneNumber);
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,7 +108,7 @@ const CreateUsersPage = () => {
     // Form submit logic here
   };
 
-  const handleCreate = () => {
+  const handleUpsert = () => {
     const newProject = {
       ...formData,
       phoneNumber: phone,
@@ -93,13 +116,13 @@ const CreateUsersPage = () => {
 
     UserManagement.upsertUser(newProject)
       .then(() => {
-        toast.success("Status Created Successfully");
+        toast.success("User Created Successfully");
         setFormData({
           displayName: "",
           lastName: "",
           email: "",
-          company: "",
           countryCode: "+1",
+          company: "",
           phoneNumber: "",
           password: "",
           confirmPassword: "",
@@ -115,7 +138,7 @@ const CreateUsersPage = () => {
           requireEmailVerification: false,
           photoURL: null,
         });
-        navigate("/users");
+        navigate("/clients");
       })
       .catch((error) => {
         toast.error(`${error}`);
@@ -154,7 +177,7 @@ const CreateUsersPage = () => {
       href="/users"
       onClick={() => handleClick("/users/create")}
     >
-      Create
+      Update
     </Link>,
   ];
   return (
@@ -209,8 +232,23 @@ const CreateUsersPage = () => {
                   placeholder="Please Enter Email"
                   name="email"
                   type="email"
+                  disabled
                   size="small"
                   value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth margin="dense">
+                <p className="text-xs text-gray-500">Company *</p>
+                <TextField
+                  placeholder="Please Enter Company"
+                  name="company"
+                  type="text"
+                  size="small"
+                  value={formData.company}
                   onChange={handleChange}
                   required
                 />
@@ -358,23 +396,6 @@ const CreateUsersPage = () => {
                 />
               </FormControl>
             </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth margin="dense">
-                <p className="text-xs text-gray-500">Role</p>
-                <Select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  size="small"
-                >
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="user">User</MenuItem>
-                  <MenuItem value="member">Member</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
             <Grid item xs={12} sm={6}>
               <FormControlLabel
                 control={
@@ -430,8 +451,8 @@ const CreateUsersPage = () => {
             </Grid>
           </Grid>
         </form>
-        <Button variant="contained" color="primary" onClick={handleCreate}>
-          Create
+        <Button variant="contained" color="primary" onClick={handleUpsert}>
+          Update
         </Button>
         <Button>Cancel</Button>
       </div>
@@ -439,9 +460,9 @@ const CreateUsersPage = () => {
   );
 };
 
-CreateUsersPage.propTypes = {
+UpdateClientPage.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-export default CreateUsersPage;
+export default UpdateClientPage;

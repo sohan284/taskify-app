@@ -196,7 +196,10 @@ function SideBar(props) {
             }}
             onClick={() => handleNavigate("/meetings")}
           >
-            <SiGotomeeting style={{ fontSize:'16', color: "lightgreen" }} className="mr-5 " />
+            <SiGotomeeting
+              style={{ fontSize: "16", color: "lightgreen" }}
+              className="mr-5 "
+            />
             Meetings
           </Button>
           <Button
@@ -209,10 +212,25 @@ function SideBar(props) {
             onClick={() => handleNavigate("/users")}
           >
             <LuUsers2
-              style={{ color: "orange", fontSize: "20" }}
+              style={{ color: "#6479f3", fontSize: "20" }}
               className="mr-4"
             />
             Users
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "600",
+              color: "#888888",
+              justifyContent: "flex-start",
+            }}
+            onClick={() => handleNavigate("/clients")}
+          >
+            <LuUsers2
+              style={{ color: "orange", fontSize: "20" }}
+              className="mr-4"
+            />
+            Clients
           </Button>
           <Button
             className="flex items-center w-full"

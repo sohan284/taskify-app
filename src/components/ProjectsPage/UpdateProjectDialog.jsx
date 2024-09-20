@@ -30,10 +30,12 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
   const dispatch = useDispatch();
   const [color, setColor] = useState([]);
   const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
 
   useEffect(() => {
     if (project) {
       UserManagement.getUserList().then((res) => setUsers(res?.data));
+      UserManagement.getUserList("client").then((res) => setClients(res?.data));
       setFormData({
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,
@@ -225,7 +227,7 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={users}
+          options={clients}
           getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients || []}
           onChange={(event, newValue) => {

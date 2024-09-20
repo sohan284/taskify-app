@@ -13,10 +13,10 @@ const upsertUser = async (userData) => {
     throw error;
   }
 };
-const getUserList = async () => {
+const getUserList = async (role = "") => {
   try {
     const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/users"
+      `https://taskify-server-iota.vercel.app/users?role=${role}`
     );
     return response.data;
   } catch (error) {

@@ -5,8 +5,6 @@ import {
   TextField,
   FormControl,
   Grid,
-  Select,
-  MenuItem,
   FormControlLabel,
   Checkbox,
   Stack,
@@ -20,21 +18,20 @@ import UserManagement from "../../service/User";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-const CreateUsersPage = () => {
+const CreateClientPage = () => {
   const navigate = useNavigate();
   const [phone, setPhone] = useState(null);
   const [formData, setFormData] = useState({
     displayName: "",
     lastName: "",
     email: "",
-    company: "",
     countryCode: "+1",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
     dateOfBirth: "",
     dateOfJoining: "",
-    role: "",
+    role: "client",
     address: "",
     city: "",
     state: "",
@@ -105,7 +102,7 @@ const CreateUsersPage = () => {
           confirmPassword: "",
           dateOfBirth: "",
           dateOfJoining: "",
-          role: "",
+          role: "client",
           address: "",
           city: "",
           state: "",
@@ -115,7 +112,7 @@ const CreateUsersPage = () => {
           requireEmailVerification: false,
           photoURL: null,
         });
-        navigate("/users");
+        navigate("/clients");
       })
       .catch((error) => {
         toast.error(`${error}`);
@@ -141,19 +138,12 @@ const CreateUsersPage = () => {
       underline="hover"
       key="2"
       color="inherit"
-      href="/users"
-      onClick={() => handleClick("/users")}
+      href="/clients"
+      onClick={() => handleClick("/clients")}
     >
-      Users
+      Clients
     </Link>,
-    <Link
-      style={{ fontWeight: 500 }}
-      underline="hover"
-      key="2"
-      color="black"
-      href="/users"
-      onClick={() => handleClick("/users/create")}
-    >
+    <Link style={{ fontWeight: 500 }} underline="hover" key="2" color="inherit">
       Create
     </Link>,
   ];
@@ -211,6 +201,20 @@ const CreateUsersPage = () => {
                   type="email"
                   size="small"
                   value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth margin="dense">
+                <p className="text-xs text-gray-500">Company *</p>
+                <TextField
+                  placeholder="Please Enter Company"
+                  name="company"
+                  type="text"
+                  size="small"
+                  value={formData.company}
                   onChange={handleChange}
                   required
                 />
@@ -359,7 +363,7 @@ const CreateUsersPage = () => {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            {/* <Grid item xs={12} sm={6}>
               <FormControl fullWidth margin="dense">
                 <p className="text-xs text-gray-500">Role</p>
                 <Select
@@ -373,7 +377,7 @@ const CreateUsersPage = () => {
                   <MenuItem value="member">Member</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6}>
               <FormControlLabel
@@ -439,9 +443,9 @@ const CreateUsersPage = () => {
   );
 };
 
-CreateUsersPage.propTypes = {
+CreateClientPage.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
-export default CreateUsersPage;
+export default CreateClientPage;

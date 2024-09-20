@@ -10,8 +10,6 @@ import {
   Button,
   Paper,
   TablePagination,
-  FormControl,
-  MenuItem,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -27,13 +25,10 @@ import UserManagement from "../../service/User";
 import { useNavigate } from "react-router-dom";
 import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
-import { Select } from "antd";
-import { setFilter } from "../../store/features/projectSlice";
-const UsersTable = () => {
+const ClientsTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
-  const [role, setRole] = useState("");
   const [users, setUsers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +38,7 @@ const UsersTable = () => {
     id: true,
     displayName: true,
     email: true,
-    role: true,
+    company: true,
     status: true,
     options: true,
     phoneNumber: true,
@@ -61,14 +56,13 @@ const UsersTable = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        await UserManagement.getUserList(role).then((res) =>
+        await UserManagement.getUserList("client").then((res) =>
           setUsers(res.data)
         );
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
-        dispatch(setFilter(false));
         dispatch(setReloadPage(false));
       }
     };
@@ -137,49 +131,11 @@ const UsersTable = () => {
         console.error("Error deleting the Status:", error);
       });
   };
-  const handleRoleFilter = (event) => {
-    if (event === "Select Role") {
-      setRole("");
-    } else {
-      setRole(event);
-    }
-    dispatch(setFilter(true));
-  };
 
   return (
     <div>
-      <div className="grid grid-cols-2">
-        <FormControl fullWidth size="small">
-          <Select
-            style={{ color: "gray" }}
-            className="w-full h-8"
-            value={role || "Select Role"}
-            defaultValue="Select Role"
-            onChange={handleRoleFilter}
-          >
-            <MenuItem
-              style={{ color: "gray", fontSize: "14px" }}
-              value="Select Role"
-            >
-              Select role
-            </MenuItem>
-            <MenuItem style={{ color: "gray", fontSize: "14px" }} value="admin">
-              Admin
-            </MenuItem>
-            <MenuItem style={{ color: "gray", fontSize: "14px" }} value="user">
-              User
-            </MenuItem>
-            <MenuItem
-              style={{ color: "gray", fontSize: "14px" }}
-              value="member"
-            >
-              Member
-            </MenuItem>
-          </Select>
-        </FormControl>
-      </div>
       <Paper>
-        <div className="flex mt-5 p-1 mb-3 justify-between flex-nowrap">
+        <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
           <div className="flex h-10 text-nowrap">
             <Button
               variant="contained"
@@ -232,8 +188,8 @@ const UsersTable = () => {
                   />
                 </TableCell>
                 {visibleColumns?.id && <TableCell>ID</TableCell>}
-                {visibleColumns?.displayName && <TableCell>USERS</TableCell>}
-                {visibleColumns?.role && <TableCell>ROLE</TableCell>}
+                {visibleColumns?.displayName && <TableCell>CLIENTS</TableCell>}
+                {visibleColumns?.company && <TableCell>COMPANY</TableCell>}
                 {visibleColumns?.phoneNumber && (
                   <TableCell>PHONE NUMBER</TableCell>
                 )}
@@ -298,21 +254,9 @@ const UsersTable = () => {
                         </div>
                       </TableCell>
                     )}
-                    {visibleColumns?.role && (
+                    {visibleColumns?.company && (
                       <TableCell>
-                        <p
-                          className={`  inline p-1 px-2 rounded uppercase font-medium text-xs ${
-                            user?.role === "admin"
-                              ? "bg-blue-200 text-blue-700"
-                              : user?.role === "member"
-                              ? "bg-green-200 text-green-800"
-                              : user?.role === "client"
-                              ? "bg-red-200 text-red-800"
-                              : "bg-orange-200 text-orange-700?"
-                          }`}
-                        >
-                          {user?.role}
-                        </p>
+                        <p>{user?.company}</p>
                       </TableCell>
                     )}
                     {visibleColumns?.phoneNumber && (
@@ -347,7 +291,7 @@ const UsersTable = () => {
                               fontSize: "16px",
                               marginRight: "20px",
                             }}
-                            onClick={() => navigate(`/users/${user?._id}`)}
+                            onClick={() => navigate(`/clients/${user?._id}`)}
                           />
                           <RiDeleteBinLine
                             onClick={() => handleClickOpen(user?._id)}
@@ -384,7 +328,7 @@ const UsersTable = () => {
     </div>
   );
 };
-UsersTable.propTypes = {
+ClientsTable.propTypes = {
   API: PropTypes.func.isRequired,
 };
-export default UsersTable;
+export default ClientsTable;

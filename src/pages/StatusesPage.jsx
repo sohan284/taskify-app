@@ -24,14 +24,7 @@ const StatusesPage = () => {
     >
       Home
     </Link>,
-    <Link
-      style={{ fontWeight: 500 }}
-      underline="hover"
-      key="2"
-      color="black"
-      href="/statuses"
-      onClick={() => handleClick("/statuses")}
-    >
+    <Link style={{ fontWeight: 500 }} underline="none" key="2" color="inherit">
       Statuses
     </Link>,
   ];

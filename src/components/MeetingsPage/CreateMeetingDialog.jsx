@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"; // Import DateTimePicker
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
@@ -23,10 +23,9 @@ import CloseDialog from "../../shared/CloseDialog";
 const CreateMeetingDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]); // Users fetched from API
-  // const [error, setError] = useState(null);
+  const [clients, setClients] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    status: "",
     priority: "",
     budget: "",
     startsAt: null,
@@ -34,13 +33,15 @@ const CreateMeetingDialog = ({ open, onClose }) => {
     users: [], // Selected users
     clients: [],
     tags: [],
-    favourite: true,
   });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await UserManagement.getUserList();
-        setUsers(response.data); // Set the user list
+        setUsers(response.data);
+        const response2 = await UserManagement.getUserList("client");
+        setClients(response2.data);
       } catch (err) {
         console.log(err);
       } finally {
@@ -54,6 +55,7 @@ const CreateMeetingDialog = ({ open, onClose }) => {
   const handleDateChange = (name, date) => {
     setFormData((prev) => ({ ...prev, [name]: date }));
   };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -63,10 +65,10 @@ const CreateMeetingDialog = ({ open, onClose }) => {
     const newMeeting = {
       ...formData,
       startsAt: formData.startsAt
-        ? dayjs(formData.startsAt).format("YYYY-MM-DD")
+        ? dayjs(formData.startsAt).format("YYYY-MM-DD HH:mm")
         : null,
       endsAt: formData.endsAt
-        ? dayjs(formData.endsAt).format("YYYY-MM-DD")
+        ? dayjs(formData.endsAt).format("YYYY-MM-DD HH:mm")
         : null,
     };
 
@@ -75,6 +77,16 @@ const CreateMeetingDialog = ({ open, onClose }) => {
         toast.success("Meeting Created Successfully");
         onClose();
         dispatch(setReloadPage(true));
+        setFormData({
+          title: "",
+          priority: "",
+          budget: "",
+          startsAt: null,
+          endsAt: null,
+          users: [], // Selected users
+          clients: [],
+          tags: [],
+        });
       })
       .catch((error) => {
         toast.error(`${error}`);
@@ -113,28 +125,31 @@ const CreateMeetingDialog = ({ open, onClose }) => {
 
         <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">START DATE</p>
+            <p className="text-xs mt-2 text-gray-500">START DATE & TIME</p>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                views={["day"]}
-                format="DD-MM-YYYY"
+              <DateTimePicker
                 value={formData.startsAt || null}
                 onChange={(newDate) => handleDateChange("startsAt", newDate)}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder="Select start date" />
+                  <TextField
+                    {...params}
+                    placeholder="Select start date and time"
+                  />
                 )}
               />
             </LocalizationProvider>
           </FormControl>
           <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">END DATE</p>
+            <p className="text-xs mt-2 text-gray-500">END DATE & TIME</p>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                format="DD-MM-YYYY"
+              <DateTimePicker
                 value={formData.endsAt || null}
                 onChange={(newDate) => handleDateChange("endsAt", newDate)}
                 renderInput={(params) => (
-                  <TextField {...params} placeholder="Select end date" />
+                  <TextField
+                    {...params}
+                    placeholder="Select end date and time"
+                  />
                 )}
               />
             </LocalizationProvider>
@@ -165,7 +180,7 @@ const CreateMeetingDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={users}
+          options={clients}
           getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients}
           onChange={(event, newValue) => {

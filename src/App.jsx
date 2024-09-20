@@ -14,6 +14,9 @@ import NotesPage from "./pages/NotesPage";
 import CreateUsersPage from "./components/UsersPage/CreateUserPage";
 import UpdateUserPage from "./components/UsersPage/UpdateUserPage";
 import MeetingsPage from "./pages/MeetingsPage";
+import ClientsPage from "./pages/ClientsPage";
+import CreateClientPage from "./components/ClientsPage/CreateClientPage";
+import UpdateClientPage from "./components/ClientsPage/UpdateClientPage";
 
 function App() {
   return (
@@ -28,6 +31,9 @@ function App() {
         <Route path="/users" element={<UsersPage />} />
         <Route path="/users/create" element={<CreateUsersPage />} />
         <Route path="/users/:id" element={<UpdateUserPage />} />
+        <Route path="/clients" element={<ClientsPage />} />
+        <Route path="/clients/create" element={<CreateClientPage />} />
+        <Route path="/clients/:id" element={<UpdateClientPage />} />
         <Route path="/notes" element={<NotesPage />} />
         <Route path="/meetings" element={<MeetingsPage />} />
       </Route>
