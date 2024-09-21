@@ -38,6 +38,7 @@ import moment from "moment";
 import UpdateTaskDialog from "./UpdateTasksDialog";
 import TaskManagement from "../../service/Task";
 import GridTable from "../ProjectsPage/GridTable";
+import Loading from "../../shared/Loading";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -104,7 +105,7 @@ const TasksTable = ({ API }) => {
     fetchData();
   }, [reloadPage, filter]);
 
-  if (loading) return <div>{/* <Loading /> */}</div>;
+  if (loading) return <div>{<Loading />}</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {

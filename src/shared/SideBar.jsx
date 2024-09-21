@@ -278,7 +278,7 @@ function SideBar(props) {
             />
             Notes
           </Button>
-          <Button
+          {/* <Button
             className="flex items-center w-full"
             style={{
               fontWeight: "500",
@@ -293,7 +293,7 @@ function SideBar(props) {
               className="mr-5"
             />
             Leave Requests
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>
