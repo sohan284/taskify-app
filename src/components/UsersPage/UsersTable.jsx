@@ -29,6 +29,7 @@ import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import { Select } from "antd";
 import { setFilter } from "../../store/features/projectSlice";
+import moment from "moment";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -47,6 +48,8 @@ const UsersTable = () => {
     status: true,
     options: true,
     phoneNumber: true,
+    dateOfBirth: false,
+    dateOfJoining: false,
     assigned: true,
   });
   const [open, setOpen] = useState(false);
@@ -237,6 +240,12 @@ const UsersTable = () => {
                 {visibleColumns?.phoneNumber && (
                   <TableCell>PHONE NUMBER</TableCell>
                 )}
+                 {visibleColumns?.dateOfBirth && (
+                  <TableCell>DATE OF BIRTH</TableCell>
+                )}
+                 {visibleColumns?.dateOfJoining && (
+                  <TableCell>DATE OF JOINING</TableCell>
+                )}
                 {visibleColumns?.status && <TableCell>ASSIGNED</TableCell>}
                 {visibleColumns?.options && <TableCell>ACTIONS</TableCell>}
               </TableRow>
@@ -321,6 +330,28 @@ const UsersTable = () => {
                           className={`  inline p-1 px-2 rounded uppercase text-xs`}
                         >
                           {user?.phoneNumber}
+                        </p>
+                      </TableCell>
+                    )}
+                     {visibleColumns?.dateOfBirth && (
+                      <TableCell>
+                        <p
+                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
+                        >
+                           {moment(user?.dateOfBirth).format(
+                          "MMMM D, YYYY"
+                        )}
+                        </p>
+                      </TableCell>
+                    )}
+                     {visibleColumns?.dateOfJoining && (
+                      <TableCell>
+                        <p
+                          className={`  inline p-1 px-2 rounded uppercase text-xs`}
+                        >
+                           {moment(user?.dateOfJoining).format(
+                          "MMMM D, YYYY"
+                        )}
                         </p>
                       </TableCell>
                     )}

@@ -41,7 +41,7 @@ const ColumnVisibilityButton = ({ visibleColumns, setVisibleColumns }) => {
         onClose={handleClose}
         PaperProps={{
           style: {
-            maxHeight: 200,
+            maxHeight: 500,
             width: 200, // Adjust width as needed
             fontSize: "0.875rem", // Smaller font size
           },
@@ -56,7 +56,8 @@ const ColumnVisibilityButton = ({ visibleColumns, setVisibleColumns }) => {
               checked={visibleColumns[column]}
               onChange={() => handleToggleColumn(column)}
             />
-            {column.toUpperCase()}
+            {column.slice(0, 1).toUpperCase()}
+            {column.slice(1).toLowerCase()}
           </MenuItem>
         ))}
       </Menu>

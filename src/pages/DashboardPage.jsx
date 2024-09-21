@@ -161,7 +161,7 @@ function DashboardPage() {
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       {loading ? (
-        <div className="mt-[80%]">
+        <div className="mt-[50%]">
           <Loading />
         </div>
       ) : error ? (

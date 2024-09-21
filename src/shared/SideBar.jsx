@@ -26,6 +26,7 @@ import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
 import { SiGotomeeting } from "react-icons/si";
+import { FaArrowRight } from "react-icons/fa";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -85,13 +86,14 @@ function SideBar(props) {
         style={{ cursor: "pointer" }}
       />
       <div className="mt-8 w-full">
-        <div className="flex flex-col">
+        <div className="flex flex-col pl-3">
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/")}
           >
@@ -104,9 +106,10 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={(event) => handleCollapse(event)}
           >
@@ -127,14 +130,23 @@ function SideBar(props) {
           </Button>
 
           <Collapse in={collapseProjects} timeout="auto" unmountOnExit>
-            <div className="ml-8 text-[#888888]">
-              <MenuItem onClick={() => handleNavigate("/projects")}>
+            <div className="ml-8  text-[#888888]">
+              <MenuItem
+                style={{ fontSize: "14px" }}
+                onClick={() => handleNavigate("/projects")}
+              >
                 Manage Projects
               </MenuItem>
-              <MenuItem onClick={() => handleNavigate("/projects/favourite")}>
+              <MenuItem
+                style={{ fontSize: "14px" }}
+                onClick={() => handleNavigate("/projects/favourite")}
+              >
                 Favorite Projects
               </MenuItem>
-              <MenuItem onClick={() => handleNavigate("/projects/tags")}>
+              <MenuItem
+                style={{ fontSize: "14px" }}
+                onClick={() => handleNavigate("/projects/tags")}
+              >
                 Tags
               </MenuItem>
             </div>
@@ -142,9 +154,10 @@ function SideBar(props) {
           <Button
             className="flex  items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/tasks")}
           >
@@ -157,9 +170,10 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/statuses")}
           >
@@ -170,9 +184,10 @@ function SideBar(props) {
           <Button
             className="flex  items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/todos")}
           >
@@ -190,9 +205,10 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/meetings")}
           >
@@ -205,9 +221,10 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/users")}
           >
@@ -220,9 +237,10 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/clients")}
           >
@@ -235,9 +253,10 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "600",
+              fontWeight: "500",
               color: "#888888",
               justifyContent: "flex-start",
+              textTransform: "none",
             }}
             onClick={() => handleNavigate("/notes")}
           >
@@ -246,6 +265,22 @@ function SideBar(props) {
               className="mr-5"
             />
             Notes
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "500",
+              color: "#888888",
+              justifyContent: "flex-start",
+              textTransform: "none",
+            }}
+            onClick={() => handleNavigate("/notes")}
+          >
+            <FaArrowRight
+              style={{ color: "red", fontSize: "16" }}
+              className="mr-5"
+            />
+            Leave Requests
           </Button>
         </div>
       </div>

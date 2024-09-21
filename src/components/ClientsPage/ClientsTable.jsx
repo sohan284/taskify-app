@@ -37,12 +37,10 @@ const ClientsTable = () => {
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     displayName: true,
-    email: true,
     company: true,
-    status: true,
-    options: true,
     phoneNumber: true,
     assigned: true,
+    options: true,
   });
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -193,7 +191,7 @@ const ClientsTable = () => {
                 {visibleColumns?.phoneNumber && (
                   <TableCell>PHONE NUMBER</TableCell>
                 )}
-                {visibleColumns?.status && <TableCell>ASSIGNED</TableCell>}
+                {visibleColumns?.assigned && <TableCell>ASSIGNED</TableCell>}
                 {visibleColumns?.options && <TableCell>ACTIONS</TableCell>}
               </TableRow>
             </TableHead>
