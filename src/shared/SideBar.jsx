@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -27,6 +27,7 @@ import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
 import { SiGotomeeting } from "react-icons/si";
 import { FaArrowRight } from "react-icons/fa";
+import UserManagement from "../service/User";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -39,6 +40,17 @@ function SideBar(props) {
   const [isClosing, setIsClosing] = useState(false);
   const [collapseProjects, setCollapseProjects] = useState(false);
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    UserManagement.getUserList().then((res) => {
+      const foundUser = res.data.find((u) => u.email === user?.email);
+      if (foundUser) {
+        setUserId(foundUser._id);
+      }
+    });
+  }, [user]);
+
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -343,7 +355,7 @@ function SideBar(props) {
                   horizontal: "right",
                 }}
               >
-                <MenuItem onClick={() => handleNavigate("/profile")}>
+                <MenuItem onClick={() => handleNavigate(`/users/${userId}`)}>
                   Profile
                 </MenuItem>
                 <MenuItem onClick={() => handleNavigate("/account")}>

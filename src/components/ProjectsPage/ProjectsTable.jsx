@@ -37,6 +37,7 @@ import GridTable from "./GridTable";
 import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import moment from "moment";
+import Loading from "../../shared/Loading";
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -74,7 +75,6 @@ const ProjectsTable = ({ API }) => {
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  console.log(gridView);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,7 +105,7 @@ const ProjectsTable = ({ API }) => {
     fetchData();
   }, [reloadPage, filter]);
 
-  if (loading) return <div>{/* <Loading /> */}</div>;
+  if (loading) return <div>{<Loading />}</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
