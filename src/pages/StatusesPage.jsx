@@ -51,7 +51,7 @@ const StatusesPage = () => {
       <div>
         <StatusesTable />
       </div>
-      <CreateStatusesDialog open={open} onClose={handleClose} />
+      {open && <CreateStatusesDialog open={open} onClose={handleClose} />}
     </div>
   );
 };

@@ -26,7 +26,6 @@ import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
 import { SiGotomeeting } from "react-icons/si";
-import { FaArrowRight } from "react-icons/fa";
 import UserManagement from "../service/User";
 const drawerWidth = 240;
 
@@ -41,15 +40,19 @@ function SideBar(props) {
   const [collapseProjects, setCollapseProjects] = useState(false);
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const [userId, setUserId] = useState(null);
+  const [loadUser, setLoadUser] = useState(false);
 
   useEffect(() => {
-    UserManagement.getUserList().then((res) => {
-      const foundUser = res.data.find((u) => u.email === user?.email);
-      if (foundUser) {
-        setUserId(foundUser._id);
-      }
-    });
-  }, [user]);
+    if (loadUser && user) {
+      UserManagement.getUserList().then((res) => {
+        const foundUser = res.data.find((u) => u.email === user.email);
+        if (foundUser) {
+          setUserId(foundUser._id);
+        }
+        setLoadUser(false); // Set loadUser to false after fetching
+      });
+    }
+  }, [loadUser]);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -71,6 +74,7 @@ function SideBar(props) {
   };
 
   const handleMenuClick = (event) => {
+    setLoadUser(true);
     setAnchorEl(event.currentTarget);
   };
 
