@@ -18,32 +18,37 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { GoCopy } from "react-icons/go";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { toast } from "react-toastify";
-import TaskManagement from "../../service/Task";
+import ProjectManagement from "../../service/Project";
 import { useDispatch, useSelector } from "react-redux";
-import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 // import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
-import { setFilter } from "../../store/features/projectSlice";
-import UpdateTaskDialog from "./UpdateTasksDialog";
-import DateFilter from "../shared-component/DateFilter";
+import StatusFilter from "../shared-component/StatusFilter";
+import { setFilter, setGridView } from "../../store/features/projectSlice";
 import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
+import DateFilter from "../shared-component/DateFilter";
 import SearchFilter from "../shared-component/SearchFilter";
-import StatusFilter from "../shared-component/StatusFilter";
+import StatusManagement from "../../service/Status";
 import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
+import moment from "moment";
+import UpdateTaskDialog from "./UpdateTasksDialog";
+import TaskManagement from "../../service/Task";
+import GridTable from "../ProjectsPage/GridTable";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
+  const gridView = useSelector((state) => state.project.gridView);
   const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
@@ -53,8 +58,6 @@ const TasksTable = ({ API }) => {
     priority: true,
     startsAt: true,
     endsAt: true,
-    budget: true,
-    tags: true,
     options: true,
   });
   const [open, setOpen] = useState(false);
@@ -65,10 +68,12 @@ const TasksTable = ({ API }) => {
   const [startDates, setStartDates] = useState([]);
   const [endDates, setEndDates] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statuses, setStatuses] = useState(null);
 
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  console.log(gridView);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,13 +88,16 @@ const TasksTable = ({ API }) => {
           endDates[1],
           searchQuery
         );
+
         setMembers(result?.data);
+        StatusManagement.getStatusList().then((res) => setStatuses(res.data));
       } catch (err) {
         setError(err);
       } finally {
         setLoading(false);
         dispatch(setReloadPage(false));
         dispatch(setFilter(false));
+        dispatch(setGridView(false));
       }
     };
 
@@ -131,14 +139,14 @@ const TasksTable = ({ API }) => {
     setPage(0);
   };
 
-  const handleOpenDialog = (project) => {
-    setSelectedTask(project);
+  const handleOpenDialog = (task) => {
+    setSelectedProject(task);
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSelectedTask(null);
+    setSelectedProject(null);
   };
 
   const handleSaveDialog = () => {};
@@ -155,16 +163,23 @@ const TasksTable = ({ API }) => {
       .then(() => {
         dispatch(setReloadPage(true));
         handleClose();
-        toast.success("Task Delete Successfully");
+        toast.success("Project Delete Successfully");
       })
       .catch((error) => {
-        console.error("Error deleting the project:", error);
+        console.error("Error deleting the task:", error);
       });
   };
   const handleStatusChange = async (e, member) => {
-    const updatedStatus = e.target.value;
+    console.log(statuses);
+    console.log(e.target.value);
+
+    const updatedStatus = statuses?.find(
+      (status) => status.title == e.target.value
+    );
+    console.log(updatedStatus);
+
     try {
-      await TaskManagement.updateTaskStatus(member._id, updatedStatus);
+      await ProjectManagement.updateProjectStatus(member._id, updatedStatus);
       setMembers((prevMembers) =>
         prevMembers.map((m) =>
           m.id === member.id ? { ...m, status: updatedStatus } : m
@@ -176,29 +191,7 @@ const TasksTable = ({ API }) => {
       console.error("Error updating the status:", error);
     }
   };
-  const handleFavourite = async (member, value, message) => {
-    const favourite = value;
-    try {
-      await TaskManagement.updateTaskFavourite(member._id, favourite);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
-      );
-      dispatch(setReloadPage(true));
-      toast.success(`${message} Successfully`);
-    } catch (error) {
-      console.error("Error updating the favourite status:", error);
-    }
-  };
 
-  //  status filter
-  const handleStatusFilter = (event) => {
-    if (event.target.value === "Select Status") {
-      setStatusFilter("");
-    } else {
-      setStatusFilter(event.target.value);
-    }
-    dispatch(setFilter(true));
-  };
   //  user filter
   const handleUserFilter = (event) => {
     if (event.target.value === "Select User") {
@@ -235,7 +228,7 @@ const TasksTable = ({ API }) => {
         {/* status filter  */}
         <StatusFilter
           statusFilter={statusFilter}
-          handleStatusFilter={handleStatusFilter}
+          setStatusFilter={setStatusFilter}
         />
         <UserFilter
           userFilter={userFilter}
@@ -249,7 +242,7 @@ const TasksTable = ({ API }) => {
 
       <Paper>
         <div className="flex mt-10 p-1 mb-3 justify-between flex-nowrap">
-          <div className="flex h-10 text-nowrap">
+          <div className="flex h-10 lg:text-nowrap overflow-auto">
             <Button
               variant="contained"
               onClick={handleDeleteSelected}
@@ -294,96 +287,126 @@ const TasksTable = ({ API }) => {
             />
           </div>
         </div>
-        <TableContainer>
-          <Table
-            sx={{
-              border: "1px solid gray",
-              "& th, & td": { border: "1px solid #E0E5E5", color: "gray" },
-            }}
-          >
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={
-                      selectedIds?.length > 0 &&
-                      selectedIds?.length < members.length
-                    }
-                    checked={
-                      members?.length > 0 &&
-                      selectedIds.length === members.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-                {visibleColumns?.id && <TableCell>ID</TableCell>}
-                {visibleColumns?.title && <TableCell>TITLE</TableCell>}
-                {visibleColumns?.users && <TableCell>USERS</TableCell>}
-                {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
-                {visibleColumns?.status && <TableCell>STATUS</TableCell>}
-                {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
-                {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
-                {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
-                {visibleColumns?.budget && <TableCell>BUDGET</TableCell>}
-                {visibleColumns?.tags && <TableCell>TAGS</TableCell>}
-                {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody className="text-nowrap">
-              {members
-                ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ?.map((member, index) => (
-                  <TableRow key={member?.id}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedIds?.includes(member?.id)}
-                        onChange={() => handleSelect(member?.id)}
-                      />
-                    </TableCell>
-                    {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
-                    {visibleColumns?.title && (
-                      <TableCell>
-                        <div className="flex">
-                          <p className="mr-3 text-[#5b6edd] font-semibold">
-                            {member?.title}
-                          </p>
-                          {member?.favourite ? (
-                            <FaStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  false,
-                                  "Remove from Favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          ) : (
-                            <FaRegStar
-                              onClick={() =>
-                                handleFavourite(
-                                  member,
-                                  true,
-                                  "Added to favourite"
-                                )
-                              }
-                              className="mt-1 text-[orange] mr-3 text-[15px]"
-                            />
-                          )}
-                          <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
-                        </div>
+        {gridView ? (
+          <GridTable
+            members={members}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            selectedIds={selectedIds}
+            handleSelect={handleSelect}
+            visibleColumns={visibleColumns}
+            handleOpenDialog={handleOpenDialog}
+            handleStatusChange={handleStatusChange}
+            statuses={statuses}
+            handleClickOpen={handleClickOpen}
+          />
+        ) : (
+          <TableContainer>
+            <Table
+              sx={{
+                border: "1px solid gray",
+                "& th, & td": { border: "1px solid #E0E5E5", color: "gray" },
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      indeterminate={
+                        selectedIds?.length > 0 &&
+                        selectedIds?.length < members.length
+                      }
+                      checked={
+                        members?.length > 0 &&
+                        selectedIds.length === members.length
+                      }
+                      onChange={handleSelectAll}
+                    />
+                  </TableCell>
+                  {visibleColumns?.id && <TableCell>ID</TableCell>}
+                  {visibleColumns?.title && <TableCell>TITLE</TableCell>}
+                  {visibleColumns?.users && <TableCell>USERS</TableCell>}
+                  {visibleColumns?.clients && <TableCell>CLIENTS</TableCell>}
+                  {visibleColumns?.status && <TableCell>STATUS</TableCell>}
+                  {visibleColumns?.priority && <TableCell>PRIORITY</TableCell>}
+                  {visibleColumns?.startsAt && <TableCell>STARTS AT</TableCell>}
+                  {visibleColumns?.endsAt && <TableCell>ENDS AT</TableCell>}
+                  {visibleColumns?.options && <TableCell>OPTIONS</TableCell>}
+                </TableRow>
+              </TableHead>
+              <TableBody className="text-nowrap">
+                {members
+                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  ?.map((member, index) => (
+                    <TableRow key={member?.id}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedIds?.includes(member?.id)}
+                          onChange={() => handleSelect(member?.id)}
+                        />
                       </TableCell>
-                    )}
-                    {visibleColumns?.users && (
-                      <TableCell>
-                        <div className="flex items-center">
-                          {Array.isArray(member?.users)
-                            ? member?.users.map((el, index) => (
+                      {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
+                      {visibleColumns?.title && (
+                        <TableCell>
+                          <div className="flex">
+                            <p className="mr-3 text-[#5b6edd] font-semibold">
+                              {member?.title}
+                            </p>
+
+                            <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns?.users && (
+                        <TableCell>
+                          <div className="flex items-center">
+                            {Array.isArray(member?.users)
+                              ? member?.users.map((el, index) => (
+                                  <div key={index}>
+                                    {el?.photoURL ? (
+                                      <div className="w-8 h-8 -ml-2">
+                                        <img
+                                          className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 w-8 hover:transform hover:-translate-y-1"
+                                          src={el?.photoURL}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                                        {" "}
+                                        <AccountCircleIcon
+                                          className="bg-[#5a6fe2] rounded-full"
+                                          style={{
+                                            color: "white",
+                                            fontSize: 30,
+                                            marginLeft: -10,
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                ))
+                              : "No users"}
+                            <div
+                              className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
+                              onClick={() => handleOpenDialog(member)}
+                            >
+                              <FaRegEdit />
+                            </div>
+                          </div>
+                        </TableCell>
+                      )}
+
+                      {visibleColumns?.clients && (
+                        <TableCell>
+                          <div className="relative flex items-center">
+                            {Array.isArray(member?.clients) &&
+                            member?.clients.length > 0 ? (
+                              member?.clients.map((el, index) => (
                                 <div key={index}>
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
                                       <img
-                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 hover:transform hover:-translate-y-1"
                                         src={el?.photoURL}
                                       />
                                     </div>
@@ -402,193 +425,109 @@ const TasksTable = ({ API }) => {
                                   )}
                                 </div>
                               ))
-                            : "No users"}
-                          <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                            onClick={() => handleOpenDialog(member)}
-                          >
-                            <FaRegEdit />
-                          </div>
-                        </div>
-                      </TableCell>
-                    )}
-
-                    {visibleColumns?.clients && (
-                      <TableCell>
-                        <div className="relative flex items-center">
-                          {Array.isArray(member?.clients) &&
-                          member?.clients.length > 0 ? (
-                            member?.clients.map((el, index) => (
-                              <div key={index}>
-                                {el?.photoURL ? (
-                                  <div className="w-8 h-8 -ml-2">
-                                    <img
-                                      className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out hover:transform hover:-translate-y-1"
-                                      src={el?.photoURL}
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                                    {" "}
-                                    <AccountCircleIcon
-                                      className="bg-[#5a6fe2] rounded-full"
-                                      style={{
-                                        color: "white",
-                                        fontSize: 30,
-                                        marginLeft: -10,
-                                      }}
-                                    />
-                                  </div>
-                                )}
+                            ) : (
+                              <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
+                                NOT ASSIGNED
                               </div>
-                            ))
-                          ) : (
-                            <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
-                              NOT ASSIGNED
+                            )}
+                            <div
+                              className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
+                              onClick={() => handleOpenDialog(member)}
+                            >
+                              <FaRegEdit />
                             </div>
-                          )}
-                          <div
-                            className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                            onClick={() => handleOpenDialog(member)}
-                          >
-                            <FaRegEdit />
                           </div>
-                        </div>
-                      </TableCell>
-                    )}
+                        </TableCell>
+                      )}
 
-                    {visibleColumns?.status && (
-                      <TableCell>
-                        <NativeSelect
-                          name="status"
-                          style={{
-                            fontSize: "12px",
-                            borderRadius: "5px",
-                            height: "28px",
-                            width: "200px",
-                            textAlign: "center",
-                            backgroundColor:
-                              member?.status === "default"
-                                ? "#ff260056"
-                                : member?.status === "started"
-                                ? "#7737c056"
-                                : member?.status === "on going"
-                                ? "#3777c056"
-                                : "#ffd00056",
-                            color:
-                              member?.status === "default"
-                                ? "red"
-                                : member?.status === "started"
-                                ? "#ae00ff"
-                                : member?.status === "on going"
-                                ? "#00aeff"
-                                : "#ff9900",
-                          }}
-                          disableUnderline={true}
-                          value={member?.status}
-                          onChange={(e) => handleStatusChange(e, member)}
-                        >
-                          <option
+                      {visibleColumns?.status && (
+                        <TableCell>
+                          <NativeSelect
+                            name="status"
                             style={{
-                              backgroundColor: "#ff260056",
-                              color: "red",
+                              fontSize: "12px",
+                              borderRadius: "5px",
+                              height: "28px",
+                              width: "200px",
                               textAlign: "center",
+                              backgroundColor: member?.status?.bgColor,
+                              color: member?.status?.txColor,
                             }}
-                            value="default"
+                            disableUnderline={true}
+                            value={member?.status?.title}
+                            onChange={(e) => handleStatusChange(e, member)}
                           >
-                            Default
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#7737c056",
-                              color: "#ae00ff",
-                              textAlign: "center",
-                            }}
-                            value="started"
-                          >
-                            Started
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#3777c056",
-                              color: "#00aeff",
-                              textAlign: "center",
-                            }}
-                            value="on going"
-                          >
-                            On Going
-                          </option>
-                          <option
-                            style={{
-                              backgroundColor: "#ffd00056",
-                              color: "#ff9900",
-                              textAlign: "center",
-                            }}
-                            value="in review"
-                          >
-                            In Review
-                          </option>
-                        </NativeSelect>
-                      </TableCell>
-                    )}
-                    {visibleColumns?.priority && (
-                      <TableCell>{member?.priority}</TableCell>
-                    )}
-                    {visibleColumns?.startsAt && (
-                      <TableCell>{member?.startsAt}</TableCell>
-                    )}
-                    {visibleColumns?.endsAt && (
-                      <TableCell>{member?.endsAt}</TableCell>
-                    )}
-                    {visibleColumns?.budget && (
-                      <TableCell>{member?.budget}</TableCell>
-                    )}
-                    {visibleColumns?.tags && (
-                      <TableCell>
-                        {member?.tags?.join(", ") || "No tags"}
-                      </TableCell>
-                    )}
-                    {visibleColumns?.options && (
-                      <TableCell>
-                        <div className="flex justify-between">
-                          <FaRegEdit
-                            style={{
-                              color: "#3f51b5",
-                              fontSize: "16px",
-                              marginRight: "20px",
-                            }}
-                            onClick={() => handleOpenDialog(member)}
-                          />
-                          <RiDeleteBinLine
-                            onClick={() => handleClickOpen(member?._id)}
-                            style={{
-                              color: "tomato",
-                              fontSize: "16px",
-                              marginRight: "20px",
-                            }}
-                          />
-                          <GoCopy
-                            style={{
-                              color: "orange",
-                              fontSize: "16px",
-                              marginRight: "20px",
-                            }}
-                          />
-                          <ErrorOutlineOutlinedIcon
-                            style={{
-                              color: "#3f51b5",
-                              fontSize: "18px",
-                              marginRight: "10px",
-                            }}
-                          />
-                        </div>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                            {statuses?.map((status) => (
+                              <option
+                                key={status._id}
+                                style={{
+                                  backgroundColor: status.bgColor,
+                                  color: status.txColor,
+                                  textAlign: "center",
+                                }}
+                                value={status?.title || "Default"}
+                              >
+                                {status?.title || "Default"}
+                              </option>
+                            ))}
+                          </NativeSelect>
+                        </TableCell>
+                      )}
+                      {visibleColumns?.priority && (
+                        <TableCell>{member?.priority}</TableCell>
+                      )}
+                      {visibleColumns?.startsAt && (
+                        <TableCell>
+                          {moment(member?.startsAt).format("MMMM D, YYYY")}
+                        </TableCell>
+                      )}
+                      {visibleColumns?.endsAt && (
+                        <TableCell>
+                          {moment(member?.endsAt).format("MMMM D, YYYY")}
+                        </TableCell>
+                      )}
+                      {visibleColumns?.options && (
+                        <TableCell>
+                          <div className="flex justify-between">
+                            <FaRegEdit
+                              style={{
+                                color: "#3f51b5",
+                                fontSize: "16px",
+                                marginRight: "20px",
+                              }}
+                              onClick={() => handleOpenDialog(member)}
+                            />
+                            <RiDeleteBinLine
+                              onClick={() => handleClickOpen(member?._id)}
+                              style={{
+                                color: "tomato",
+                                fontSize: "16px",
+                                marginRight: "20px",
+                              }}
+                            />
+                            <GoCopy
+                              style={{
+                                color: "orange",
+                                fontSize: "16px",
+                                marginRight: "20px",
+                              }}
+                            />
+                            <ErrorOutlineOutlinedIcon
+                              style={{
+                                color: "#3f51b5",
+                                fontSize: "18px",
+                                marginRight: "10px",
+                              }}
+                            />
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
@@ -599,8 +538,9 @@ const TasksTable = ({ API }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+      {/* grid table  */}
 
-      {/* Use UpdateTaskDialog component */}
+      {/* Use UpdateProjectDialog component */}
       {/* delete dialog  */}
       <DeleteDialog
         open={open}
@@ -611,7 +551,7 @@ const TasksTable = ({ API }) => {
       <UpdateTaskDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        project={selectedTask}
+        task={selectedProject}
         onSave={handleSaveDialog}
       />
     </div>

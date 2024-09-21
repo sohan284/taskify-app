@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -12,48 +11,71 @@ import {
   FormControl,
   MenuItem,
   Autocomplete,
+  NativeSelect,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
+import TaskManagement from "../../service/Task";
 import { useDispatch } from "react-redux";
 import { setReloadPage } from "../../store/features/reloadSlice";
-import TaskManagement from "../../service/Task";
-import ProjectManagement from "../../service/Project";
+import UserManagement from "../../service/User";
+import Loading from "../../shared/Loading";
+import StatusManagement from "../../service/Status";
+import CloseDialog from "../../shared/CloseDialog";
 
 const CreateTaskDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
-  const [projects, setProjects] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [statuses, setStatuses] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    status: "",
+    status: null, // status will be an object
     priority: "",
-    budget: "",
     startsAt: null,
     endsAt: null,
     users: [],
     clients: [],
-    tags: [],
     favourite: true,
   });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // get projects
-        await ProjectManagement.getProjectList().then((res) =>
-          setProjects(res.data)
-        );
+        setLoading(true);
+        const [userResponse, clientResponse, statusResponse] =
+          await Promise.all([
+            UserManagement.getUserList(),
+            UserManagement.getUserList("client"),
+            StatusManagement.getStatusList(),
+          ]);
+        setUsers(userResponse?.data);
+        setClients(clientResponse?.data);
+        setStatuses(statusResponse?.data);
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoading(false);
+        dispatch(setReloadPage(false));
       }
     };
-
     fetchData();
-  }, []);
+  }, [dispatch]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleStatusChange = (event) => {
+    const statusId = event.target.value;
+    const selectedStatus = statuses.find((status) => status._id === statusId);
+    if (selectedStatus) {
+      setFormData((prev) => ({ ...prev, status: selectedStatus }));
+    }
   };
 
   const handleDateChange = (name, date) => {
@@ -61,7 +83,7 @@ const CreateTaskDialog = ({ open, onClose }) => {
   };
 
   const handleCreate = () => {
-    const newProject = {
+    const newTask = {
       ...formData,
       startsAt: formData.startsAt
         ? dayjs(formData.startsAt).format("YYYY-MM-DD")
@@ -71,10 +93,21 @@ const CreateTaskDialog = ({ open, onClose }) => {
         : null,
     };
 
-    TaskManagement.createTask(newProject)
+    TaskManagement.createTask(newTask)
       .then(() => {
-        toast.success("Project Created Successfully");
+        toast.success("Task Created Successfully");
         onClose();
+        setFormData({
+          title: "",
+          status: null, // status will be an object
+          priority: "",
+          budget: "",
+          startsAt: null,
+          endsAt: null,
+          users: [],
+          clients: [],
+          favourite: true,
+        });
         dispatch(setReloadPage(true));
       })
       .catch((error) => {
@@ -82,51 +115,77 @@ const CreateTaskDialog = ({ open, onClose }) => {
       });
   };
 
+  if (loading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+
   return (
     <Dialog
       open={open}
       PaperProps={{
         style: {
-          width: "80%", // Adjust the width as needed
-          maxWidth: "800px", // Optional: set a maximum width
+          width: "80%",
+          maxWidth: "800px",
         },
       }}
       onClose={onClose}
     >
-      <DialogTitle>Create Task</DialogTitle>
+      <CloseDialog title="Create Task" handleClose={onClose} />
       <DialogContent>
-        <FormControl fullWidth margin="dense">
-          <p className="text-xs text-gray-500">TITLE</p>
-          <TextField
-            autoFocus
-            margin="dense"
-            placeholder="Enter project title"
-            name="title"
-            type="text"
-            fullWidth
-            value={formData.title}
-            onChange={handleChange}
-            required
-          />
-        </FormControl>
+        <div className="grid grid-cols-1 gap-5">
+          <FormControl fullWidth margin="dense">
+            <p className="text-xs text-gray-500">TITLE</p>
+            <TextField
+              autoFocus
+              margin="dense"
+              placeholder="Enter project title"
+              name="title"
+              type="text"
+              fullWidth
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </FormControl>
+        </div>
+
         <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">STATUS</p>
-            <Select
+            <NativeSelect
               name="status"
-              value={formData.status}
-              onChange={handleChange}
-              displayEmpty
-              placeholder="Select status"
+              style={{
+                fontSize: "12px",
+                borderRadius: "5px",
+                height: "56px",
+                border: "1px solid gray",
+                textAlign: "center",
+                backgroundColor: formData.status?.bgColor || "white",
+              }}
+              onChange={handleStatusChange}
+              disableUnderline={true}
+              value={formData.status?._id || ""}
             >
-              <MenuItem value="" disabled>
-                Select status
-              </MenuItem>
-              <MenuItem value="started">Started</MenuItem>
-              <MenuItem value="on going">On Going</MenuItem>
-              <MenuItem value="default">Default</MenuItem>
-              <MenuItem value="in review">In Review</MenuItem>
-            </Select>
+              <option style={{ textAlign: "center", color: "gray" }} hidden>
+                Select Status
+              </option>
+              {statuses?.map((el) => (
+                <option
+                  key={el._id}
+                  style={{
+                    backgroundColor: el.bgColor,
+                    color: el.txColor,
+                    textAlign: "center",
+                  }}
+                  value={el._id}
+                >
+                  {el.title}
+                </option>
+              ))}
+            </NativeSelect>
           </FormControl>
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">PRIORITY</p>
@@ -145,40 +204,6 @@ const CreateTaskDialog = ({ open, onClose }) => {
               <MenuItem value="Low">Low</MenuItem>
               <MenuItem value="Critical">Critical</MenuItem>
             </Select>
-          </FormControl>
-        </div>
-        <FormControl fullWidth margin="dense">
-          <p className="text-xs mt-2 text-gray-500">SELECT PROJECT</p>
-          <Select
-            name="project"
-            value={formData.priority}
-            onChange={handleChange}
-            displayEmpty
-            placeholder="Select Project"
-          >
-            <MenuItem value="" disabled>
-              Select Project
-            </MenuItem>
-            {projects?.map((project) => (
-              <MenuItem key={project?._id} value="High">
-                {project?.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <div className="grid grid-cols-2 gap-5">
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs text-gray-500">BUDGET</p>
-            <TextField
-              margin="dense"
-              name="budget"
-              type="text"
-              fullWidth
-              placeholder="Enter budget"
-              value={formData.budget}
-              onChange={handleChange}
-              required
-            />
           </FormControl>
         </div>
 
@@ -216,8 +241,8 @@ const CreateTaskDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={[]} // Replace with your users options if needed
-          getOptionLabel={(option) => option.name || ""}
+          options={users}
+          getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.users}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
@@ -236,8 +261,8 @@ const CreateTaskDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={[]} // Replace with your clients options if needed
-          getOptionLabel={(option) => option.name || ""}
+          options={clients}
+          getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, clients: newValue }));
@@ -251,57 +276,18 @@ const CreateTaskDialog = ({ open, onClose }) => {
             />
           )}
         />
-
-        {/* Autocomplete for Tags */}
-        <Autocomplete
-          className="mt-10"
-          multiple
-          options={["design", "website", "development", "marketing"]}
-          getOptionLabel={(option) => option}
-          value={formData.tags}
-          onChange={(event, newValue) => {
-            setFormData((prev) => ({ ...prev, tags: newValue }));
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Select Tags"
-              placeholder="Select tags"
-            />
-          )}
-        />
       </DialogContent>
       <DialogActions>
-        <div className="border rounded-lg text-gray-600">
-          <Button
-            style={{ color: "gray", paddingInline: "20px" }}
-            onClick={onClose}
-          >
-            Close
-          </Button>
-        </div>
-        <Button
-          style={{
-            color: "white",
-            paddingInline: "20px",
-            backgroundColor: "#3f51b5",
-          }}
-          className="bg-[#3f51b5]"
-          onClick={handleCreate}
-        >
-          Create
-        </Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleCreate}>Create</Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-// Define prop types
 CreateTaskDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
 };
 
 export default CreateTaskDialog;

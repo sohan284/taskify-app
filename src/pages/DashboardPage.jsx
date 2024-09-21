@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CustomCard from "../components/DashboardPage/CustomCard";
 import CustomChart from "../components/DashboardPage/CustomChart";
-import EventsTab from "../components/DashboardPage/EventsTab";
+// import EventsTab from "../components/DashboardPage/EventsTab";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
@@ -82,6 +82,9 @@ function DashboardPage() {
           )
         );
 
+        // Fetch status lists for both projects and tasks
+        const statusResult = await StatusManagement.getStatusList();
+
         // Aggregate data for projects
         const projectsCounts = projects.reduce((acc, project) => {
           const status = project.status?.title;
@@ -89,7 +92,6 @@ function DashboardPage() {
           return acc;
         }, {});
 
-        const statusResult = await StatusManagement.getStatusList();
         const projectLabels = statusResult.data.map((status) => status.title);
         const projectColors = statusResult.data.map((status) => status.txColor);
         const projectSeries = projectLabels.map(
@@ -97,13 +99,14 @@ function DashboardPage() {
         );
 
         // Aggregate data for tasks
-        const taskCounts = tasks.reduce((acc, task) => {
-          const status = task.status;
+        const tasksCounts = tasks.reduce((acc, task) => {
+          const status = task.status?.title;
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         }, {});
-        const taskLabels = Object.keys(taskCounts);
-        const taskSeries = Object.values(taskCounts);
+
+        const taskLabels = statusResult.data.map((status) => status.title);
+        const taskSeries = taskLabels.map((label) => tasksCounts[label] || 0);
 
         // Set chart details
         setChartDetails([
@@ -117,7 +120,7 @@ function DashboardPage() {
             title: "Task Statistics",
             series: taskSeries,
             labels: taskLabels,
-            colors: ["#ebb400", "#852bfa", "#00b9d1", "#70d100"],
+            colors: projectColors, // You can use the same colors for both
           },
           {
             title: "Todos Overview",
@@ -161,7 +164,7 @@ function DashboardPage() {
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       {loading ? (
-        <div className="mt-[50%]">
+        <div>
           <Loading />
         </div>
       ) : error ? (
@@ -195,9 +198,7 @@ function DashboardPage() {
               </div>
             ))}
           </div>
-          <div>
-            <EventsTab />
-          </div>
+          <div>{/* <EventsTab /> */}</div>
           <div>
             <ProjectsTasksTab />
           </div>

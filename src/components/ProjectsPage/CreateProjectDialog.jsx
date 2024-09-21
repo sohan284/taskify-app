@@ -32,27 +32,24 @@ const CreateProjectDialog = ({ open, onClose }) => {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statuses, setStatuses] = useState([]);
-  const [color, setColor] = useState([]);
   const [tags, setTags] = useState([]);
-  // const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
-    status: "",
+    status: null, // status will be an object
     priority: "",
     budget: "",
     startsAt: null,
     endsAt: null,
-    users: [], // Selected users
+    users: [],
     clients: [],
     tags: [],
     favourite: true,
   });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true); // Optional: start loading before the API calls
-
-        // Call all the APIs concurrently
+        setLoading(true);
         const [userResponse, clientResponse, statusResponse, tagResponse] =
           await Promise.all([
             UserManagement.getUserList(),
@@ -60,40 +57,31 @@ const CreateProjectDialog = ({ open, onClose }) => {
             StatusManagement.getStatusList(),
             TagManagement.getTagList(),
           ]);
-
-        // Set the data from all API responses
         setUsers(userResponse?.data);
         setClients(clientResponse?.data);
         setStatuses(statusResponse?.data);
-        setColor(statusResponse?.data[0]?.bgColor);
         setTags(tagResponse?.data);
-        
       } catch (err) {
         console.log(err);
       } finally {
-        setLoading(false); // Finish loading after all API calls
-        dispatch(setReloadPage(false)); // Reset reload state
+        setLoading(false);
+        dispatch(setReloadPage(false));
       }
     };
-
     fetchData();
   }, [dispatch]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    StatusManagement.getStatusList().then((res) => {
-      // Find the matching status based on event value
-      const selectedStatus = res.data.find((status) => status.title === value);
-      // If a matching status is found, set the background color
-      if (selectedStatus) {
-        setColor(selectedStatus.bgColor);
-      }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-      // Set statuses and form data after fetching
-      setStatuses(res.data);
-
-      setFormData((prev) => ({ ...prev, [name]: selectedStatus }));
-    });
+  const handleStatusChange = (event) => {
+    const statusId = event.target.value;
+    const selectedStatus = statuses.find((status) => status._id === statusId);
+    if (selectedStatus) {
+      setFormData((prev) => ({ ...prev, status: selectedStatus }));
+    }
   };
 
   const handleDateChange = (name, date) => {
@@ -115,12 +103,25 @@ const CreateProjectDialog = ({ open, onClose }) => {
       .then(() => {
         toast.success("Project Created Successfully");
         onClose();
+        setFormData({
+          title: "",
+          status: null, // status will be an object
+          priority: "",
+          budget: "",
+          startsAt: null,
+          endsAt: null,
+          users: [],
+          clients: [],
+          tags: [],
+          favourite: true,
+        });
         dispatch(setReloadPage(true));
       })
       .catch((error) => {
         toast.error(`${error}`);
       });
   };
+
   if (loading)
     return (
       <div>
@@ -140,7 +141,6 @@ const CreateProjectDialog = ({ open, onClose }) => {
       onClose={onClose}
     >
       <CloseDialog title="Create Project" handleClose={onClose} />
-
       <DialogContent>
         <div className="grid grid-cols-2 gap-5">
           <FormControl fullWidth margin="dense">
@@ -167,21 +167,24 @@ const CreateProjectDialog = ({ open, onClose }) => {
                 height: "56px",
                 border: "1px solid gray",
                 textAlign: "center",
-                backgroundColor: color,
+                backgroundColor: formData.status?.bgColor || "white",
               }}
-              onChange={handleChange}
+              onChange={handleStatusChange}
               disableUnderline={true}
-              value={formData.status || ""} // Bind to formData.status
+              value={formData.status?._id || ""}
             >
+              <option style={{ textAlign: "center", color: "gray" }} hidden>
+                Select Status
+              </option>
               {statuses?.map((el) => (
                 <option
-                  key={el.title}
+                  key={el._id}
                   style={{
                     backgroundColor: el.bgColor,
                     color: el.txColor,
                     textAlign: "center",
                   }}
-                  value={el.title} // Set the value to the status title
+                  value={el._id}
                 >
                   {el.title}
                 </option>
@@ -258,8 +261,8 @@ const CreateProjectDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={users} // Use the fetched users list
-          getOptionLabel={(option) => option.displayName || option?.email} // Assuming the user has a 'name' property
+          options={users}
+          getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.users}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
@@ -298,8 +301,8 @@ const CreateProjectDialog = ({ open, onClose }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={tags.map((tag) => tag.title)}
-          getOptionLabel={(option) => option}
+          options={tags}
+          getOptionLabel={(option) => option.title}
           value={formData.tags}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, tags: newValue }));
@@ -315,25 +318,8 @@ const CreateProjectDialog = ({ open, onClose }) => {
         />
       </DialogContent>
       <DialogActions>
-        <div className="border rounded-lg text-gray-600">
-          <Button
-            style={{ color: "gray", paddingInline: "20px" }}
-            onClick={onClose}
-          >
-            Close
-          </Button>
-        </div>
-        <Button
-          style={{
-            color: "white",
-            paddingInline: "20px",
-            backgroundColor: "#3f51b5",
-          }}
-          className="bg-[#3f51b5]"
-          onClick={handleCreate}
-        >
-          Create
-        </Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleCreate}>Create</Button>
       </DialogActions>
     </Dialog>
   );

@@ -13,10 +13,19 @@ const createTask = async (taskData) => {
     throw error;
   }
 };
-const getTaskList = async () => {
+const getTaskList = async (
+  status = "",
+  user = "",
+  client = "",
+  start_date_from = "",
+  start_date_to = "",
+  end_date_from = "",
+  end_date_to = "",
+  search = ""
+) => {
   try {
     const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/tasks"
+      `https://taskify-server-iota.vercel.app/tasks?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {

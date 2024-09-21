@@ -225,27 +225,6 @@ const ProjectsTable = ({ API }) => {
     }
     dispatch(setFilter(true));
   };
-  const getTagColor = (tag) => {
-    // Example logic for determining the color
-    switch (tag) {
-      case "E-Commerce":
-        return "lightblue";
-      case "Content Management":
-        return "lightgreen";
-      case "Entertainment":
-        return "lightpink";
-      case "Social Networking":
-        return "lightcoral";
-      case "Project Management":
-        return "orange";
-      case "Renewal":
-        return "wheat";
-      case "Web Development":
-        return "skyblue";
-      default:
-        return "lightgray"; // Fallback color
-    }
-  };
   return (
     <div>
       <div className="grid grid-cols-3 gap-5">
@@ -556,14 +535,14 @@ const ProjectsTable = ({ API }) => {
                                 <span
                                   key={index}
                                   style={{
-                                    backgroundColor: getTagColor(tag),
+                                    backgroundColor: tag?.bgColor,
                                     color: "black", // You can adjust the text color
                                     borderRadius: "4px",
                                     padding: "4px 8px",
                                     margin: "0 4px",
                                   }}
                                 >
-                                  {tag}
+                                  {tag?.title}
                                 </span>
                               ))
                             : "No tags"}

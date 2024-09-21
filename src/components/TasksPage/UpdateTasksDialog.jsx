@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -10,6 +9,7 @@ import {
   Select,
   FormControl,
   MenuItem,
+  NativeSelect,
   Autocomplete,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -17,39 +17,51 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/projectSlice";
+import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
-
-const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
+import StatusManagement from "../../service/Status";
+import CloseDialog from "../../shared/CloseDialog";
+import TaskManagement from "../../service/Task";
+const UpdateTaskDialog = ({ open, onClose, task, onSave }) => {
   const [formData, setFormData] = useState({});
+  const [statuses, setStatuses] = useState([]);
   const dispatch = useDispatch();
+  const [color, setColor] = useState([]);
   const [users, setUsers] = useState([]);
-  console.log(users);
-  // useEffect(() => {
-  //   if (project) {
-  //     setFormData({
-  //       ...project,
-  //       startsAt: project.startsAt ? dayjs(project.startsAt) : null,
-  //       endsAt: project.endsAt ? dayjs(project.endsAt) : null,
-  //     });
-  //   }
-  // }, [project]);
+  const [clients, setClients] = useState([]);
+
   useEffect(() => {
-    if (project) {
+    if (task) {
       UserManagement.getUserList().then((res) => setUsers(res?.data));
+      UserManagement.getUserList("client").then((res) => setClients(res?.data));
+      StatusManagement.getStatusList().then((res) => {
+        setStatuses(res.data);
+        setColor(res?.data[0]?.bgColor);
+      });
       setFormData({
-        ...project,
-        startsAt: project.startsAt ? dayjs(project.startsAt) : null,
-        endsAt: project.endsAt ? dayjs(project.endsAt) : null,
+        ...task,
+        startsAt: task.startsAt ? dayjs(task.startsAt) : null,
+        endsAt: task.endsAt ? dayjs(task.endsAt) : null,
+        status: task.status || {}, // Set initial tags from task
       });
     }
-  }, [project]);
+  }, [task]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleStatusChange = (event) => {
+    const selectedStatus = statuses.find(
+      (status) => status.title === event.target.value
+    );
+    setFormData((prev) => ({
+      ...prev,
+      status: selectedStatus || {}, // Set the full status object
+    }));
+    setColor(selectedStatus.bgColor); // Change the color as per selected status
   };
 
   const handleDateChange = (name, date) => {
@@ -65,15 +77,15 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
         : null,
       endsAt: formData.endsAt ? formData.endsAt.format("YYYY-MM-DD") : null,
     };
-    ProjectManagement.updateProject(_id, formattedUpdateData)
+    TaskManagement.updateTask(_id, formattedUpdateData)
       .then(() => {
-        toast.success("Project Updated Successfully");
+        toast.success("Task Updated Successfully");
         onSave(formData);
         onClose();
         dispatch(setReloadPage(true));
       })
       .catch((error) => {
-        console.error("Error updating the project:", error);
+        console.error("Error updating the task:", error);
       });
   };
 
@@ -88,9 +100,10 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
       }}
       onClose={onClose}
     >
-      <DialogTitle>Update Project</DialogTitle>
+      <CloseDialog title="Update Task" handleClose={onClose} />
+
       <DialogContent>
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5">
           <FormControl fullWidth margin="dense">
             <p className="text-xs text-gray-500">TITLE</p>
             <TextField
@@ -103,22 +116,40 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
               onChange={handleChange}
             />
           </FormControl>
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs mt-2 text-gray-500">STATUS</p>
-            <Select
-              name="status"
-              value={formData.status || ""}
-              onChange={handleChange}
-            >
-              <MenuItem value="started">Started</MenuItem>
-              <MenuItem value="on going">On Going</MenuItem>
-              <MenuItem value="default">Default</MenuItem>
-              <MenuItem value="in review">In Review</MenuItem>
-            </Select>
-          </FormControl>
         </div>
 
         <div className="grid grid-cols-2 gap-5">
+          <FormControl fullWidth margin="dense">
+            <p className="text-xs mt-2 text-gray-500">STATUS</p>
+            <NativeSelect
+              name="status"
+              style={{
+                fontSize: "12px",
+                borderRadius: "5px",
+                height: "56px",
+                border: "1px solid gray",
+                textAlign: "center",
+                backgroundColor: color,
+              }}
+              onChange={handleStatusChange} // Change handler for status
+              disableUnderline={true}
+              value={formData.status?.title || ""} // Bind to formData.status.title
+            >
+              {statuses?.map((el) => (
+                <option
+                  key={el.title}
+                  style={{
+                    backgroundColor: el.bgColor,
+                    color: el.txColor,
+                    textAlign: "center",
+                  }}
+                  value={el.title}
+                >
+                  {el.title}
+                </option>
+              ))}
+            </NativeSelect>
+          </FormControl>
           <FormControl fullWidth margin="dense">
             <p className="text-xs mt-2 text-gray-500">PRIORITY</p>
             <Select
@@ -131,17 +162,6 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
               <MenuItem value="Low">Low</MenuItem>
               <MenuItem value="Critical">Critical</MenuItem>
             </Select>
-          </FormControl>
-          <FormControl fullWidth margin="dense">
-            <p className="text-xs text-gray-500">BUDGET</p>
-            <TextField
-              margin="dense"
-              name="budget"
-              type="text"
-              fullWidth
-              value={formData.budget || ""}
-              onChange={handleChange}
-            />
           </FormControl>
         </div>
 
@@ -175,14 +195,19 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={project?.users || []}
-          getOptionLabel={(option) => option.name}
+          options={users} // Use the fetched users list
+          getOptionLabel={(option) => option.displayName || option?.email} // Assuming the user has a 'name' property
           value={formData.users || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, users: newValue }));
           }}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Users" />
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Select Users"
+              placeholder="Select users"
+            />
           )}
         />
 
@@ -190,29 +215,14 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={project?.clients || []}
-          getOptionLabel={(option) => option.name}
+          options={clients}
+          getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, clients: newValue }));
           }}
           renderInput={(params) => (
             <TextField {...params} variant="outlined" label="Select Clients" />
-          )}
-        />
-
-        {/* Autocomplete for Tags */}
-        <Autocomplete
-          className="mt-10"
-          multiple
-          options={["design", "website", "development", "marketing"]}
-          getOptionLabel={(option) => option}
-          value={formData.tags || []}
-          onChange={(event, newValue) => {
-            setFormData((prev) => ({ ...prev, tags: newValue }));
-          }}
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Select Tags" />
           )}
         />
       </DialogContent>
@@ -241,39 +251,11 @@ const UpdateTaskDialog = ({ open, onClose, project, onSave }) => {
   );
 };
 
-// Define prop types
 UpdateTaskDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  project: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    status: PropTypes.string,
-    priority: PropTypes.string,
-    budget: PropTypes.string,
-    startsAt: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    endsAt: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    users: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        image: PropTypes.string,
-      })
-    ),
-    clients: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        image: PropTypes.string,
-      })
-    ),
-    tags: PropTypes.arrayOf(PropTypes.string),
-  }),
+  task: PropTypes.object,
   onSave: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-};
-
-// Define default props (if necessary)
-UpdateTaskDialog.defaultProps = {
-  project: null,
 };
 
 export default UpdateTaskDialog;
