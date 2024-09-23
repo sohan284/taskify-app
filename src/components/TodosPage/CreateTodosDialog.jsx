@@ -13,9 +13,9 @@ import {
 
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/projectSlice";
 import TodoManagement from "../../service/Todo";
 import CloseDialog from "../../shared/CloseDialog";
+import { setResetTodos } from "../../store/features/reloadSlice";
 const CreateTodosDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -47,7 +47,7 @@ const CreateTodosDialog = ({ open, onClose }) => {
           status: false,
           date: new Date(),
         });
-        dispatch(setReloadPage(true));
+        dispatch(setResetTodos(true));
       })
       .catch((error) => {
         toast.error(`${error}`);

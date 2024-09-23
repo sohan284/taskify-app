@@ -12,9 +12,8 @@ import auth from "../firebase.init";
 import { useAuthState } from "react-firebase-hooks/auth";
 import UserManagement from "../service/User";
 import { setCreateUser } from "../store/features/userSlice";
-import TodoManagement from "../service/Todo";
 import StatusManagement from "../service/Status";
-import { setPendingTodos } from "../store/features/reloadSlice";
+import TodosChart from "../components/DashboardPage/TodosChart";
 
 function DashboardPage() {
   const [user] = useAuthState(auth);
@@ -57,19 +56,15 @@ function DashboardPage() {
     const fetchData = async () => {
       try {
         setLoading(true); // Start loading
-
         // Fetch all data concurrently
-        const [projectResult, taskResult, todosResult, userResult] =
-          await Promise.all([
-            ProjectManagement.getProjectList(),
-            TaskManagement.getTaskList(),
-            TodoManagement.getTodosList(),
-            UserManagement.getUserList(),
-          ]);
+        const [projectResult, taskResult, userResult] = await Promise.all([
+          ProjectManagement.getProjectList(),
+          TaskManagement.getTaskList(),
+          UserManagement.getUserList(),
+        ]);
 
         const projects = projectResult?.data || [];
         const tasks = taskResult?.data || [];
-        const { trueCount, falseCount } = todosResult.statusCount;
         const users = userResult.data || [];
 
         // Set counts
@@ -122,16 +117,7 @@ function DashboardPage() {
             labels: taskLabels,
             colors: projectColors, // You can use the same colors for both
           },
-          {
-            title: "Todos Overview",
-            series: [trueCount, falseCount],
-            labels: ["Done", "Pending"],
-            colors: ["#57bb29", "#df3b3b"],
-          },
         ]);
-
-        // Dispatch pending todos count
-        dispatch(setPendingTodos(falseCount));
 
         // Check if the user already exists and create if not
         if (user) {
@@ -197,6 +183,7 @@ function DashboardPage() {
                 />
               </div>
             ))}
+            <TodosChart />
           </div>
           <div>{/* <EventsTab /> */}</div>
           <div>
