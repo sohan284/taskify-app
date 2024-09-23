@@ -21,7 +21,7 @@ import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRig
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
 import { IoGrid } from "react-icons/io5";
-import { FaHandsClapping } from "react-icons/fa6";
+import { FaArrowRight, FaHandsClapping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
@@ -282,7 +282,7 @@ function SideBar(props) {
             />
             Notes
           </Button>
-          {/* <Button
+          <Button
             className="flex items-center w-full"
             style={{
               fontWeight: "500",
@@ -290,14 +290,14 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/notes")}
+            onClick={() => handleNavigate("/paypal")}
           >
             <FaArrowRight
               style={{ color: "red", fontSize: "16" }}
               className="mr-5"
             />
             Leave Requests
-          </Button> */}
+          </Button>
         </div>
       </div>
     </div>

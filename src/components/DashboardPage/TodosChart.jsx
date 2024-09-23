@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
+import { setReloadTodos } from "../../store/features/todoSlice";
 
 const CustomChart = () => {
   const resetTodos = useSelector((state) => state.reload.resetTodos);
@@ -69,7 +70,8 @@ const CustomChart = () => {
   const updateTodoStatus = async (id, status) => {
     setLoading(true);
     try {
-      await TodoManagement.updateTodoStatus(id, { status }).then(() =>
+      await TodoManagement.updateTodoStatus(id, { status }).then(
+        () => dispatch(setReloadTodos(true)),
         dispatch(setResetTodos(true))
       );
       setTodos((prevTodos) =>
@@ -90,6 +92,7 @@ const CustomChart = () => {
     setLoading(true);
     TodoManagement.deleteTodos(id)
       .then(() => {
+        dispatch(setReloadTodos(true));
         dispatch(setResetTodos(true));
         handleClose();
         toast.success("Todos Delete Successfully");
@@ -100,7 +103,7 @@ const CustomChart = () => {
   };
   if (loading)
     return (
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center h-96">
         <div className="flex justify-center">
           <PropagateLoader
             color="#6366F1"

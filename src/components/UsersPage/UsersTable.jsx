@@ -30,12 +30,14 @@ import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import { Select } from "antd";
 import { setFilter } from "../../store/features/projectSlice";
 import moment from "moment";
+import { setUsers } from "../../store/features/userSlice";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
   const [role, setRole] = useState("");
-  const [users, setUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
+  const users = useSelector((state) => state.user.users);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,25 +63,27 @@ const UsersTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        await UserManagement.getUserList(role).then((res) =>
-          setUsers(res.data)
-        );
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setFilter(false));
-        dispatch(setReloadPage(false));
-      }
-    };
+    if (users === null || reloadPage || filter) {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          await UserManagement.getUserList(role).then((res) =>
+            dispatch(setUsers(res.data))
+          );
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setFilter(false));
+          dispatch(setReloadPage(false));
+        }
+      };
 
-    fetchData();
-  }, [reloadPage, filter]);
+      fetchData();
+    }
+  }, [reloadPage, filter, users]);
 
-  if (loading)
+  if (loading && !users)
     return (
       <div>
         <Loading />
@@ -104,7 +108,9 @@ const UsersTable = () => {
   };
 
   const handleDeleteSelected = () => {
-    setUsers(users?.filter((status) => !selectedIds.includes(status.id)));
+    dispatch(
+      setUsers(users?.filter((status) => !selectedIds.includes(status.id)))
+    );
     setSelectedIds([]);
   };
 
@@ -240,10 +246,10 @@ const UsersTable = () => {
                 {visibleColumns?.phoneNumber && (
                   <TableCell>PHONE NUMBER</TableCell>
                 )}
-                 {visibleColumns?.dateOfBirth && (
+                {visibleColumns?.dateOfBirth && (
                   <TableCell>DATE OF BIRTH</TableCell>
                 )}
-                 {visibleColumns?.dateOfJoining && (
+                {visibleColumns?.dateOfJoining && (
                   <TableCell>DATE OF JOINING</TableCell>
                 )}
                 {visibleColumns?.status && <TableCell>ASSIGNED</TableCell>}
@@ -333,25 +339,21 @@ const UsersTable = () => {
                         </p>
                       </TableCell>
                     )}
-                     {visibleColumns?.dateOfBirth && (
+                    {visibleColumns?.dateOfBirth && (
                       <TableCell>
                         <p
                           className={`  inline p-1 px-2 rounded uppercase text-xs`}
                         >
-                           {moment(user?.dateOfBirth).format(
-                          "MMMM D, YYYY"
-                        )}
+                          {moment(user?.dateOfBirth).format("MMMM D, YYYY")}
                         </p>
                       </TableCell>
                     )}
-                     {visibleColumns?.dateOfJoining && (
+                    {visibleColumns?.dateOfJoining && (
                       <TableCell>
                         <p
                           className={`  inline p-1 px-2 rounded uppercase text-xs`}
                         >
-                           {moment(user?.dateOfJoining).format(
-                          "MMMM D, YYYY"
-                        )}
+                          {moment(user?.dateOfJoining).format("MMMM D, YYYY")}
                         </p>
                       </TableCell>
                     )}

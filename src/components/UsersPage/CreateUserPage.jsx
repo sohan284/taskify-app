@@ -13,12 +13,13 @@ import {
   Breadcrumbs,
   Link,
 } from "@mui/material";
-
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import UserManagement from "../../service/User";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import auth from "../../firebase.init";
 
 const CreateUsersPage = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const CreateUsersPage = () => {
     confirmPassword: "",
     dateOfBirth: "",
     dateOfJoining: "",
-    role: "",
+    role: "user",
     address: "",
     city: "",
     state: "",
@@ -85,46 +86,66 @@ const CreateUsersPage = () => {
     // Form submit logic here
   };
 
-  const handleCreate = () => {
-    const newProject = {
-      ...formData,
-      phoneNumber: phone,
-    };
+  const handleCreate = async () => {
+    const { email, password, displayName } = formData;
 
-    UserManagement.upsertUser(newProject)
-      .then(() => {
-        toast.success("Status Created Successfully");
-        setFormData({
-          displayName: "",
-          lastName: "",
-          email: "",
-          company: "",
-          countryCode: "+1",
-          phoneNumber: "",
-          password: "",
-          confirmPassword: "",
-          dateOfBirth: "",
-          dateOfJoining: "",
-          role: "",
-          address: "",
-          city: "",
-          state: "",
-          country: "",
-          zipCode: "",
-          status: false,
-          requireEmailVerification: false,
-          photoURL: null,
-        });
-        navigate("/users");
-      })
-      .catch((error) => {
-        toast.error(`${error}`);
+    try {
+      // Firebase sign-up logic
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Update the user's profile with displayName
+      await updateProfile(userCredential.user, { displayName });
+
+      // You can now add the rest of the form data to your own backend
+      const newUser = {
+        ...formData,
+        phoneNumber: phone,
+        uid: userCredential.user.uid, // Store Firebase user ID
+      };
+
+      // Upsert user in your backend system
+      await UserManagement.upsertUser(newUser);
+
+      toast.success("User created successfully");
+
+      // Reset form data after successful user creation
+      setFormData({
+        displayName: "",
+        lastName: "",
+        email: "",
+        company: "",
+        countryCode: "+1",
+        phoneNumber: "",
+        password: "",
+        confirmPassword: "",
+        dateOfBirth: "",
+        dateOfJoining: "",
+        role: "user",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        zipCode: "",
+        status: false,
+        requireEmailVerification: false,
+        photoURL: null,
       });
+
+      navigate("/users");
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+    }
   };
+
   function handleClick(event) {
     event.preventDefault();
     navigate(`${event}`);
   }
+
   const breadcrumbs = [
     <Link
       style={{ fontWeight: 400 }}
@@ -157,6 +178,7 @@ const CreateUsersPage = () => {
       Create
     </Link>,
   ];
+
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       <div className="flex justify-between">

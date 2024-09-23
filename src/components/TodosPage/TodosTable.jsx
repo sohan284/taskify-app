@@ -13,26 +13,30 @@ import moment from "moment";
 import PropTypes from "prop-types";
 import TodoManagement from "../../service/Todo";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/projectSlice";
 import Loading from "../../shared/Loading";
+import { setReloadTodos } from "../../store/features/todoSlice";
 
-const TodosTable = ({ todos, setTodos }) => {
+const TodosTable = ({ todos = [], setTodos }) => {
   const dispatch = useDispatch();
+
   const updateTodoStatus = async (id, status) => {
     try {
-      await TodoManagement.updateTodoStatus(id, { status }).then(() =>
-        dispatch(setReloadPage(true))
+      await TodoManagement.updateTodoStatus(id, { status });
+      // Updating todos state in a serializable way by using a new array
+      const updatedTodos = todos.map((todo) =>
+        todo._id === id ? { ...todo, status } : todo
       );
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) => (todo._id === id ? { ...todo, status } : todo))
-      );
+      setTodos(updatedTodos);
+      dispatch(setReloadTodos(true)); 
     } catch (err) {
-      console.log(err);
+      console.error("Error updating todo status:", err);
     }
   };
+
   const handleTodos = (id, currentStatus) => {
-    updateTodoStatus(id, !currentStatus);
+    updateTodoStatus(id, !currentStatus); // Toggle status
   };
+
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -44,13 +48,13 @@ const TodosTable = ({ todos, setTodos }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {todos?.length ? (
-            todos?.map((todo) => (
+          {Array.isArray(todos) && todos.length > 0 ? (
+            todos.map((todo) => (
               <TableRow
-                key={todo.id}
+                key={todo._id}
                 sx={{
                   "&:last-child td, &:last-child th": { border: 0 },
-                  borderBottom: "1px solid #e0e0e0", // Adding border to each row
+                  borderBottom: "1px solid #e0e0e0",
                 }}
               >
                 <TableCell>
@@ -121,15 +125,15 @@ const TodosTable = ({ todos, setTodos }) => {
 };
 
 TodosTable.propTypes = {
-  setTodos: PropTypes.any,
+  setTodos: PropTypes.func.isRequired,
   todos: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       title: PropTypes.string.isRequired,
       priority: PropTypes.string.isRequired,
       description: PropTypes.string,
-      date: PropTypes.string, // Add date field if it's part of the data
-      status: PropTypes.bool.isRequired, // Add status field for checkbox
+      date: PropTypes.string,
+      status: PropTypes.bool.isRequired,
     })
   ),
 };

@@ -8,14 +8,13 @@ import TodoManagement from "../service/Todo";
 import TodosTable from "../components/TodosPage/TodosTable";
 import CreateTodosDialog from "../components/TodosPage/CreateTodosDialog";
 import { useDispatch, useSelector } from "react-redux";
-import { setReloadPage } from "../store/features/projectSlice";
+import { setReloadTodos, setTodos } from "../store/features/todoSlice";
 
 const TodosPage = () => {
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const reloadTodos = useSelector((state) => state.todo.reloadTodos);
+  const todos = useSelector((state) => state.todo.todos);
   const dispatch = useDispatch();
-
   const [open, setOpen] = useState(false);
-  const [todos, setTodos] = useState(null);
   const navigate = useNavigate();
 
   function handleClick(event) {
@@ -44,9 +43,13 @@ const TodosPage = () => {
   };
 
   useEffect(() => {
-    TodoManagement.getTodosList().then((res) => setTodos(res?.data));
-    dispatch(setReloadPage(false));
-  }, [reloadPage]);
+    if (todos === null || reloadTodos) {
+      TodoManagement.getTodosList().then((res) => {
+        dispatch(setTodos(res?.data));
+        dispatch(setReloadTodos(false));
+      });
+    }
+  }, [reloadTodos, todos]);
 
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
@@ -59,7 +62,7 @@ const TodosPage = () => {
         <div className="mt-6 flex h-8">
           <div
             onClick={() => setOpen(true)}
-            className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 hover:text-xl rounded   shadow-lg text-white"
+            className="bg-[#6479f3] text-lg mr-5 px-3 pt-2 hover:text-xl rounded shadow-lg text-white"
           >
             <IoMdAdd />
           </div>
@@ -67,7 +70,10 @@ const TodosPage = () => {
       </div>
 
       <div className="mr-5 shadow-lg mb-10">
-        <TodosTable todos={todos} setTodos={setTodos} />
+        <TodosTable
+          todos={todos}
+          setTodos={(newTodos) => dispatch(setTodos(newTodos))}
+        />
       </div>
       <div>
         <CreateTodosDialog open={open} onClose={onclose} />

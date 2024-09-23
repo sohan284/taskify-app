@@ -36,6 +36,7 @@ function App() {
           <Route path="todos/*" element={<TodosRoutes />} />
           <Route path="notes/*" element={<NoteRoutes />} />
           <Route path="meetings/*" element={<MeetingRoutes />} />
+          
         </Route>
       </Routes>
     </Suspense>
