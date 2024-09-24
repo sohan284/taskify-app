@@ -1,5 +1,6 @@
 import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+import PaymentRoutes from "./routes/PaymentRoutes";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -36,7 +37,7 @@ function App() {
           <Route path="todos/*" element={<TodosRoutes />} />
           <Route path="notes/*" element={<NoteRoutes />} />
           <Route path="meetings/*" element={<MeetingRoutes />} />
-          
+          <Route path="payment/*" element={<PaymentRoutes />} />
         </Route>
       </Routes>
     </Suspense>

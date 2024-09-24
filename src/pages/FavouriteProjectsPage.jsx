@@ -5,17 +5,21 @@ import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import { IoMdAdd } from "react-icons/io";
 import { IoGridSharp } from "react-icons/io5";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateProjectDialog from "../components/ProjectsPage/CreateProjectDialog";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
-import { setGridView } from "../store/features/projectSlice";
+import { setGridView, setReloadProjects } from "../store/features/projectSlice";
 import { FaList } from "react-icons/fa";
 const FavouriteProjectsPage = () => {
   const [open, setOpen] = useState(false);
   const gridView = useSelector((state) => state.project.gridView);
+  const projects = useSelector((state) => state.project.projects);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(setReloadProjects(true));
+  }, [projects]);
   function handleClick(event) {
     event.preventDefault();
     navigate(`${event}`);

@@ -30,14 +30,13 @@ import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import { Select } from "antd";
 import { setFilter } from "../../store/features/projectSlice";
 import moment from "moment";
-import { setUsers } from "../../store/features/userSlice";
+import { setReloadUsers, setUsers } from "../../store/features/userSlice";
 const UsersTable = () => {
   const dispatch = useDispatch();
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const users = useSelector((state) => state.user.users);
+  const reloadUsers = useSelector((state) => state.user.reloadUsers);
   const filter = useSelector((state) => state.project.filter);
   const [role, setRole] = useState("");
-  // const [users, setUsers] = useState([]);
-  const users = useSelector((state) => state.user.users);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,7 +62,7 @@ const UsersTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    if (users === null || reloadPage || filter) {
+    if (users === null || reloadUsers || filter) {
       const fetchData = async () => {
         setLoading(true);
         try {
@@ -76,12 +75,13 @@ const UsersTable = () => {
           setLoading(false);
           dispatch(setFilter(false));
           dispatch(setReloadPage(false));
+          dispatch(setReloadUsers(false));
         }
       };
 
       fetchData();
     }
-  }, [reloadPage, filter, users]);
+  }, [reloadUsers, filter, users]);
 
   if (loading && !users)
     return (

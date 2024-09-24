@@ -25,11 +25,14 @@ import UserManagement from "../../service/User";
 import { useNavigate } from "react-router-dom";
 import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
+import { setClients, setReloadClients } from "../../store/features/clientSlice";
+import { setFilter } from "../../store/features/projectSlice";
 const ClientsTable = () => {
   const dispatch = useDispatch();
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const clients = useSelector((state) => state.client.clients);
+  const reloadClients = useSelector((state) => state.client.reloadClients);
   const filter = useSelector((state) => state.project.filter);
-  const [users, setUsers] = useState([]);
+  // const [users, setUsers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,24 +54,28 @@ const ClientsTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        await UserManagement.getUserList("client").then((res) =>
-          setUsers(res.data)
-        );
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-      }
-    };
+    if (clients === null || reloadClients || filter) {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          await UserManagement.getUserList("client").then((res) =>
+            dispatch(setClients(res.data))
+          );
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setFilter(false));
+          dispatch(setReloadPage(false));
+          dispatch(setReloadClients(false));
+        }
+      };
 
-    fetchData();
-  }, [reloadPage, filter]);
+      fetchData();
+    }
+  }, [reloadClients, filter, clients]);
 
-  if (loading)
+  if (loading && !clients)
     return (
       <div>
         <Loading />
@@ -78,7 +85,7 @@ const ClientsTable = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(users.map((status) => status.id));
+      setSelectedIds(clients.map((status) => status.id));
     } else {
       setSelectedIds([]);
     }
@@ -93,7 +100,9 @@ const ClientsTable = () => {
   };
 
   const handleDeleteSelected = () => {
-    setUsers(users?.filter((status) => !selectedIds.includes(status.id)));
+    dispatch(
+      setClients(clients?.filter((status) => !selectedIds.includes(status.id)))
+    );
     setSelectedIds([]);
   };
 
@@ -177,10 +186,11 @@ const ClientsTable = () => {
                   <Checkbox
                     indeterminate={
                       selectedIds?.length > 0 &&
-                      selectedIds?.length < users.length
+                      selectedIds?.length < clients.length
                     }
                     checked={
-                      users?.length > 0 && selectedIds.length === users.length
+                      clients?.length > 0 &&
+                      selectedIds.length === clients.length
                     }
                     onChange={handleSelectAll}
                   />
@@ -196,7 +206,7 @@ const ClientsTable = () => {
               </TableRow>
             </TableHead>
             <TableBody className="text-nowrap">
-              {users
+              {clients
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 ?.map((user, index) => (
                   <TableRow key={user?.id}>
@@ -310,7 +320,7 @@ const ClientsTable = () => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={users?.length}
+          count={clients?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

@@ -16,18 +16,21 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegEdit } from "react-icons/fa";
-import { setReloadPage } from "../../store/features/reloadSlice";
-import SearchFilter from "../shared-component/SearchFilter";
+
+// import SearchFilter from "../shared-component/SearchFilter";
 import StatusManagement from "../../service/Status";
 import UpdateStatusDialog from "./UpdateStatusDialog";
 import Loading from "../../shared/Loading";
 import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
+import {
+  setReloadStatuses,
+  setStatuses,
+} from "../../store/features/statusSlice";
 const StatusesTable = () => {
   const dispatch = useDispatch();
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
-  const filter = useSelector((state) => state.project.filter);
-  const [statuses, setStatuses] = useState([]);
+  const reloadStatuses = useSelector((state) => state.status.reloadStatuses);
+  const statuses = useSelector((state) => state.status.statuses);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,7 +42,7 @@ const StatusesTable = () => {
     options: true,
   });
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
@@ -48,22 +51,24 @@ const StatusesTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await StatusManagement.getStatusList();
-        setStatuses(result?.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-      }
-    };
+    if (statuses === null || reloadStatuses) {
+      const fetchData = async () => {
+        try {
+          const result = await StatusManagement.getStatusList();
+          dispatch(setStatuses(result?.data));
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setReloadStatuses(false));
+        }
+      };
 
-    fetchData();
-  }, [reloadPage, filter]);
+      fetchData();
+    }
+  }, [reloadStatuses, statuses]);
 
-  if (loading)
+  if (loading && !statuses)
     return (
       <div>
         <Loading />
@@ -88,7 +93,11 @@ const StatusesTable = () => {
   };
 
   const handleDeleteSelected = () => {
-    setStatuses(statuses?.filter((status) => !selectedIds.includes(status.id)));
+    dispatch(
+      setStatuses(
+        statuses?.filter((status) => !selectedIds.includes(status.id))
+      )
+    );
     setSelectedIds([]);
   };
 
@@ -120,7 +129,7 @@ const StatusesTable = () => {
   const handleDelete = (id) => {
     StatusManagement.deleteStatus(id)
       .then(() => {
-        dispatch(setReloadPage(true));
+        dispatch(setReloadStatuses(true));
         handleClose();
         toast.success("Status Delete Successfully");
       })
@@ -153,10 +162,10 @@ const StatusesTable = () => {
             </Button>
           </div>
           <div className="flex">
-            <SearchFilter
+            {/* <SearchFilter
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
-            />
+            /> */}
             <ColumnVisibilityButton
               visibleColumns={visibleColumns}
               setVisibleColumns={setVisibleColumns}

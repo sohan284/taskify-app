@@ -36,11 +36,12 @@ import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import MeetingManagement from "../../service/Meeting";
 import moment from "moment";
 import Loading from "../../shared/Loading";
+import { setMeetings } from "../../store/features/meetingSlice";
 const MeetingsTable = ({ API }) => {
   const dispatch = useDispatch();
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const reloadMeetings = useSelector((state) => state.meeting.reloadMeetings);
   const filter = useSelector((state) => state.project.filter);
-  const [members, setMembers] = useState([]);
+  const meetings = useSelector((state) => state.meeting.meetings);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,7 +58,7 @@ const MeetingsTable = ({ API }) => {
     options: true,
   });
   const [open, setOpen] = useState(false);
-  const [memberId, setMemberId] = useState(null);
+  const [meetingId, setMeetingId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [userFilter, setUserFilter] = useState("");
   const [clientFilter, setClientFilter] = useState("");
@@ -70,32 +71,34 @@ const MeetingsTable = ({ API }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await API(
-          statusFilter,
-          userFilter,
-          clientFilter,
-          startDates[0],
-          startDates[1],
-          endDates[0],
-          endDates[1],
-          searchQuery
-        );
-        setMembers(result?.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-        dispatch(setFilter(false));
-      }
-    };
+    if (meetings === null || filter || reloadMeetings) {
+      const fetchData = async () => {
+        try {
+          const result = await API(
+            statusFilter,
+            userFilter,
+            clientFilter,
+            startDates[0],
+            startDates[1],
+            endDates[0],
+            endDates[1],
+            searchQuery
+          );
+          dispatch(setMeetings(result?.data));
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setReloadPage(false));
+          dispatch(setFilter(false));
+        }
+      };
 
-    fetchData();
-  }, [reloadPage, filter]);
+      fetchData();
+    }
+  }, [reloadMeetings, filter, meetings]);
 
-  if (loading)
+  if (loading && meetings === null)
     return (
       <div>
         <Loading />
@@ -105,7 +108,7 @@ const MeetingsTable = ({ API }) => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(members.map((member) => member.id));
+      setSelectedIds(meetings.map((meeting) => meeting.id));
     } else {
       setSelectedIds([]);
     }
@@ -120,7 +123,11 @@ const MeetingsTable = ({ API }) => {
   };
 
   const handleDeleteSelected = () => {
-    setMembers(members?.filter((member) => !selectedIds.includes(member.id)));
+    dispatch(
+      setMeetings(
+        meetings?.filter((meeting) => !selectedIds.includes(meeting.id))
+      )
+    );
     setSelectedIds([]);
   };
 
@@ -147,7 +154,7 @@ const MeetingsTable = ({ API }) => {
 
   const handleSaveDialog = () => {};
   const handleClickOpen = (id) => {
-    setMemberId(id);
+    setMeetingId(id);
     setOpen(true);
   };
 
@@ -309,11 +316,11 @@ const MeetingsTable = ({ API }) => {
                   <Checkbox
                     indeterminate={
                       selectedIds?.length > 0 &&
-                      selectedIds?.length < members.length
+                      selectedIds?.length < meetings.length
                     }
                     checked={
-                      members?.length > 0 &&
-                      selectedIds.length === members.length
+                      meetings?.length > 0 &&
+                      selectedIds.length === meetings.length
                     }
                     onChange={handleSelectAll}
                   />
@@ -329,29 +336,29 @@ const MeetingsTable = ({ API }) => {
               </TableRow>
             </TableHead>
             <TableBody className="text-nowrap">
-              {members
+              {meetings
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                ?.map((member, index) => (
-                  <TableRow key={member?.id}>
+                ?.map((meeting, index) => (
+                  <TableRow key={meeting?.id}>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedIds?.includes(member?.id)}
-                        onChange={() => handleSelect(member?.id)}
+                        checked={selectedIds?.includes(meeting?.id)}
+                        onChange={() => handleSelect(meeting?.id)}
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
                     {visibleColumns?.title && (
                       <TableCell>
                         <div className="flex">
-                          <p className="mr-3 font-medium">{member?.title}</p>{" "}
+                          <p className="mr-3 font-medium">{meeting?.title}</p>{" "}
                         </div>
                       </TableCell>
                     )}
                     {visibleColumns?.users && (
                       <TableCell>
                         <div className="flex items-center">
-                          {Array.isArray(member?.users)
-                            ? member?.users.map((el, index) => (
+                          {Array.isArray(meeting?.users)
+                            ? meeting?.users.map((el, index) => (
                                 <div key={index}>
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
@@ -378,7 +385,7 @@ const MeetingsTable = ({ API }) => {
                             : "No users"}
                           <div
                             className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                            onClick={() => handleOpenDialog(member)}
+                            onClick={() => handleOpenDialog(meeting)}
                           >
                             <FaRegEdit />
                           </div>
@@ -389,9 +396,9 @@ const MeetingsTable = ({ API }) => {
                     {visibleColumns?.clients && (
                       <TableCell>
                         <div className="relative flex items-center">
-                          {Array.isArray(member?.clients) &&
-                          member?.clients.length > 0 ? (
-                            member?.clients.map((el, index) => (
+                          {Array.isArray(meeting?.clients) &&
+                          meeting?.clients.length > 0 ? (
+                            meeting?.clients.map((el, index) => (
                               <div key={index}>
                                 {el?.photoURL ? (
                                   <div className="w-8 h-8 -ml-2">
@@ -422,7 +429,7 @@ const MeetingsTable = ({ API }) => {
                           )}
                           <div
                             className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                            onClick={() => handleOpenDialog(member)}
+                            onClick={() => handleOpenDialog(meeting)}
                           >
                             <FaRegEdit />
                           </div>
@@ -432,21 +439,21 @@ const MeetingsTable = ({ API }) => {
 
                     {visibleColumns?.startsAt && (
                       <TableCell>
-                        {moment(member?.startsAt).format(
+                        {moment(meeting?.startsAt).format(
                           "MMMM D, YYYY hh:mm:ss A"
                         )}
                       </TableCell>
                     )}
                     {visibleColumns?.endsAt && (
                       <TableCell>
-                        {moment(member?.endsAt).format(
+                        {moment(meeting?.endsAt).format(
                           "MMMM D, YYYY hh:mm:ss A"
                         )}
                       </TableCell>
                     )}
                     {visibleColumns?.startsAt && (
                       <TableCell>
-                        {member?.status ? member?.status : "No Status"}
+                        {meeting?.status ? meeting?.status : "No Status"}
                       </TableCell>
                     )}
                     {visibleColumns?.options && (
@@ -458,10 +465,10 @@ const MeetingsTable = ({ API }) => {
                               fontSize: "16px",
                               marginRight: "20px",
                             }}
-                            onClick={() => handleOpenDialog(member)}
+                            onClick={() => handleOpenDialog(meeting)}
                           />
                           <RiDeleteBinLine
-                            onClick={() => handleClickOpen(member?._id)}
+                            onClick={() => handleClickOpen(meeting?._id)}
                             style={{
                               color: "tomato",
                               fontSize: "16px",
@@ -486,7 +493,7 @@ const MeetingsTable = ({ API }) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={members?.length}
+          count={meetings?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -497,7 +504,7 @@ const MeetingsTable = ({ API }) => {
         open={open}
         handleClose={handleClose}
         handleDelete={handleDelete}
-        id={memberId}
+        id={meetingId}
       />
       <UpdateMeetingDialog
         open={dialogOpen}

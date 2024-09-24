@@ -14,21 +14,23 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import MeetingManagement from "../../service/Meeting";
 import CloseDialog from "../../shared/CloseDialog";
 
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { setReloadMeetings } from "../../store/features/meetingSlice";
 
 const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
 
   useEffect(() => {
     if (project) {
       UserManagement.getUserList().then((res) => setUsers(res?.data));
+      UserManagement.getUserList("client").then((res) => setClients(res?.data));
       setFormData({
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,
@@ -69,7 +71,7 @@ const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
         toast.success("Meeting Updated Successfully");
         onSave(formData);
         onClose();
-        dispatch(setReloadPage(true));
+        dispatch(setReloadMeetings(true));
       })
       .catch((error) => {
         console.error("Error updating the project:", error);
@@ -153,7 +155,7 @@ const UpdateMeetingDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={users}
+          options={clients}
           getOptionLabel={(option) => option.displayName || option?.email}
           value={formData.clients || []}
           onChange={(event, newValue) => {

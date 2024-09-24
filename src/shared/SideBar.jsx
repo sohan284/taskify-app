@@ -282,7 +282,7 @@ function SideBar(props) {
             />
             Notes
           </Button>
-          <Button
+          {/* <Button
             className="flex items-center w-full"
             style={{
               fontWeight: "500",
@@ -290,14 +290,15 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/paypal")}
+            onClick={() => handleNavigate("/payment")}
           >
             <FaArrowRight
               style={{ color: "red", fontSize: "16" }}
               className="mr-5"
             />
-            Leave Requests
-          </Button>
+            
+            Payment
+          </Button> */}
         </div>
       </div>
     </div>

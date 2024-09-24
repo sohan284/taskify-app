@@ -15,10 +15,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"; // Import DateTimePicker
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import MeetingManagement from "../../service/Meeting";
 import CloseDialog from "../../shared/CloseDialog";
+import { setReloadMeetings } from "../../store/features/meetingSlice";
 
 const CreateMeetingDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const CreateMeetingDialog = ({ open, onClose }) => {
       } catch (err) {
         console.log(err);
       } finally {
-        dispatch(setReloadPage(false));
+        dispatch(setReloadMeetings(true));
       }
     };
 
@@ -76,7 +76,6 @@ const CreateMeetingDialog = ({ open, onClose }) => {
       .then(() => {
         toast.success("Meeting Created Successfully");
         onClose();
-        dispatch(setReloadPage(true));
         setFormData({
           title: "",
           priority: "",
@@ -87,6 +86,7 @@ const CreateMeetingDialog = ({ open, onClose }) => {
           clients: [],
           tags: [],
         });
+        dispatch(setReloadMeetings(true));
       })
       .catch((error) => {
         toast.error(`${error}`);

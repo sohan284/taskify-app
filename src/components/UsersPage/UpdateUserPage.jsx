@@ -19,8 +19,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import UserManagement from "../../service/User";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { useDispatch } from "react-redux";
+import { setReloadUsers } from "../../store/features/userSlice";
 const UpdateUserPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const [phone, setPhone] = useState(null);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -137,6 +140,7 @@ const UpdateUserPage = () => {
           requireEmailVerification: false,
           photoURL: null,
         });
+        dispatch(setReloadUsers(true));
         navigate("/users");
       })
       .catch((error) => {

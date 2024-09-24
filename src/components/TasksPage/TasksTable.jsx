@@ -39,12 +39,14 @@ import UpdateTaskDialog from "./UpdateTasksDialog";
 import TaskManagement from "../../service/Task";
 import GridTable from "../ProjectsPage/GridTable";
 import Loading from "../../shared/Loading";
+import { setReloadTasks, setTasks } from "../../store/features/taskSlice";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
   const gridView = useSelector((state) => state.project.gridView);
-  const [members, setMembers] = useState([]);
+  const tasks = useSelector((state) => state.task.tasks);
+  const reloadTasks = useSelector((state) => state.task.reloadTasks);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,7 +64,7 @@ const TasksTable = ({ API }) => {
     options: true,
   });
   const [open, setOpen] = useState(false);
-  const [memberId, setMemberId] = useState(null);
+  const [taskId, setMaskId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [userFilter, setUserFilter] = useState("");
   const [clientFilter, setClientFilter] = useState("");
@@ -77,40 +79,42 @@ const TasksTable = ({ API }) => {
   console.log(gridView);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await API(
-          statusFilter,
-          userFilter,
-          clientFilter,
-          startDates[0],
-          startDates[1],
-          endDates[0],
-          endDates[1],
-          searchQuery
-        );
+    if (tasks === null || filter || reloadTasks) {
+      const fetchData = async () => {
+        try {
+          const result = await API(
+            statusFilter,
+            userFilter,
+            clientFilter,
+            startDates[0],
+            startDates[1],
+            endDates[0],
+            endDates[1],
+            searchQuery
+          );
 
-        setMembers(result?.data);
-        StatusManagement.getStatusList().then((res) => setStatuses(res.data));
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-        dispatch(setFilter(false));
-        dispatch(setGridView(false));
-      }
-    };
+          dispatch(setTasks(result?.data));
+          StatusManagement.getStatusList().then((res) => setStatuses(res.data));
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setReloadPage(false));
+          dispatch(setFilter(false));
+          dispatch(setGridView(false));
+        }
+      };
 
-    fetchData();
-  }, [reloadPage, filter]);
+      fetchData();
+    }
+  }, [reloadPage, filter, tasks]);
 
-  if (loading) return <div>{<Loading />}</div>;
+  if (loading && tasks === null) return <div>{<Loading />}</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(members.map((member) => member.id));
+      setSelectedIds(tasks.map((task) => task.id));
     } else {
       setSelectedIds([]);
     }
@@ -125,7 +129,7 @@ const TasksTable = ({ API }) => {
   };
 
   const handleDeleteSelected = () => {
-    setMembers(members?.filter((member) => !selectedIds.includes(member.id)));
+    dispatch(setTasks(tasks?.filter((task) => !selectedIds.includes(task.id))));
     setSelectedIds([]);
   };
 
@@ -152,7 +156,7 @@ const TasksTable = ({ API }) => {
 
   const handleSaveDialog = () => {};
   const handleClickOpen = (id) => {
-    setMemberId(id);
+    setMaskId(id);
     setOpen(true);
   };
 
@@ -162,7 +166,7 @@ const TasksTable = ({ API }) => {
   const handleDelete = (id) => {
     TaskManagement.deleteTask(id)
       .then(() => {
-        dispatch(setReloadPage(true));
+        dispatch(setReloadTasks(true));
         handleClose();
         toast.success("Project Delete Successfully");
       })
@@ -170,7 +174,7 @@ const TasksTable = ({ API }) => {
         console.error("Error deleting the task:", error);
       });
   };
-  const handleStatusChange = async (e, member) => {
+  const handleStatusChange = async (e, task) => {
     console.log(statuses);
     console.log(e.target.value);
 
@@ -180,10 +184,10 @@ const TasksTable = ({ API }) => {
     console.log(updatedStatus);
 
     try {
-      await ProjectManagement.updateProjectStatus(member._id, updatedStatus);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) =>
-          m.id === member.id ? { ...m, status: updatedStatus } : m
+      await ProjectManagement.updateProjectStatus(task._id, updatedStatus);
+      setTasks((prevMasks) =>
+        prevMasks.map((m) =>
+          m.id === task.id ? { ...m, status: updatedStatus } : m
         )
       );
       dispatch(setReloadPage(true));
@@ -290,7 +294,7 @@ const TasksTable = ({ API }) => {
         </div>
         {gridView ? (
           <GridTable
-            members={members}
+            tasks={tasks}
             page={page}
             rowsPerPage={rowsPerPage}
             selectedIds={selectedIds}
@@ -315,11 +319,10 @@ const TasksTable = ({ API }) => {
                     <Checkbox
                       indeterminate={
                         selectedIds?.length > 0 &&
-                        selectedIds?.length < members.length
+                        selectedIds?.length < tasks.length
                       }
                       checked={
-                        members?.length > 0 &&
-                        selectedIds.length === members.length
+                        tasks?.length > 0 && selectedIds.length === tasks.length
                       }
                       onChange={handleSelectAll}
                     />
@@ -336,14 +339,14 @@ const TasksTable = ({ API }) => {
                 </TableRow>
               </TableHead>
               <TableBody className="text-nowrap">
-                {members
+                {tasks
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  ?.map((member, index) => (
-                    <TableRow key={member?.id}>
+                  ?.map((task, index) => (
+                    <TableRow key={task?.id}>
                       <TableCell padding="checkbox">
                         <Checkbox
-                          checked={selectedIds?.includes(member?.id)}
-                          onChange={() => handleSelect(member?.id)}
+                          checked={selectedIds?.includes(task?.id)}
+                          onChange={() => handleSelect(task?.id)}
                         />
                       </TableCell>
                       {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
@@ -351,7 +354,7 @@ const TasksTable = ({ API }) => {
                         <TableCell>
                           <div className="flex">
                             <p className="mr-3 text-[#5b6edd] font-semibold">
-                              {member?.title}
+                              {task?.title}
                             </p>
 
                             <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
@@ -361,8 +364,8 @@ const TasksTable = ({ API }) => {
                       {visibleColumns?.users && (
                         <TableCell>
                           <div className="flex items-center">
-                            {Array.isArray(member?.users)
-                              ? member?.users.map((el, index) => (
+                            {Array.isArray(task?.users)
+                              ? task?.users.map((el, index) => (
                                   <div key={index}>
                                     {el?.photoURL ? (
                                       <div className="w-8 h-8 -ml-2">
@@ -389,7 +392,7 @@ const TasksTable = ({ API }) => {
                               : "No users"}
                             <div
                               className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                              onClick={() => handleOpenDialog(member)}
+                              onClick={() => handleOpenDialog(task)}
                             >
                               <FaRegEdit />
                             </div>
@@ -400,9 +403,9 @@ const TasksTable = ({ API }) => {
                       {visibleColumns?.clients && (
                         <TableCell>
                           <div className="relative flex items-center">
-                            {Array.isArray(member?.clients) &&
-                            member?.clients.length > 0 ? (
-                              member?.clients.map((el, index) => (
+                            {Array.isArray(task?.clients) &&
+                            task?.clients.length > 0 ? (
+                              task?.clients.map((el, index) => (
                                 <div key={index}>
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
@@ -433,7 +436,7 @@ const TasksTable = ({ API }) => {
                             )}
                             <div
                               className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                              onClick={() => handleOpenDialog(member)}
+                              onClick={() => handleOpenDialog(task)}
                             >
                               <FaRegEdit />
                             </div>
@@ -451,12 +454,12 @@ const TasksTable = ({ API }) => {
                               height: "28px",
                               width: "200px",
                               textAlign: "center",
-                              backgroundColor: member?.status?.bgColor,
-                              color: member?.status?.txColor,
+                              backgroundColor: task?.status?.bgColor,
+                              color: task?.status?.txColor,
                             }}
                             disableUnderline={true}
-                            value={member?.status?.title}
-                            onChange={(e) => handleStatusChange(e, member)}
+                            value={task?.status?.title}
+                            onChange={(e) => handleStatusChange(e, task)}
                           >
                             {statuses?.map((status) => (
                               <option
@@ -475,16 +478,16 @@ const TasksTable = ({ API }) => {
                         </TableCell>
                       )}
                       {visibleColumns?.priority && (
-                        <TableCell>{member?.priority}</TableCell>
+                        <TableCell>{task?.priority}</TableCell>
                       )}
                       {visibleColumns?.startsAt && (
                         <TableCell>
-                          {moment(member?.startsAt).format("MMMM D, YYYY")}
+                          {moment(task?.startsAt).format("MMMM D, YYYY")}
                         </TableCell>
                       )}
                       {visibleColumns?.endsAt && (
                         <TableCell>
-                          {moment(member?.endsAt).format("MMMM D, YYYY")}
+                          {moment(task?.endsAt).format("MMMM D, YYYY")}
                         </TableCell>
                       )}
                       {visibleColumns?.options && (
@@ -496,10 +499,10 @@ const TasksTable = ({ API }) => {
                                 fontSize: "16px",
                                 marginRight: "20px",
                               }}
-                              onClick={() => handleOpenDialog(member)}
+                              onClick={() => handleOpenDialog(task)}
                             />
                             <RiDeleteBinLine
-                              onClick={() => handleClickOpen(member?._id)}
+                              onClick={() => handleClickOpen(task?._id)}
                               style={{
                                 color: "tomato",
                                 fontSize: "16px",
@@ -532,7 +535,7 @@ const TasksTable = ({ API }) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={members?.length}
+          count={tasks?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -547,7 +550,7 @@ const TasksTable = ({ API }) => {
         open={open}
         handleClose={handleClose}
         handleDelete={handleDelete}
-        id={memberId}
+        id={taskId}
       />
       <UpdateTaskDialog
         open={dialogOpen}

@@ -27,7 +27,12 @@ import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { setReloadPage } from "../../store/features/reloadSlice";
 import StatusFilter from "../shared-component/StatusFilter";
-import { setFilter, setGridView } from "../../store/features/projectSlice";
+import {
+  setFilter,
+  setGridView,
+  setProjects,
+  setReloadProjects,
+} from "../../store/features/projectSlice";
 import UserFilter from "../shared-component/UserFilter";
 import ClientFilter from "../shared-component/ClientFilter";
 import DateFilter from "../shared-component/DateFilter";
@@ -38,12 +43,13 @@ import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import moment from "moment";
 import Loading from "../../shared/Loading";
+
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
+  const projects = useSelector((state) => state.project.projects);
+  const reloadProjects = useSelector((state) => state.project.reloadProjects);
   const filter = useSelector((state) => state.project.filter);
   const gridView = useSelector((state) => state.project.gridView);
-  const [members, setMembers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,7 +69,7 @@ const ProjectsTable = ({ API }) => {
     options: true,
   });
   const [open, setOpen] = useState(false);
-  const [memberId, setMemberId] = useState(null);
+  const [projectId, setProjectId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [userFilter, setUserFilter] = useState("");
   const [clientFilter, setClientFilter] = useState("");
@@ -77,40 +83,42 @@ const ProjectsTable = ({ API }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await API(
-          statusFilter,
-          userFilter,
-          clientFilter,
-          startDates[0],
-          startDates[1],
-          endDates[0],
-          endDates[1],
-          searchQuery
-        );
+    if (projects === null || reloadProjects || filter) {
+      const fetchData = async () => {
+        try {
+          const result = await API(
+            statusFilter,
+            userFilter,
+            clientFilter,
+            startDates[0],
+            startDates[1],
+            endDates[0],
+            endDates[1],
+            searchQuery
+          );
 
-        setMembers(result?.data);
-        StatusManagement.getStatusList().then((res) => setStatuses(res.data));
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-        dispatch(setFilter(false));
-        dispatch(setGridView(false));
-      }
-    };
+          dispatch(setProjects(result?.data));
+          StatusManagement.getStatusList().then((res) => setStatuses(res.data));
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setReloadProjects(false));
+          dispatch(setFilter(false));
+          dispatch(setGridView(false));
+        }
+      };
 
-    fetchData();
-  }, [reloadPage, filter]);
+      fetchData();
+    }
+  }, [reloadProjects, filter, projects]);
 
-  if (loading) return <div>{<Loading />}</div>;
+  if (loading && projects === null) return <div>{<Loading />}</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(members.map((member) => member.id));
+      setSelectedIds(projects.map((project) => project.id));
     } else {
       setSelectedIds([]);
     }
@@ -125,7 +133,9 @@ const ProjectsTable = ({ API }) => {
   };
 
   const handleDeleteSelected = () => {
-    setMembers(members?.filter((member) => !selectedIds.includes(member.id)));
+    setProjects(
+      projects?.filter((project) => !selectedIds.includes(project.id))
+    );
     setSelectedIds([]);
   };
 
@@ -152,7 +162,7 @@ const ProjectsTable = ({ API }) => {
 
   const handleSaveDialog = () => {};
   const handleClickOpen = (id) => {
-    setMemberId(id);
+    setProjectId(id);
     setOpen(true);
   };
 
@@ -162,7 +172,7 @@ const ProjectsTable = ({ API }) => {
   const handleDelete = (id) => {
     ProjectManagement.deleteProject(id)
       .then(() => {
-        dispatch(setReloadPage(true));
+        dispatch(setReloadProjects(true));
         handleClose();
         toast.success("Project Delete Successfully");
       })
@@ -170,7 +180,7 @@ const ProjectsTable = ({ API }) => {
         console.error("Error deleting the project:", error);
       });
   };
-  const handleStatusChange = async (e, member) => {
+  const handleStatusChange = async (e, project) => {
     console.log(statuses);
     console.log(e.target.value);
 
@@ -180,10 +190,10 @@ const ProjectsTable = ({ API }) => {
     console.log(updatedStatus);
 
     try {
-      await ProjectManagement.updateProjectStatus(member._id, updatedStatus);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) =>
-          m.id === member.id ? { ...m, status: updatedStatus } : m
+      await ProjectManagement.updateProjectStatus(project._id, updatedStatus);
+      setProjects((prevProjects) =>
+        prevProjects.map((m) =>
+          m.id === project.id ? { ...m, status: updatedStatus } : m
         )
       );
       dispatch(setReloadPage(true));
@@ -192,12 +202,12 @@ const ProjectsTable = ({ API }) => {
       console.error("Error updating the status:", error);
     }
   };
-  const handleFavourite = async (member, value, message) => {
+  const handleFavourite = async (project, value, message) => {
     const favourite = value;
     try {
-      await ProjectManagement.updateProjectFavourite(member._id, favourite);
-      setMembers((prevMembers) =>
-        prevMembers.map((m) => (m.id === member.id ? { ...m, favourite } : m))
+      await ProjectManagement.updateProjectFavourite(project._id, favourite);
+      setProjects((prevProjects) =>
+        prevProjects.map((m) => (m.id === project.id ? { ...m, favourite } : m))
       );
       dispatch(setReloadPage(true));
       toast.success(`${message} Successfully`);
@@ -303,7 +313,7 @@ const ProjectsTable = ({ API }) => {
         </div>
         {gridView ? (
           <GridTable
-            members={members}
+            projects={projects}
             page={page}
             rowsPerPage={rowsPerPage}
             selectedIds={selectedIds}
@@ -329,11 +339,11 @@ const ProjectsTable = ({ API }) => {
                     <Checkbox
                       indeterminate={
                         selectedIds?.length > 0 &&
-                        selectedIds?.length < members.length
+                        selectedIds?.length < projects.length
                       }
                       checked={
-                        members?.length > 0 &&
-                        selectedIds.length === members.length
+                        projects?.length > 0 &&
+                        selectedIds.length === projects.length
                       }
                       onChange={handleSelectAll}
                     />
@@ -352,14 +362,14 @@ const ProjectsTable = ({ API }) => {
                 </TableRow>
               </TableHead>
               <TableBody className="text-nowrap">
-                {members
+                {projects
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  ?.map((member, index) => (
-                    <TableRow key={member?.id}>
+                  ?.map((project, index) => (
+                    <TableRow key={project?.id}>
                       <TableCell padding="checkbox">
                         <Checkbox
-                          checked={selectedIds?.includes(member?.id)}
-                          onChange={() => handleSelect(member?.id)}
+                          checked={selectedIds?.includes(project?.id)}
+                          onChange={() => handleSelect(project?.id)}
                         />
                       </TableCell>
                       {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
@@ -367,13 +377,13 @@ const ProjectsTable = ({ API }) => {
                         <TableCell>
                           <div className="flex">
                             <p className="mr-3 text-[#5b6edd] font-semibold">
-                              {member?.title}
+                              {project?.title}
                             </p>
-                            {member?.favourite ? (
+                            {project?.favourite ? (
                               <FaStar
                                 onClick={() =>
                                   handleFavourite(
-                                    member,
+                                    project,
                                     false,
                                     "Remove from Favourite"
                                   )
@@ -384,7 +394,7 @@ const ProjectsTable = ({ API }) => {
                               <FaRegStar
                                 onClick={() =>
                                   handleFavourite(
-                                    member,
+                                    project,
                                     true,
                                     "Added to favourite"
                                   )
@@ -399,8 +409,8 @@ const ProjectsTable = ({ API }) => {
                       {visibleColumns?.users && (
                         <TableCell>
                           <div className="flex items-center">
-                            {Array.isArray(member?.users)
-                              ? member?.users.map((el, index) => (
+                            {Array.isArray(project?.users)
+                              ? project?.users.map((el, index) => (
                                   <div key={index}>
                                     {el?.photoURL ? (
                                       <div className="w-8 h-8 -ml-2">
@@ -427,7 +437,7 @@ const ProjectsTable = ({ API }) => {
                               : "No users"}
                             <div
                               className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                              onClick={() => handleOpenDialog(member)}
+                              onClick={() => handleOpenDialog(project)}
                             >
                               <FaRegEdit />
                             </div>
@@ -438,9 +448,9 @@ const ProjectsTable = ({ API }) => {
                       {visibleColumns?.clients && (
                         <TableCell>
                           <div className="relative flex items-center">
-                            {Array.isArray(member?.clients) &&
-                            member?.clients.length > 0 ? (
-                              member?.clients.map((el, index) => (
+                            {Array.isArray(project?.clients) &&
+                            project?.clients.length > 0 ? (
+                              project?.clients.map((el, index) => (
                                 <div key={index}>
                                   {el?.photoURL ? (
                                     <div className="w-8 h-8 -ml-2">
@@ -471,7 +481,7 @@ const ProjectsTable = ({ API }) => {
                             )}
                             <div
                               className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                              onClick={() => handleOpenDialog(member)}
+                              onClick={() => handleOpenDialog(project)}
                             >
                               <FaRegEdit />
                             </div>
@@ -489,12 +499,12 @@ const ProjectsTable = ({ API }) => {
                               height: "28px",
                               width: "200px",
                               textAlign: "center",
-                              backgroundColor: member?.status?.bgColor,
-                              color: member?.status?.txColor,
+                              backgroundColor: project?.status?.bgColor,
+                              color: project?.status?.txColor,
                             }}
                             disableUnderline={true}
-                            value={member?.status?.title}
-                            onChange={(e) => handleStatusChange(e, member)}
+                            value={project?.status?.title}
+                            onChange={(e) => handleStatusChange(e, project)}
                           >
                             {statuses?.map((status) => (
                               <option
@@ -513,25 +523,25 @@ const ProjectsTable = ({ API }) => {
                         </TableCell>
                       )}
                       {visibleColumns?.priority && (
-                        <TableCell>{member?.priority}</TableCell>
+                        <TableCell>{project?.priority}</TableCell>
                       )}
                       {visibleColumns?.startsAt && (
                         <TableCell>
-                          {moment(member?.startsAt).format("MMMM D, YYYY")}
+                          {moment(project?.startsAt).format("MMMM D, YYYY")}
                         </TableCell>
                       )}
                       {visibleColumns?.endsAt && (
                         <TableCell>
-                          {moment(member?.endsAt).format("MMMM D, YYYY")}
+                          {moment(project?.endsAt).format("MMMM D, YYYY")}
                         </TableCell>
                       )}
                       {visibleColumns?.budget && (
-                        <TableCell>{member?.budget}</TableCell>
+                        <TableCell>{project?.budget}</TableCell>
                       )}
                       {visibleColumns?.tags && (
                         <TableCell>
-                          {member?.tags && member.tags.length > 0
-                            ? member.tags.map((tag, index) => (
+                          {project?.tags && project.tags.length > 0
+                            ? project.tags.map((tag, index) => (
                                 <span
                                   key={index}
                                   style={{
@@ -557,10 +567,10 @@ const ProjectsTable = ({ API }) => {
                                 fontSize: "16px",
                                 marginRight: "20px",
                               }}
-                              onClick={() => handleOpenDialog(member)}
+                              onClick={() => handleOpenDialog(project)}
                             />
                             <RiDeleteBinLine
-                              onClick={() => handleClickOpen(member?._id)}
+                              onClick={() => handleClickOpen(project?._id)}
                               style={{
                                 color: "tomato",
                                 fontSize: "16px",
@@ -593,7 +603,7 @@ const ProjectsTable = ({ API }) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={members?.length}
+          count={projects?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -608,7 +618,7 @@ const ProjectsTable = ({ API }) => {
         open={open}
         handleClose={handleClose}
         handleDelete={handleDelete}
-        id={memberId}
+        id={projectId}
       />
       <UpdateProjectDialog
         open={dialogOpen}

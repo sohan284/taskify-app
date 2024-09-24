@@ -5,7 +5,6 @@ import CustomChart from "../components/DashboardPage/CustomChart";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
-import { setReloadPage } from "../store/features/projectSlice";
 import Loading from "../shared/Loading";
 import TaskManagement from "../service/Task";
 import auth from "../firebase.init";
@@ -14,6 +13,14 @@ import UserManagement from "../service/User";
 import { setCreateUser } from "../store/features/userSlice";
 import StatusManagement from "../service/Status";
 import TodosChart from "../components/DashboardPage/TodosChart";
+import {
+  setClientsCount,
+  setProjectsCount,
+  setReloadDashboard,
+  setTasksCount,
+  setUsersCount,
+} from "../store/features/dashboardSlice";
+
 
 function DashboardPage() {
   const [user] = useAuthState(auth);
@@ -22,134 +29,132 @@ function DashboardPage() {
   const createUser = useSelector((state) => state.user.createUser);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [projectCount, setProjectCount] = useState(null);
-  const [taskCount, setTaskCount] = useState(null);
-  const [userCount, setUserCount] = useState(null);
-  const [clientCount, setClientCount] = useState(null);
   const [chartDetails, setChartDetails] = useState([]);
-
+  const dashboard = useSelector((state) => state.dashboard);
   let cardDetails = [
     {
       title: "Projects",
-      total: projectCount,
+      total: dashboard?.projectsCount,
       color: "#70d100",
     },
     {
       title: "Tasks",
-      total: taskCount,
+      total: dashboard.tasksCount,
       color: "#852bfa",
     },
     {
       title: "Users",
-      total: userCount,
+      total: dashboard?.usersCount,
       color: "#ebb400",
     },
     {
       _id: "66dbda4e634dfb28c415b5cb",
       title: "Clients",
-      total: clientCount,
+      total: dashboard?.clientsCount,
       color: "#00b9d1",
     },
   ];
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true); // Start loading
-        // Fetch all data concurrently
-        const [projectResult, taskResult, userResult] = await Promise.all([
-          ProjectManagement.getProjectList(),
-          TaskManagement.getTaskList(),
-          UserManagement.getUserList(),
-        ]);
+    if (dashboard.reloadDashboard || reloadPage) {
+      const fetchData = async () => {
+        try {
+          setLoading(true); // Start loading
+          // Fetch all data concurrently
+          const [projectResult, taskResult, userResult, clientResult] =
+            await Promise.all([
+              ProjectManagement.getProjectList(),
+              TaskManagement.getTaskList(),
+              UserManagement.getUserList(),
+              UserManagement.getUserList("client"),
+            ]);
 
-        const projects = projectResult?.data || [];
-        const tasks = taskResult?.data || [];
-        const users = userResult.data || [];
+          const projects = projectResult?.data || [];
+          const tasks = taskResult?.data || [];
+          const users = userResult.data || [];
+          const clients = clientResult?.data || [];
 
-        // Set counts
-        setProjectCount(projects.length);
-        setTaskCount(tasks.length);
-        setUserCount(users.length);
-        setClientCount(
-          await UserManagement.getUserList("client").then(
-            (res) => res.data.length
-          )
-        );
+          // Set counts
+          dispatch(setProjectsCount(projects?.length));
+          dispatch(setUsersCount(users?.length));
+          dispatch(setTasksCount(tasks?.length));
+          dispatch(setClientsCount(clients?.length));
 
-        // Fetch status lists for both projects and tasks
-        const statusResult = await StatusManagement.getStatusList();
+          // Fetch status lists for both projects and tasks
+          const statusResult = await StatusManagement.getStatusList();
 
-        // Aggregate data for projects
-        const projectsCounts = projects.reduce((acc, project) => {
-          const status = project.status?.title;
-          acc[status] = (acc[status] || 0) + 1;
-          return acc;
-        }, {});
+          // Aggregate data for projects
+          const projectsCounts = projects.reduce((acc, project) => {
+            const status = project.status?.title;
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+          }, {});
 
-        const projectLabels = statusResult.data.map((status) => status.title);
-        const projectColors = statusResult.data.map((status) => status.txColor);
-        const projectSeries = projectLabels.map(
-          (label) => projectsCounts[label] || 0
-        );
+          const projectLabels = statusResult.data.map((status) => status.title);
+          const projectColors = statusResult.data.map(
+            (status) => status.txColor
+          );
+          const projectSeries = projectLabels.map(
+            (label) => projectsCounts[label] || 0
+          );
 
-        // Aggregate data for tasks
-        const tasksCounts = tasks.reduce((acc, task) => {
-          const status = task.status?.title;
-          acc[status] = (acc[status] || 0) + 1;
-          return acc;
-        }, {});
+          // Aggregate data for tasks
+          const tasksCounts = tasks.reduce((acc, task) => {
+            const status = task.status?.title;
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+          }, {});
 
-        const taskLabels = statusResult.data.map((status) => status.title);
-        const taskSeries = taskLabels.map((label) => tasksCounts[label] || 0);
+          const taskLabels = statusResult.data.map((status) => status.title);
+          const taskSeries = taskLabels.map((label) => tasksCounts[label] || 0);
 
-        // Set chart details
-        setChartDetails([
-          {
-            title: "Project Statistics",
-            series: projectSeries,
-            labels: projectLabels,
-            colors: projectColors,
-          },
-          {
-            title: "Task Statistics",
-            series: taskSeries,
-            labels: taskLabels,
-            colors: projectColors, // You can use the same colors for both
-          },
-        ]);
+          // Set chart details
+          setChartDetails([
+            {
+              title: "Project Statistics",
+              series: projectSeries,
+              labels: projectLabels,
+              colors: projectColors,
+            },
+            {
+              title: "Task Statistics",
+              series: taskSeries,
+              labels: taskLabels,
+              colors: projectColors, // You can use the same colors for both
+            },
+          ]);
 
-        // Check if the user already exists and create if not
-        if (user) {
-          const existingUser = users.find((u) => u.email === user.email);
-          const userData = {
-            email: user.email,
-            photoURL: user.photoURL || "",
-            displayName: user.displayName || "",
-          };
+          // Check if the user already exists and create if not
+          if (user) {
+            const existingUser = users.find((u) => u.email === user.email);
+            const userData = {
+              email: user.email,
+              photoURL: user.photoURL || "",
+              displayName: user.displayName || "",
+            };
 
-          if (!existingUser && createUser) {
-            await UserManagement.upsertUser(userData);
-            dispatch(setCreateUser(false));
-            console.log("User data posted successfully");
-          } else {
-            console.log("User already exists, skipping creation.");
+            if (!existingUser && createUser) {
+              await UserManagement.upsertUser(userData);
+              dispatch(setCreateUser(false));
+              console.log("User data posted successfully");
+            } else {
+              console.log("User already exists, skipping creation.");
+            }
           }
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+          dispatch(setReloadDashboard(false));
         }
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-      }
-    };
-
-    fetchData();
+      };
+      fetchData();
+    }
   }, [reloadPage, dispatch]);
 
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
-      {loading ? (
+      {loading && reloadPage ? (
         <div>
           <Loading />
         </div>

@@ -20,9 +20,12 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import auth from "../../firebase.init";
+import { useDispatch } from "react-redux";
+import { setReloadUsers } from "../../store/features/userSlice";
 
 const CreateUsersPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [phone, setPhone] = useState(null);
   const [formData, setFormData] = useState({
     displayName: "",
@@ -134,6 +137,7 @@ const CreateUsersPage = () => {
         requireEmailVerification: false,
         photoURL: null,
       });
+      dispatch(setReloadUsers(true));
 
       navigate("/users");
     } catch (error) {

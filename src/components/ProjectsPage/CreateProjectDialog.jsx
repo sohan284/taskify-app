@@ -19,12 +19,13 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import Loading from "../../shared/Loading";
 import StatusManagement from "../../service/Status";
 import CloseDialog from "../../shared/CloseDialog";
 import TagManagement from "../../service/Tag";
+import { setReloadUsers } from "../../store/features/userSlice";
+import { setReloadProjects } from "../../store/features/projectSlice";
 
 const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -65,7 +66,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
         console.log(err);
       } finally {
         setLoading(false);
-        dispatch(setReloadPage(false));
+        dispatch(setReloadProjects(false));
       }
     };
     fetchData();
@@ -115,7 +116,8 @@ const CreateProjectDialog = ({ open, onClose }) => {
           tags: [],
           favourite: true,
         });
-        dispatch(setReloadPage(true));
+        dispatch(setReloadUsers(true));
+        dispatch(setReloadProjects(true));
       })
       .catch((error) => {
         toast.error(`${error}`);

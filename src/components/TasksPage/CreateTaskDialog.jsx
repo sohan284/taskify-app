@@ -24,6 +24,7 @@ import UserManagement from "../../service/User";
 import Loading from "../../shared/Loading";
 import StatusManagement from "../../service/Status";
 import CloseDialog from "../../shared/CloseDialog";
+import { setReloadTasks } from "../../store/features/taskSlice";
 
 const CreateTaskDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -108,7 +109,7 @@ const CreateTaskDialog = ({ open, onClose }) => {
           clients: [],
           favourite: true,
         });
-        dispatch(setReloadPage(true));
+        dispatch(setReloadTasks(true));
       })
       .catch((error) => {
         toast.error(`${error}`);

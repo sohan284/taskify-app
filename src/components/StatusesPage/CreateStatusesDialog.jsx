@@ -13,8 +13,8 @@ import {
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import StatusManagement from "../../service/Status";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import CloseDialog from "../../shared/CloseDialog";
+import { setReloadStatuses } from "../../store/features/statusSlice";
 
 const CreateStatusesDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ const CreateStatusesDialog = ({ open, onClose }) => {
           txColor: "",
           bgColor: "",
         });
-        dispatch(setReloadPage(true));
+        dispatch(setReloadStatuses(true));
       })
 
       .catch((error) => {

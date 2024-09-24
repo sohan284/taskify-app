@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import StatusManagement from "../../service/Status";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import CloseDialog from "../../shared/CloseDialog";
+import { setReloadStatuses } from "../../store/features/statusSlice";
 
 const UpdateStatusDialog = ({ open, onClose, status }) => {
   const dispatch = useDispatch();
@@ -70,7 +70,7 @@ const UpdateStatusDialog = ({ open, onClose, status }) => {
     try {
       await StatusManagement.updateStatus(status._id, formData);
       onClose();
-      dispatch(setReloadPage(true));
+      dispatch(setReloadStatuses(true));
     } catch (error) {
       console.error("Error updating todo:", error);
     }

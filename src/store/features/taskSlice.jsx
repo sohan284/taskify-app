@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  reloadProjects: false,
+  reloadTasks: false,
   filter: false,
-  projects: null,
+  tasks: null,
   gridView: false,
   loading: false,
   error: null,
@@ -12,8 +12,8 @@ const projectSlice = createSlice({
   name: "project",
   initialState,
   reducers: {
-    setReloadProjects: (state, action) => {
-      state.reloadProjects = action.payload;
+    setReloadTasks: (state, action) => {
+      state.reloadTasks = action.payload;
     },
     setFilter: (state, action) => {
       state.filter = action.payload;
@@ -21,11 +21,11 @@ const projectSlice = createSlice({
     setGridView: (state, action) => {
       state.gridView = action.payload;
     },
-    setProjects: (state, action) => {
-      state.projects = action.payload;
+    setTasks: (state, action) => {
+      state.tasks = action.payload;
     },
   },
 });
-export const { setReloadProjects, setFilter, setGridView, setProjects } =
+export const { setReloadTasks, setFilter, setGridView, setTasks } =
   projectSlice.actions;
 export default projectSlice.reducer;

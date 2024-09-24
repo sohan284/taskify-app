@@ -18,11 +18,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import UserManagement from "../../service/User";
 import StatusManagement from "../../service/Status";
 import CloseDialog from "../../shared/CloseDialog";
 import TaskManagement from "../../service/Task";
+import { setReloadTasks } from "../../store/features/taskSlice";
 const UpdateTaskDialog = ({ open, onClose, task, onSave }) => {
   const [formData, setFormData] = useState({});
   const [statuses, setStatuses] = useState([]);
@@ -82,7 +82,7 @@ const UpdateTaskDialog = ({ open, onClose, task, onSave }) => {
         toast.success("Task Updated Successfully");
         onSave(formData);
         onClose();
-        dispatch(setReloadPage(true));
+        dispatch(setReloadTasks(true));
       })
       .catch((error) => {
         console.error("Error updating the task:", error);
