@@ -12,7 +12,11 @@ import { toast } from "react-toastify";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { PropagateLoader } from "react-spinners";
-import { setReloadTodos, setTodos } from "../../store/features/todoSlice";
+import {
+  setReloadTodos,
+  setTodos,
+  setTodosCount,
+} from "../../store/features/todoSlice";
 
 const CustomChart = () => {
   const reloadTodos = useSelector((state) => state.todo.reloadTodos);
@@ -20,9 +24,10 @@ const CustomChart = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  // const [todos, setTodos] = useState([]);
-  const [todosCount, setTodosCount] = useState();
+
+  const todosCount = useSelector((state) => state.todo.todosCount);
   const todos = useSelector((state) => state.todo.todos);
+
   const [options] = useState({
     chart: {
       type: "donut",
@@ -50,11 +55,13 @@ const CustomChart = () => {
         try {
           const todosResult = await TodoManagement.getTodosList();
           dispatch(setTodos(todosResult.data));
-          setTodosCount([
-            todosResult.statusCount.trueCount,
-            todosResult.statusCount.falseCount,
-          ]),
-            dispatch(setPendingTodos(todosResult.statusCount.falseCount));
+          dispatch(
+            setTodosCount([
+              todosResult.statusCount.trueCount,
+              todosResult.statusCount.falseCount,
+            ])
+          );
+          dispatch(setPendingTodos(todosResult.statusCount.falseCount));
         } catch (err) {
           console.log(err);
         } finally {
@@ -65,55 +72,53 @@ const CustomChart = () => {
 
       fetchData();
     }
-  }, [reloadTodos, todos]);
+  }, [reloadTodos, todos, dispatch]);
 
   const updateTodoStatus = async (id, status) => {
     setLoading(true);
     try {
-      await TodoManagement.updateTodoStatus(id, { status }).then(() =>
-        dispatch(setReloadTodos(true))
-      );
-      dispatch(
-        setTodos((prevTodos) =>
-          prevTodos.map((todo) =>
-            todo._id === id ? { ...todo, status } : todo
-          )
-        )
-      );
+      await TodoManagement.updateTodoStatus(id, { status });
+      dispatch(setReloadTodos(true));
     } catch (err) {
       console.log(err);
+      toast.error("Failed to update status");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleTodos = (id, currentStatus) => {
     updateTodoStatus(id, !currentStatus);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
-  const handleDeleteTodos = (id) => {
+
+  const handleDeleteTodos = async (id) => {
     setLoading(true);
-    TodoManagement.deleteTodos(id)
-      .then(() => {
-        dispatch(setReloadTodos(true));
-        handleClose();
-        toast.success("Todos Delete Successfully");
-      })
-      .catch((error) => {
-        console.error("Error deleting the todos:", error);
-      });
+    try {
+      await TodoManagement.deleteTodos(id);
+      dispatch(setReloadTodos(true));
+      handleClose();
+      toast.success("Todo Deleted Successfully");
+    } catch (error) {
+      console.error("Error deleting the todo:", error);
+      toast.error("Failed to delete the todo");
+    } finally {
+      setLoading(false);
+    }
   };
-  if (loading && todos === null)
+
+  if (loading && todos === null) {
     return (
       <div className="flex flex-col justify-center h-96">
         <div className="flex justify-center">
-          <PropagateLoader
-            color="#6366F1"
-            // size={100}
-          />
+          <PropagateLoader color="#6366F1" />
         </div>
       </div>
     );
+  }
 
   return (
     <div className="shadow-xl">
@@ -134,7 +139,7 @@ const CustomChart = () => {
         <ReactApexChart options={options} series={todosCount} type="donut" />
       </div>
       <div className="ml-10 my-5">
-        {todos?.slice(0, 5).map((todo, index) => (
+        {todos?.slice(0, 5)?.map((todo, index) => (
           <div key={index}>
             <div className="text-[gray] flex justify-between w-[50%]">
               <FormControlLabel
@@ -158,7 +163,6 @@ const CustomChart = () => {
                   },
                 }}
               />
-
               <div className="flex mt-3">
                 <FaRegEdit
                   style={{

@@ -25,7 +25,6 @@ import { FaRegStar, FaStar, FaRegEdit } from "react-icons/fa";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 // import Loading from "../../shared/Loading";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { setReloadPage } from "../../store/features/reloadSlice";
 import StatusFilter from "../shared-component/StatusFilter";
 import {
   setFilter,
@@ -43,6 +42,7 @@ import DeleteDialog from "../../shared/DeleteDialog";
 import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import moment from "moment";
 import Loading from "../../shared/Loading";
+import { setStatuses } from "../../store/features/statusSlice";
 
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
@@ -76,7 +76,8 @@ const ProjectsTable = ({ API }) => {
   const [startDates, setStartDates] = useState([]);
   const [endDates, setEndDates] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statuses, setStatuses] = useState(null);
+  // const [statuses, setStatuses] = useState(null);
+  const statuses = useSelector((state) => state.status.statuses);
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -98,7 +99,11 @@ const ProjectsTable = ({ API }) => {
           );
 
           dispatch(setProjects(result?.data));
-          StatusManagement.getStatusList().then((res) => setStatuses(res.data));
+          if (!statuses) {
+            StatusManagement.getStatusList().then((res) =>
+              dispatch(setStatuses(res.data))
+            );
+          }
         } catch (err) {
           setError(err);
         } finally {
@@ -133,8 +138,10 @@ const ProjectsTable = ({ API }) => {
   };
 
   const handleDeleteSelected = () => {
-    setProjects(
-      projects?.filter((project) => !selectedIds.includes(project.id))
+    dispatch(
+      setProjects(
+        projects?.filter((project) => !selectedIds.includes(project.id))
+      )
     );
     setSelectedIds([]);
   };
@@ -181,22 +188,20 @@ const ProjectsTable = ({ API }) => {
       });
   };
   const handleStatusChange = async (e, project) => {
-    console.log(statuses);
-    console.log(e.target.value);
-
     const updatedStatus = statuses?.find(
       (status) => status.title == e.target.value
     );
-    console.log(updatedStatus);
 
     try {
       await ProjectManagement.updateProjectStatus(project._id, updatedStatus);
-      setProjects((prevProjects) =>
-        prevProjects.map((m) =>
-          m.id === project.id ? { ...m, status: updatedStatus } : m
+      dispatch(
+        setProjects((prevProjects) =>
+          prevProjects.map((m) =>
+            m.id === project.id ? { ...m, status: updatedStatus } : m
+          )
         )
       );
-      dispatch(setReloadPage(true));
+      dispatch(setReloadProjects(true));
       toast.success("Status Updated Successfully");
     } catch (error) {
       console.error("Error updating the status:", error);
@@ -209,7 +214,7 @@ const ProjectsTable = ({ API }) => {
       setProjects((prevProjects) =>
         prevProjects.map((m) => (m.id === project.id ? { ...m, favourite } : m))
       );
-      dispatch(setReloadPage(true));
+      dispatch(setReloadProjects(true));
       toast.success(`${message} Successfully`);
     } catch (error) {
       console.error("Error updating the favourite status:", error);
@@ -362,60 +367,106 @@ const ProjectsTable = ({ API }) => {
                 </TableRow>
               </TableHead>
               <TableBody className="text-nowrap">
-                {projects
-                  ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  ?.map((project, index) => (
-                    <TableRow key={project?.id}>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedIds?.includes(project?.id)}
-                          onChange={() => handleSelect(project?.id)}
-                        />
-                      </TableCell>
-                      {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
-                      {visibleColumns?.title && (
-                        <TableCell>
-                          <div className="flex">
-                            <p className="mr-3 text-[#5b6edd] font-semibold">
-                              {project?.title}
-                            </p>
-                            {project?.favourite ? (
-                              <FaStar
-                                onClick={() =>
-                                  handleFavourite(
-                                    project,
-                                    false,
-                                    "Remove from Favourite"
-                                  )
-                                }
-                                className="mt-1 text-[orange] mr-3 text-[15px]"
-                              />
-                            ) : (
-                              <FaRegStar
-                                onClick={() =>
-                                  handleFavourite(
-                                    project,
-                                    true,
-                                    "Added to favourite"
-                                  )
-                                }
-                                className="mt-1 text-[orange] mr-3 text-[15px]"
-                              />
-                            )}
-                            <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
-                          </div>
+                {Array.isArray(projects) &&
+                  projects
+                    ?.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                    ?.map((project, index) => (
+                      <TableRow key={project?.id}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedIds?.includes(project?.id)}
+                            onChange={() => handleSelect(project?.id)}
+                          />
                         </TableCell>
-                      )}
-                      {visibleColumns?.users && (
-                        <TableCell>
-                          <div className="flex items-center">
-                            {Array.isArray(project?.users)
-                              ? project?.users.map((el, index) => (
+                        {visibleColumns?.id && (
+                          <TableCell>{index + 1}</TableCell>
+                        )}
+                        {visibleColumns?.title && (
+                          <TableCell>
+                            <div className="flex">
+                              <p className="mr-3 text-[#5b6edd] font-semibold">
+                                {project?.title}
+                              </p>
+                              {project?.favourite ? (
+                                <FaStar
+                                  onClick={() =>
+                                    handleFavourite(
+                                      project,
+                                      false,
+                                      "Remove from Favourite"
+                                    )
+                                  }
+                                  className="mt-1 text-[orange] mr-3 text-[15px]"
+                                />
+                              ) : (
+                                <FaRegStar
+                                  onClick={() =>
+                                    handleFavourite(
+                                      project,
+                                      true,
+                                      "Added to favourite"
+                                    )
+                                  }
+                                  className="mt-1 text-[orange] mr-3 text-[15px]"
+                                />
+                              )}
+                              <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
+                            </div>
+                          </TableCell>
+                        )}
+                        {visibleColumns?.users && (
+                          <TableCell>
+                            <div className="flex items-center">
+                              {Array.isArray(project?.users)
+                                ? project?.users.map((el, index) => (
+                                    <div key={index}>
+                                      {el?.photoURL ? (
+                                        <div className="w-8 h-8 -ml-2">
+                                          <img
+                                            className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 w-8 hover:transform hover:-translate-y-1"
+                                            src={el?.photoURL}
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                                          {" "}
+                                          <AccountCircleIcon
+                                            className="bg-[#5a6fe2] rounded-full"
+                                            style={{
+                                              color: "white",
+                                              fontSize: 30,
+                                              marginLeft: -10,
+                                            }}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))
+                                : "No users"}
+                              <div
+                                className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
+                                onClick={() => handleOpenDialog(project)}
+                              >
+                                <FaRegEdit />
+                              </div>
+                            </div>
+                          </TableCell>
+                        )}
+
+                        {visibleColumns?.clients && (
+                          <TableCell>
+                            <div className="relative flex items-center">
+                              {Array.isArray(project?.clients) &&
+                              project?.clients.length > 0 ? (
+                                project?.clients.map((el, index) => (
                                   <div key={index}>
                                     {el?.photoURL ? (
                                       <div className="w-8 h-8 -ml-2">
                                         <img
-                                          className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 w-8 hover:transform hover:-translate-y-1"
+                                          className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 hover:transform hover:-translate-y-1"
                                           src={el?.photoURL}
                                         />
                                       </div>
@@ -434,168 +485,128 @@ const ProjectsTable = ({ API }) => {
                                     )}
                                   </div>
                                 ))
-                              : "No users"}
-                            <div
-                              className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                              onClick={() => handleOpenDialog(project)}
-                            >
-                              <FaRegEdit />
-                            </div>
-                          </div>
-                        </TableCell>
-                      )}
-
-                      {visibleColumns?.clients && (
-                        <TableCell>
-                          <div className="relative flex items-center">
-                            {Array.isArray(project?.clients) &&
-                            project?.clients.length > 0 ? (
-                              project?.clients.map((el, index) => (
-                                <div key={index}>
-                                  {el?.photoURL ? (
-                                    <div className="w-8 h-8 -ml-2">
-                                      <img
-                                        className="rounded-full border-[#5a6fe2] border-2 duration-300 ease-in-out h-8 hover:transform hover:-translate-y-1"
-                                        src={el?.photoURL}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                                      {" "}
-                                      <AccountCircleIcon
-                                        className="bg-[#5a6fe2] rounded-full"
-                                        style={{
-                                          color: "white",
-                                          fontSize: 30,
-                                          marginLeft: -10,
-                                        }}
-                                      />
-                                    </div>
-                                  )}
+                              ) : (
+                                <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
+                                  NOT ASSIGNED
                                 </div>
-                              ))
-                            ) : (
-                              <div className="text-white mt-1 mr-1 rounded px-2 flex flex-col justify-center pt-1 text-[12px] font-medium h-5 bg-[#5a6fe2]">
-                                NOT ASSIGNED
-                              </div>
-                            )}
-                            <div
-                              className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
-                              onClick={() => handleOpenDialog(project)}
-                            >
-                              <FaRegEdit />
-                            </div>
-                          </div>
-                        </TableCell>
-                      )}
-
-                      {visibleColumns?.status && (
-                        <TableCell>
-                          <NativeSelect
-                            name="status"
-                            style={{
-                              fontSize: "12px",
-                              borderRadius: "5px",
-                              height: "28px",
-                              width: "200px",
-                              textAlign: "center",
-                              backgroundColor: project?.status?.bgColor,
-                              color: project?.status?.txColor,
-                            }}
-                            disableUnderline={true}
-                            value={project?.status?.title}
-                            onChange={(e) => handleStatusChange(e, project)}
-                          >
-                            {statuses?.map((status) => (
-                              <option
-                                key={status._id}
-                                style={{
-                                  backgroundColor: status.bgColor,
-                                  color: status.txColor,
-                                  textAlign: "center",
-                                }}
-                                value={status?.title || "Default"}
+                              )}
+                              <div
+                                className="rounded-full border h-8 w-8 flex items-center justify-center text-lg hover:bg-[#5a6fe2] hover:text-white text-[#5a6fe2] ml-2" // Add margin-left for the edit icon
+                                onClick={() => handleOpenDialog(project)}
                               >
-                                {status?.title || "Default"}
-                              </option>
-                            ))}
-                          </NativeSelect>
-                        </TableCell>
-                      )}
-                      {visibleColumns?.priority && (
-                        <TableCell>{project?.priority}</TableCell>
-                      )}
-                      {visibleColumns?.startsAt && (
-                        <TableCell>
-                          {moment(project?.startsAt).format("MMMM D, YYYY")}
-                        </TableCell>
-                      )}
-                      {visibleColumns?.endsAt && (
-                        <TableCell>
-                          {moment(project?.endsAt).format("MMMM D, YYYY")}
-                        </TableCell>
-                      )}
-                      {visibleColumns?.budget && (
-                        <TableCell>{project?.budget}</TableCell>
-                      )}
-                      {visibleColumns?.tags && (
-                        <TableCell>
-                          {project?.tags && project.tags.length > 0
-                            ? project.tags.map((tag, index) => (
-                                <span
-                                  key={index}
+                                <FaRegEdit />
+                              </div>
+                            </div>
+                          </TableCell>
+                        )}
+
+                        {visibleColumns?.status && (
+                          <TableCell>
+                            <NativeSelect
+                              name="status"
+                              style={{
+                                fontSize: "12px",
+                                borderRadius: "5px",
+                                height: "28px",
+                                width: "200px",
+                                textAlign: "center",
+                                backgroundColor: project?.status?.bgColor,
+                                color: project?.status?.txColor,
+                              }}
+                              disableUnderline={true}
+                              value={project?.status?.title}
+                              onChange={(e) => handleStatusChange(e, project)}
+                            >
+                              {statuses?.map((status) => (
+                                <option
+                                  key={status._id}
                                   style={{
-                                    backgroundColor: tag?.bgColor,
-                                    color: "black", // You can adjust the text color
-                                    borderRadius: "4px",
-                                    padding: "4px 8px",
-                                    margin: "0 4px",
+                                    backgroundColor: status.bgColor,
+                                    color: status.txColor,
+                                    textAlign: "center",
                                   }}
+                                  value={status?.title || "Default"}
                                 >
-                                  {tag?.title}
-                                </span>
-                              ))
-                            : "No tags"}
-                        </TableCell>
-                      )}
-                      {visibleColumns?.options && (
-                        <TableCell>
-                          <div className="flex justify-between">
-                            <FaRegEdit
-                              style={{
-                                color: "#3f51b5",
-                                fontSize: "16px",
-                                marginRight: "20px",
-                              }}
-                              onClick={() => handleOpenDialog(project)}
-                            />
-                            <RiDeleteBinLine
-                              onClick={() => handleClickOpen(project?._id)}
-                              style={{
-                                color: "tomato",
-                                fontSize: "16px",
-                                marginRight: "20px",
-                              }}
-                            />
-                            <GoCopy
-                              style={{
-                                color: "orange",
-                                fontSize: "16px",
-                                marginRight: "20px",
-                              }}
-                            />
-                            <ErrorOutlineOutlinedIcon
-                              style={{
-                                color: "#3f51b5",
-                                fontSize: "18px",
-                                marginRight: "10px",
-                              }}
-                            />
-                          </div>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
+                                  {status?.title || "Default"}
+                                </option>
+                              ))}
+                            </NativeSelect>
+                          </TableCell>
+                        )}
+                        {visibleColumns?.priority && (
+                          <TableCell>{project?.priority}</TableCell>
+                        )}
+                        {visibleColumns?.startsAt && (
+                          <TableCell>
+                            {moment(project?.startsAt).format("MMMM D, YYYY")}
+                          </TableCell>
+                        )}
+                        {visibleColumns?.endsAt && (
+                          <TableCell>
+                            {moment(project?.endsAt).format("MMMM D, YYYY")}
+                          </TableCell>
+                        )}
+                        {visibleColumns?.budget && (
+                          <TableCell>{project?.budget}</TableCell>
+                        )}
+                        {visibleColumns?.tags && (
+                          <TableCell>
+                            {project?.tags && project.tags.length > 0
+                              ? project.tags.map((tag, index) => (
+                                  <span
+                                    key={index}
+                                    style={{
+                                      backgroundColor: tag?.bgColor,
+                                      color: "black", // You can adjust the text color
+                                      borderRadius: "4px",
+                                      padding: "4px 8px",
+                                      margin: "0 4px",
+                                    }}
+                                  >
+                                    {tag?.title}
+                                  </span>
+                                ))
+                              : "No tags"}
+                          </TableCell>
+                        )}
+                        {visibleColumns?.options && (
+                          <TableCell>
+                            <div className="flex justify-between">
+                              <FaRegEdit
+                                style={{
+                                  color: "#3f51b5",
+                                  fontSize: "16px",
+                                  marginRight: "20px",
+                                }}
+                                onClick={() => handleOpenDialog(project)}
+                              />
+                              <RiDeleteBinLine
+                                onClick={() => handleClickOpen(project?._id)}
+                                style={{
+                                  color: "tomato",
+                                  fontSize: "16px",
+                                  marginRight: "20px",
+                                }}
+                              />
+                              <GoCopy
+                                style={{
+                                  color: "orange",
+                                  fontSize: "16px",
+                                  marginRight: "20px",
+                                }}
+                              />
+                              <ErrorOutlineOutlinedIcon
+                                style={{
+                                  color: "#3f51b5",
+                                  fontSize: "18px",
+                                  marginRight: "10px",
+                                }}
+                              />
+                            </div>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
               </TableBody>
             </Table>
           </TableContainer>

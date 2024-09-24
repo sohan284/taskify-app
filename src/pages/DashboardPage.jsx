@@ -14,13 +14,13 @@ import { setCreateUser } from "../store/features/userSlice";
 import StatusManagement from "../service/Status";
 import TodosChart from "../components/DashboardPage/TodosChart";
 import {
+  setChartDetails,
   setClientsCount,
   setProjectsCount,
   setReloadDashboard,
   setTasksCount,
   setUsersCount,
 } from "../store/features/dashboardSlice";
-
 
 function DashboardPage() {
   const [user] = useAuthState(auth);
@@ -29,7 +29,6 @@ function DashboardPage() {
   const createUser = useSelector((state) => state.user.createUser);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [chartDetails, setChartDetails] = useState([]);
   const dashboard = useSelector((state) => state.dashboard);
   let cardDetails = [
     {
@@ -109,20 +108,23 @@ function DashboardPage() {
           const taskSeries = taskLabels.map((label) => tasksCounts[label] || 0);
 
           // Set chart details
-          setChartDetails([
-            {
-              title: "Project Statistics",
-              series: projectSeries,
-              labels: projectLabels,
-              colors: projectColors,
-            },
-            {
-              title: "Task Statistics",
-              series: taskSeries,
-              labels: taskLabels,
-              colors: projectColors, // You can use the same colors for both
-            },
-          ]);
+
+          dispatch(
+            setChartDetails([
+              {
+                title: "Project Statistics",
+                series: projectSeries,
+                labels: projectLabels,
+                colors: projectColors,
+              },
+              {
+                title: "Task Statistics",
+                series: taskSeries,
+                labels: taskLabels,
+                colors: projectColors, // You can use the same colors for both
+              },
+            ])
+          );
 
           // Check if the user already exists and create if not
           if (user) {
@@ -178,7 +180,7 @@ function DashboardPage() {
             )}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mx-3 mt-5">
-            {chartDetails?.map((detail) => (
+            {dashboard?.chartDetails?.map((detail) => (
               <div key={detail.title} className="shadow-lg">
                 <CustomChart
                   title={detail?.title}

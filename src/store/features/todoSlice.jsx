@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   todos: null,
   reloadTodos: false,
+  todosCount: [],
 };
 
 const todoSlice = createSlice({
@@ -16,8 +17,11 @@ const todoSlice = createSlice({
     setReloadTodos(state, action) {
       state.reloadTodos = action.payload;
     },
+    setTodosCount(state, action) {
+      state.todosCount = action.payload;
+    },
   },
 });
 
-export const { setTodos, setReloadTodos } = todoSlice.actions;
+export const { setTodos, setReloadTodos, setTodosCount } = todoSlice.actions;
 export default todoSlice.reducer;

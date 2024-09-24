@@ -21,7 +21,7 @@ import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRig
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
 import { IoGrid } from "react-icons/io5";
-import { FaArrowRight, FaHandsClapping } from "react-icons/fa6";
+import {  FaHandsClapping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";

@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import PaymentRoutes from "./routes/PaymentRoutes";
+import Loading from "./shared/Loading";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -19,7 +20,13 @@ const TodosRoutes = lazy(() => import("./routes/TodosRoutes"));
 
 function App() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div>
+          <Loading />
+        </div>
+      }
+    >
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />

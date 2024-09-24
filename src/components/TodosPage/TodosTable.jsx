@@ -26,8 +26,8 @@ const TodosTable = ({ todos = [], setTodos }) => {
       const updatedTodos = todos.map((todo) =>
         todo._id === id ? { ...todo, status } : todo
       );
-      setTodos(updatedTodos);
-      dispatch(setReloadTodos(true)); 
+      dispatch(setTodos(updatedTodos));
+      dispatch(setReloadTodos(true));
     } catch (err) {
       console.error("Error updating todo status:", err);
     }
@@ -49,7 +49,7 @@ const TodosTable = ({ todos = [], setTodos }) => {
         </TableHead>
         <TableBody>
           {Array.isArray(todos) && todos.length > 0 ? (
-            todos.map((todo) => (
+            todos?.map((todo) => (
               <TableRow
                 key={todo._id}
                 sx={{

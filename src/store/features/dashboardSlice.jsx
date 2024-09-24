@@ -12,6 +12,8 @@ const initialState = {
   tasksCount: 0,
   usersCount: 0,
   clientsCount: 0,
+
+  chartDetails: [],
 };
 const dashboardSlice = createSlice({
   name: "dashboard",
@@ -41,6 +43,9 @@ const dashboardSlice = createSlice({
     setClientsCount: (state, action) => {
       state.clientsCount = action.payload;
     },
+    setChartDetails: (state, action) => {
+      state.chartDetails = action.payload;
+    },
   },
 });
 export const {
@@ -52,5 +57,6 @@ export const {
   setUsersCount,
   setProjects,
   setReloadDashboard,
+  setChartDetails,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

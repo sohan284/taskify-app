@@ -42,7 +42,6 @@ import Loading from "../../shared/Loading";
 import { setReloadTasks, setTasks } from "../../store/features/taskSlice";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
   const filter = useSelector((state) => state.project.filter);
   const gridView = useSelector((state) => state.project.gridView);
   const tasks = useSelector((state) => state.task.tasks);
@@ -107,7 +106,7 @@ const TasksTable = ({ API }) => {
 
       fetchData();
     }
-  }, [reloadPage, filter, tasks]);
+  }, [reloadTasks, filter, tasks]);
 
   if (loading && tasks === null) return <div>{<Loading />}</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -175,14 +174,9 @@ const TasksTable = ({ API }) => {
       });
   };
   const handleStatusChange = async (e, task) => {
-    console.log(statuses);
-    console.log(e.target.value);
-
     const updatedStatus = statuses?.find(
       (status) => status.title == e.target.value
     );
-    console.log(updatedStatus);
-
     try {
       await ProjectManagement.updateProjectStatus(task._id, updatedStatus);
       setTasks((prevMasks) =>

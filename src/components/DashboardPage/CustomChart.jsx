@@ -1,21 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { MdOutlineBusinessCenter } from "react-icons/md";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
-import { IoMdAdd } from "react-icons/io";
-import { Checkbox, FormControlLabel } from "@mui/material";
-import { RiDeleteBinLine } from "react-icons/ri";
-import { FaList, FaRegEdit } from "react-icons/fa";
-import TodoManagement from "../../service/Todo";
-import { useDispatch, useSelector } from "react-redux";
-import { setReloadPage } from "../../store/features/reloadSlice";
-import CreateTodosDialog from "../TodosPage/CreateTodosDialog";
-import { toast } from "react-toastify";
-import moment from "moment";
-import { useNavigate } from "react-router-dom";
-import Loading from "../../shared/Loading";
+// import Loading from "../../shared/Loading";
 
 const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
   CustomChart.propTypes = {
@@ -24,13 +13,6 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
     colors: PropTypes.array,
     labels: PropTypes.array,
   };
-
-  const reloadPage = useSelector((state) => state.reload.reloadPage);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [todos, setTodos] = useState([]);
   const [options] = useState({
     chart: {
       type: "donut",
@@ -52,167 +34,52 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
     ],
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await TodoManagement.getTodosList();
-        setTodos(res.data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-        dispatch(setReloadPage(false));
-      }
-    };
-
-    fetchData();
-  }, [reloadPage]);
-
   // Calculate the total series values
   const totalSeries = Array.isArray(series)
     ? series.reduce((acc, value) => acc + (value || 0), 0)
     : 0;
 
-  const updateTodoStatus = async (id, status) => {
-    setLoading(true);
-    try {
-      await TodoManagement.updateTodoStatus(id, { status }).then(() =>
-        dispatch(setReloadPage(true))
-      );
-      setTodos((prevTodos) =>
-        prevTodos.map((todo) => (todo._id === id ? { ...todo, status } : todo))
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleTodos = (id, currentStatus) => {
-    updateTodoStatus(id, !currentStatus);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleDeleteTodos = (id) => {
-    setLoading(true);
-    TodoManagement.deleteTodos(id)
-      .then(() => {
-        dispatch(setReloadPage(true));
-        handleClose();
-        toast.success("Todos Delete Successfully");
-      })
-      .catch((error) => {
-        console.error("Error deleting the todos:", error);
-      });
-  };
-  if (loading)
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
+  // if (loading)
+  //   return (
+  //     <div>
+  //       <Loading />
+  //     </div>
+  //   );
 
   return (
     <div className="">
-      {title === "Todos Overview" ? (
-        <div className="flex justify-between">
-          <p className="text-lg font-medium m-5 text-gray-500">{title}</p>
-          <div className="mt-6 flex h-8">
-            <div className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white">
-              <IoMdAdd onClick={() => setOpen(true)} />
-            </div>
-            <div className="bg-[#6479f3] text-xs mr-5 px-3 pt-2.5 rounded hover:text-sm text-white">
-              <FaList onClick={() => navigate("/todos")} />
-            </div>
-          </div>
-          <CreateTodosDialog open={open} onClose={handleClose} />
-        </div>
-      ) : (
-        <p className="text-lg font-medium m-5 text-gray-500">{title}</p>
-      )}
+      <p className="text-lg font-medium m-5 text-gray-500">{title}</p>
       <div className="w-96" id="chart">
         <ReactApexChart options={options} series={series} type="donut" />
       </div>
-      {title === "Todos Overview" ? (
-        <div className="ml-10 my-5">
-          {todos.slice(0, 5).map((todo, index) => (
-            <div key={index}>
-              <div className="text-[gray] flex justify-between w-[50%]">
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={() => handleTodos(todo._id, todo.status)}
-                      checked={todo.status}
-                      sx={{
-                        color: "#6479f3",
-                        "&.Mui-checked": {
-                          color: "#6479f3",
-                        },
-                      }}
-                    />
-                  }
-                  label={todo.status ? <s>{todo.title}</s> : todo.title}
-                  sx={{
-                    "& .MuiFormControlLabel-label": {
-                      fontSize: "16px", // Adjust font size of the label
-                      fontWeight: "500", // Adjust width of the label
-                    },
-                  }}
-                />
 
-                <div className="flex mt-3">
-                  <FaRegEdit
-                    style={{
-                      color: "#3f51b5",
-                      fontSize: "16px",
-                      marginRight: "20px",
-                    }}
-                  />
-                  <RiDeleteBinLine
-                    onClick={() => handleDeleteTodos(todo._id)}
-                    style={{
-                      color: "tomato",
-                      fontSize: "16px",
-                      marginRight: "20px",
-                    }}
-                  />
-                </div>
-              </div>
-              <p className="text-xs ml-8 text-gray-400">
-                {moment(todo?.date).format("MMMM D, YYYY hh:mm:ss A")}
-              </p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="m-5 text-gray-400 font-medium">
-          {labels?.map((label, index) => (
-            <div className="flex justify-between my-2" key={index}>
-              {title === "Project Statistics" ? (
-                <MdOutlineBusinessCenter
-                  style={{ color: colors[index] || "#000" }}
-                  className="bg-[#ebe3ff] rounded p-0.5 text-2xl"
-                />
-              ) : (
-                <AssignmentTurnedInOutlinedIcon
-                  style={{ color: colors[index] || "#000" }}
-                  className="bg-[#ebe3ff] rounded p-0.5"
-                />
-              )}
-              <p>{label || "N/A"}</p>
-              <p>{series[index] !== undefined ? series[index] : "N/A"}</p>
-            </div>
-          ))}
-          <div className="flex justify-between mt-4">
-            <MenuIcon
-              style={{ color: "#8761df" }}
-              className="bg-[#ebe3ff] rounded p-0.5"
-            />
-            <p>Total</p>
-            <p>{totalSeries}</p>
+      <div className="m-5 text-gray-400 font-medium">
+        {labels?.map((label, index) => (
+          <div className="flex justify-between my-2" key={index}>
+            {title === "Project Statistics" ? (
+              <MdOutlineBusinessCenter
+                style={{ color: colors[index] || "#000" }}
+                className="bg-[#ebe3ff] rounded p-0.5 text-2xl"
+              />
+            ) : (
+              <AssignmentTurnedInOutlinedIcon
+                style={{ color: colors[index] || "#000" }}
+                className="bg-[#ebe3ff] rounded p-0.5"
+              />
+            )}
+            <p>{label || "N/A"}</p>
+            <p>{series[index] !== undefined ? series[index] : "N/A"}</p>
           </div>
+        ))}
+        <div className="flex justify-between mt-4">
+          <MenuIcon
+            style={{ color: "#8761df" }}
+            className="bg-[#ebe3ff] rounded p-0.5"
+          />
+          <p>Total</p>
+          <p>{totalSeries}</p>
         </div>
-      )}
+      </div>
       <div id="html-dist"></div>
     </div>
   );
