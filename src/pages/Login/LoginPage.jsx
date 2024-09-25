@@ -19,26 +19,34 @@ function LoginPage() {
     return emailRegex.test(email);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setErrorMsg(null); // Clear any previous errors
 
+    // Check if fields are filled
     if (!email || !password) {
       setErrorMsg("All fields are required.");
       return;
     }
 
+    // Validate email format
     if (!validateEmail(email)) {
       setErrorMsg("Invalid email format.");
       return;
     }
 
-    signInWithEmailAndPassword(email, password)
-      .then(() => {
-        navigate("/"); // Navigate to home page after successful login
-      })
-      .catch((err) => {
-        setErrorMsg(err.message);
-      });
+    // Validate password length (at least 6 characters)
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters long.");
+      return;
+    }
+
+    try {
+      // Attempt to sign in
+      await signInWithEmailAndPassword(email, password);
+      navigate("/"); // Navigate only if sign in is successful
+    } catch (err) {
+      setErrorMsg(err.message); // Show error message if sign in fails
+    }
   };
 
   return (

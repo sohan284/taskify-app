@@ -55,7 +55,7 @@ function DashboardPage() {
   ];
 
   useEffect(() => {
-    if (dashboard.reloadDashboard || reloadPage) {
+    if (dashboard.reloadDashboard || reloadPage || createUser) {
       const fetchData = async () => {
         try {
           setLoading(true); // Start loading
@@ -152,7 +152,7 @@ function DashboardPage() {
       };
       fetchData();
     }
-  }, [reloadPage, dispatch]);
+  }, [reloadPage, dispatch, createUser]);
 
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
