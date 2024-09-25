@@ -43,6 +43,7 @@ import ColumnVisibilityButton from "../../shared/ColumnVisibilityButton";
 import moment from "moment";
 import Loading from "../../shared/Loading";
 import { setStatuses } from "../../store/features/statusSlice";
+import { setReloadDashboard } from "../../store/features/dashboardSlice";
 
 const ProjectsTable = ({ API }) => {
   const dispatch = useDispatch();
@@ -202,6 +203,7 @@ const ProjectsTable = ({ API }) => {
         )
       );
       dispatch(setReloadProjects(true));
+      dispatch(setReloadDashboard(true));
       toast.success("Status Updated Successfully");
     } catch (error) {
       console.error("Error updating the status:", error);

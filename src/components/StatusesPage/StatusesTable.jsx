@@ -27,6 +27,7 @@ import {
   setReloadStatuses,
   setStatuses,
 } from "../../store/features/statusSlice";
+import ProjectManagement from "../../service/Project";
 const StatusesTable = () => {
   const dispatch = useDispatch();
   const reloadStatuses = useSelector((state) => state.status.reloadStatuses);
@@ -78,7 +79,7 @@ const StatusesTable = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(statuses.map((status) => status.id));
+      setSelectedIds(statuses.map((status) => status._id)); // Changed from status.id to status._id
     } else {
       setSelectedIds([]);
     }
@@ -92,13 +93,21 @@ const StatusesTable = () => {
     );
   };
 
-  const handleDeleteSelected = () => {
-    dispatch(
-      setStatuses(
-        statuses?.filter((status) => !selectedIds.includes(status.id))
-      )
-    );
-    setSelectedIds([]);
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0) {
+      toast.error("No statuses selected for deletion");
+      return;
+    }
+    try {
+      await StatusManagement.deleteStatuses(selectedIds);
+      dispatch(setReloadStatuses(true)); 
+      toast.success("Selected statuses deleted successfully");
+    } catch (error) {
+      console.error("Error deleting statuses:", error); 
+      toast.error("Failed to delete selected statuses");
+    } finally {
+      setSelectedIds([]); 
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -127,14 +136,32 @@ const StatusesTable = () => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    StatusManagement.deleteStatus(id)
-      .then(() => {
-        dispatch(setReloadStatuses(true));
-        handleClose();
-        toast.success("Status Delete Successfully");
+    ProjectManagement.getProjectList()
+      .then((res) => {
+        const anyStatusExists = res.data?.some(
+          (project) => project.status._id === id
+        );
+        console.log(anyStatusExists);
+
+        if (anyStatusExists) {
+          toast.error("Ops Sorry ! Status is associated with a project.");
+          handleClose();
+        } else {
+          if (id) {
+            StatusManagement.deleteStatus(id)
+              .then(() => {
+                dispatch(setReloadStatuses(true));
+                handleClose();
+                toast.success("Status deleted successfully.");
+              })
+              .catch((error) => {
+                console.error("Error deleting the Status:", error);
+              });
+          }
+        }
       })
       .catch((error) => {
-        console.error("Error deleting the Status:", error);
+        console.error("Error fetching project list:", error);
       });
   };
 
@@ -204,11 +231,11 @@ const StatusesTable = () => {
               {statuses
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 ?.map((status, index) => (
-                  <TableRow key={status?.id}>
+                  <TableRow key={status?._id}>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedIds?.includes(status?.id)}
-                        onChange={() => handleSelect(status?.id)}
+                        checked={selectedIds?.includes(status?._id)}
+                        onChange={() => handleSelect(status?._id)}
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
