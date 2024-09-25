@@ -376,11 +376,11 @@ const ProjectsTable = ({ API }) => {
                       page * rowsPerPage + rowsPerPage
                     )
                     ?.map((project, index) => (
-                      <TableRow key={project?.id}>
+                      <TableRow key={project?._id}>
                         <TableCell padding="checkbox">
                           <Checkbox
-                            checked={selectedIds?.includes(project?.id)}
-                            onChange={() => handleSelect(project?.id)}
+                            checked={selectedIds?.includes(project?._id)}
+                            onChange={() => handleSelect(project?._id)}
                           />
                         </TableCell>
                         {visibleColumns?.id && (

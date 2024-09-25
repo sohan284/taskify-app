@@ -15,7 +15,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 
 function GridTable({
-  members,
+  projects,
   page,
   rowsPerPage,
   selectedIds,
@@ -29,16 +29,16 @@ function GridTable({
 }) {
   return (
     <Grid container spacing={2}>
-      {members
+      {projects
         ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        ?.map((member, index) => (
-          <Grid item xs={12} sm={6} md={4} key={member?.id}>
+        ?.map((project, index) => (
+          <Grid item xs={12} sm={6} md={4} key={project?._id}>
             <Card variant="outlined">
               <CardContent>
                 <div className="flex items-center justify-between">
                   <Checkbox
-                    checked={selectedIds?.includes(member?.id)}
-                    onChange={() => handleSelect(member?.id)}
+                    checked={selectedIds?.includes(project?._id)}
+                    onChange={() => handleSelect(project?._id)}
                   />
                   {visibleColumns?.id && (
                     <Typography>ID: {index + 1}</Typography>
@@ -47,22 +47,22 @@ function GridTable({
 
                 {visibleColumns?.title && (
                   <Typography variant="h6" color="primary">
-                    {member?.title}
+                    {project?.title}
                   </Typography>
                 )}
 
                 <div className="flex items-center">
-                  {member?.favourite ? (
+                  {project?.favourite ? (
                     <FaStar
                       onClick={() =>
-                        handleFavourite(member, false, "Remove from Favourite")
+                        handleFavourite(project, false, "Remove from Favourite")
                       }
                       className="text-[orange] mr-3"
                     />
                   ) : (
                     <FaRegStar
                       onClick={() =>
-                        handleFavourite(member, true, "Added to favourite")
+                        handleFavourite(project, true, "Added to favourite")
                       }
                       className="text-[orange] mr-3"
                     />
@@ -72,8 +72,8 @@ function GridTable({
 
                 {visibleColumns?.users && (
                   <div className="flex items-center mt-2">
-                    {Array.isArray(member?.users)
-                      ? member?.users.map((el, index) => (
+                    {Array.isArray(project?.users)
+                      ? project?.users.map((el, index) => (
                           <div key={index} className="-ml-2">
                             {el?.photoURL ? (
                               <img
@@ -88,16 +88,16 @@ function GridTable({
                       : "No users"}
                     <FaRegEdit
                       className="ml-2 text-[#5a6fe2] cursor-pointer"
-                      onClick={() => handleOpenDialog(member)}
+                      onClick={() => handleOpenDialog(project)}
                     />
                   </div>
                 )}
 
                 {visibleColumns?.clients && (
                   <div className="flex items-center mt-2">
-                    {Array.isArray(member?.clients) &&
-                    member?.clients.length > 0 ? (
-                      member?.clients.map((el, index) => (
+                    {Array.isArray(project?.clients) &&
+                    project?.clients.length > 0 ? (
+                      project?.clients.map((el, index) => (
                         <div key={index} className="-ml-2">
                           {el?.photoURL ? (
                             <img
@@ -116,19 +116,19 @@ function GridTable({
                     )}
                     <FaRegEdit
                       className="ml-2 text-[#5a6fe2] cursor-pointer"
-                      onClick={() => handleOpenDialog(member)}
+                      onClick={() => handleOpenDialog(project)}
                     />
                   </div>
                 )}
 
                 {visibleColumns?.status && (
                   <NativeSelect
-                    value={member?.status?.title}
-                    onChange={(e) => handleStatusChange(e, member)}
+                    value={project?.status?.title}
+                    onChange={(e) => handleStatusChange(e, project)}
                     disableUnderline
                     style={{
-                      backgroundColor: member?.status?.bgColor,
-                      color: member?.status?.txColor,
+                      backgroundColor: project?.status?.bgColor,
+                      color: project?.status?.txColor,
                       width: "100%",
                       marginTop: "10px",
                     }}
@@ -149,30 +149,30 @@ function GridTable({
                 )}
 
                 {visibleColumns?.priority && (
-                  <Typography>Priority: {member?.priority}</Typography>
+                  <Typography>Priority: {project?.priority}</Typography>
                 )}
                 {visibleColumns?.startsAt && (
-                  <Typography>Starts At: {member?.startsAt}</Typography>
+                  <Typography>Starts At: {project?.startsAt}</Typography>
                 )}
                 {visibleColumns?.endsAt && (
-                  <Typography>Ends At: {member?.endsAt}</Typography>
+                  <Typography>Ends At: {project?.endsAt}</Typography>
                 )}
                 {visibleColumns?.budget && (
-                  <Typography>Budget: {member?.budget}</Typography>
+                  <Typography>Budget: {project?.budget}</Typography>
                 )}
                 {visibleColumns?.tags && (
-                  <Typography>Tags: {member?.tags?.join(", ")}</Typography>
+                  <Typography>Tags: {project?.tags?.join(", ")}</Typography>
                 )}
 
                 {visibleColumns?.options && (
                   <div className="flex justify-between mt-3">
                     <FaRegEdit
                       className="text-[#3f51b5] cursor-pointer"
-                      onClick={() => handleOpenDialog(member)}
+                      onClick={() => handleOpenDialog(project)}
                     />
                     <RiDeleteBinLine
                       className="text-[tomato] cursor-pointer"
-                      onClick={() => handleClickOpen(member?._id)}
+                      onClick={() => handleClickOpen(project?._id)}
                     />
                     <GoCopy className="text-[orange] cursor-pointer" />
                     <ErrorOutlineOutlinedIcon className="text-[#3f51b5]" />
@@ -187,7 +187,7 @@ function GridTable({
 }
 
 GridTable.propTypes = {
-  members: PropTypes.arrayOf(
+  projects: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,

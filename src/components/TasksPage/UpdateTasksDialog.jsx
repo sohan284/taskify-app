@@ -33,17 +33,28 @@ const UpdateTaskDialog = ({ open, onClose, task, onSave }) => {
 
   useEffect(() => {
     if (task) {
-      UserManagement.getUserList().then((res) => setUsers(res?.data));
-      UserManagement.getUserList("client").then((res) => setClients(res?.data));
+      UserManagement.getUserList().then((res) => {
+        const activeUsers = res?.data?.filter((user) => user.status === true);
+        setUsers(activeUsers);
+      });
+
+      UserManagement.getUserList("client").then((res) => {
+        const activeClients = res?.data?.filter(
+          (client) => client.status === true
+        );
+        setClients(activeClients);
+      });
+
       StatusManagement.getStatusList().then((res) => {
         setStatuses(res.data);
         setColor(res?.data[0]?.bgColor);
       });
+
       setFormData({
         ...task,
         startsAt: task.startsAt ? dayjs(task.startsAt) : null,
         endsAt: task.endsAt ? dayjs(task.endsAt) : null,
-        status: task.status || {}, // Set initial tags from task
+        status: task.status || {}, // Set initial status from task
       });
     }
   }, [task]);

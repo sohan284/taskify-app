@@ -88,8 +88,24 @@ const TagsTable = () => {
   };
 
   const handleDeleteSelected = () => {
-    setTags(tags?.filter((tag) => !selectedIds.includes(tag.id)));
-    setSelectedIds([]);
+    if (selectedIds.length === 0) return;
+
+    // Confirm before deleting
+    if (!window.confirm("Are you sure you want to delete the selected tags?")) {
+      return;
+    }
+    // Delete multiple tags
+    Promise.all(selectedIds.map((id) => TagManagement.deleteTag(id)))
+      .then(() => {
+        setTags(tags.filter((tag) => !selectedIds.includes(tag.id)));
+        setSelectedIds([]);
+        toast.success("Selected tags deleted successfully.");
+        dispatch(setReloadPage(true)); // Reload page to fetch updated tags list
+      })
+      .catch((err) => {
+        console.error("Error deleting tags:", err);
+        toast.error("Failed to delete selected tags.");
+      });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -194,11 +210,11 @@ const TagsTable = () => {
               {tags
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 ?.map((tag, index) => (
-                  <TableRow key={tag?.id}>
+                  <TableRow key={tag?._id}>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedIds?.includes(tag?.id)}
-                        onChange={() => handleSelect(tag?.id)}
+                        checked={selectedIds?.includes(tag?._id)}
+                        onChange={() => handleSelect(tag?._id)}
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}

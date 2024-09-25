@@ -12,6 +12,7 @@ import {
   MenuItem,
   Autocomplete,
   NativeSelect,
+  CircularProgress,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -20,18 +21,16 @@ import { toast } from "react-toastify";
 import ProjectManagement from "../../service/Project";
 import { useDispatch } from "react-redux";
 import UserManagement from "../../service/User";
-import Loading from "../../shared/Loading";
 import StatusManagement from "../../service/Status";
-import CloseDialog from "../../shared/CloseDialog";
 import TagManagement from "../../service/Tag";
 import { setReloadUsers } from "../../store/features/userSlice";
 import { setReloadProjects } from "../../store/features/projectSlice";
+import CloseDialog from "../../shared/CloseDialog";
 
 const CreateProjectDialog = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [statuses, setStatuses] = useState([]);
   const [tags, setTags] = useState([]);
   const [formData, setFormData] = useState({
@@ -46,11 +45,23 @@ const CreateProjectDialog = ({ open, onClose }) => {
     tags: [],
     favourite: true,
   });
+  const [loading, setLoading] = useState({
+    users: true,
+    clients: true,
+    statuses: true,
+    tags: true,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
+        setLoading({
+          users: true,
+          clients: true,
+          statuses: true,
+          tags: true,
+        });
+
         const [userResponse, clientResponse, statusResponse, tagResponse] =
           await Promise.all([
             UserManagement.getUserList(),
@@ -58,15 +69,28 @@ const CreateProjectDialog = ({ open, onClose }) => {
             StatusManagement.getStatusList(),
             TagManagement.getTagList(),
           ]);
-        setUsers(userResponse?.data);
-        setClients(clientResponse?.data);
+
+        const activeUsers = userResponse?.data.filter(
+          (user) => user.status === true
+        );
+        const activeClients = clientResponse?.data.filter(
+          (client) => client.status === true
+        );
+
+        setUsers(activeUsers);
+        setClients(activeClients);
         setStatuses(statusResponse?.data);
         setTags(tagResponse?.data);
       } catch (err) {
-        console.log(err);
+        console.error(err);
+        toast.error("Error fetching data. Please try again.");
       } finally {
-        setLoading(false);
-        dispatch(setReloadProjects(false));
+        setLoading({
+          users: false,
+          clients: false,
+          statuses: false,
+          tags: false,
+        });
       }
     };
     fetchData();
@@ -106,7 +130,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
         onClose();
         setFormData({
           title: "",
-          status: null, // status will be an object
+          status: null,
           priority: "",
           budget: "",
           startsAt: null,
@@ -120,16 +144,9 @@ const CreateProjectDialog = ({ open, onClose }) => {
         dispatch(setReloadProjects(true));
       })
       .catch((error) => {
-        toast.error(`${error}`);
+        toast.error(`Error creating project: ${error.message}`);
       });
   };
-
-  if (loading)
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
 
   return (
     <Dialog
@@ -203,7 +220,6 @@ const CreateProjectDialog = ({ open, onClose }) => {
               value={formData.priority}
               onChange={handleChange}
               displayEmpty
-              placeholder="Select priority"
             >
               <MenuItem value="" disabled>
                 Select priority
@@ -260,68 +276,91 @@ const CreateProjectDialog = ({ open, onClose }) => {
         </div>
 
         {/* Autocomplete for Users */}
-        <Autocomplete
-          className="mt-10"
-          multiple
-          options={users}
-          getOptionLabel={(option) => option.displayName || option?.email}
-          value={formData.users}
-          onChange={(event, newValue) => {
-            setFormData((prev) => ({ ...prev, users: newValue }));
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Select Users"
-              placeholder="Select users"
+        <FormControl fullWidth margin="dense" className="mt-10">
+          <p className="text-xs text-gray-500">USERS</p>
+          {loading.users ? (
+            <CircularProgress size={24} />
+          ) : (
+            <Autocomplete
+              multiple
+              options={users}
+              getOptionLabel={(option) => option.displayName || option?.email}
+              value={formData.users}
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({ ...prev, users: newValue }));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Select Users"
+                  placeholder="Select users"
+                />
+              )}
             />
           )}
-        />
+        </FormControl>
 
         {/* Autocomplete for Clients */}
-        <Autocomplete
-          className="mt-10"
-          multiple
-          options={clients}
-          getOptionLabel={(option) => option.displayName || option?.email}
-          value={formData.clients}
-          onChange={(event, newValue) => {
-            setFormData((prev) => ({ ...prev, clients: newValue }));
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Select Clients"
-              placeholder="Select clients"
+        <FormControl fullWidth margin="dense" className="mt-10">
+          <p className="text-xs text-gray-500">CLIENTS</p>
+          {loading.clients ? (
+            <CircularProgress size={24} />
+          ) : (
+            <Autocomplete
+              multiple
+              options={clients}
+              getOptionLabel={(option) => option.displayName || option?.email}
+              value={formData.clients}
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({ ...prev, clients: newValue }));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Select Clients"
+                  placeholder="Select clients"
+                />
+              )}
             />
           )}
-        />
+        </FormControl>
 
         {/* Autocomplete for Tags */}
-        <Autocomplete
-          className="mt-10"
-          multiple
-          options={tags}
-          getOptionLabel={(option) => option.title}
-          value={formData.tags}
-          onChange={(event, newValue) => {
-            setFormData((prev) => ({ ...prev, tags: newValue }));
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Select Tags"
-              placeholder="Select tags"
+        <FormControl fullWidth margin="dense" className="mt-10">
+          <p className="text-xs text-gray-500">TAGS</p>
+          {loading.tags ? (
+            <CircularProgress size={24} />
+          ) : (
+            <Autocomplete
+              multiple
+              options={tags}
+              getOptionLabel={(option) => option.title}
+              value={formData.tags}
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({ ...prev, tags: newValue }));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Select Tags"
+                  placeholder="Select tags"
+                />
+              )}
             />
           )}
-        />
+        </FormControl>
       </DialogContent>
+
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleCreate}>Create</Button>
+        <Button onClick={onClose} color="secondary">
+          Cancel
+        </Button>
+        <Button onClick={handleCreate} variant="contained" color="primary">
+          Create
+        </Button>
       </DialogActions>
     </Dialog>
   );

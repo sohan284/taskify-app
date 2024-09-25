@@ -36,19 +36,30 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
 
   useEffect(() => {
     if (project) {
-      UserManagement.getUserList().then((res) => setUsers(res?.data));
-      UserManagement.getUserList("client").then((res) => setClients(res?.data));
+      UserManagement.getUserList().then((res) => {
+        const activeUsers = res?.data?.filter((user) => user.status === true);
+        setUsers(activeUsers);
+      });
+      UserManagement.getUserList("client").then((res) => {
+        const activeClients = res?.data?.filter(
+          (client) => client.status === true
+        );
+        setClients(activeClients);
+      });
+
       StatusManagement.getStatusList().then((res) => {
         setStatuses(res.data);
         setColor(res?.data[0]?.bgColor);
       });
-      TagManagement.getTagList().then((res) => setTags(res?.data)); // Fetch tags from API
+
+      TagManagement.getTagList().then((res) => setTags(res?.data));
+
       setFormData({
         ...project,
         startsAt: project.startsAt ? dayjs(project.startsAt) : null,
         endsAt: project.endsAt ? dayjs(project.endsAt) : null,
-        status: project.status || {}, // Initialize status as an object
-        tags: project.tags || [], // Set initial tags from project
+        status: project.status || {},
+        tags: project.tags || [],
       });
     }
   }, [project]);
@@ -247,8 +258,8 @@ const UpdateProjectDialog = ({ open, onClose, project, onSave }) => {
         <Autocomplete
           className="mt-10"
           multiple
-          options={tags.map((tag) => tag.title)}
-          getOptionLabel={(option) => option.name || option} // Assuming the tag has a 'name' field
+          options={tags?.map((tag) => tag.title)}
+          getOptionLabel={(option) => option.title || option} // Assuming the tag has a 'name' field
           value={formData.tags || []}
           onChange={(event, newValue) => {
             setFormData((prev) => ({ ...prev, tags: newValue }));

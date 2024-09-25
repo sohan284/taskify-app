@@ -336,11 +336,11 @@ const TasksTable = ({ API }) => {
                 {tasks
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   ?.map((task, index) => (
-                    <TableRow key={task?.id}>
+                    <TableRow key={task?._id}>
                       <TableCell padding="checkbox">
                         <Checkbox
-                          checked={selectedIds?.includes(task?.id)}
-                          onChange={() => handleSelect(task?.id)}
+                          checked={selectedIds?.includes(task?._id)}
+                          onChange={() => handleSelect(task?._id)}
                         />
                       </TableCell>
                       {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}

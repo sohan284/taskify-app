@@ -42,14 +42,23 @@ const TodosTable = ({ todos = [], setTodos }) => {
       <Table>
         <TableHead>
           <TableRow sx={{ borderBottom: "2px solid #e0e0e0" }}>
-            <TableCell>TODO</TableCell>
-            <TableCell>PRIORITY</TableCell>
-            <TableCell>DESCRIPTION</TableCell>
+            <TableCell style={{ fontSize: "12px", color: "gray" }}>
+              ID
+            </TableCell>
+            <TableCell style={{ fontSize: "12px", color: "gray" }}>
+              TODO
+            </TableCell>
+            <TableCell style={{ fontSize: "12px", color: "gray" }}>
+              PRIORITY
+            </TableCell>
+            <TableCell style={{ fontSize: "12px", color: "gray" }}>
+              DESCRIPTION
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {Array.isArray(todos) && todos.length > 0 ? (
-            todos?.map((todo) => (
+            todos?.map((todo, index) => (
               <TableRow
                 key={todo._id}
                 sx={{
@@ -57,6 +66,7 @@ const TodosTable = ({ todos = [], setTodos }) => {
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>
                   <div className="p-2">
                     <div className="text-[gray] flex justify-between w-[50%]">
@@ -89,19 +99,19 @@ const TodosTable = ({ todos = [], setTodos }) => {
                 </TableCell>
                 {todo.priority === "Medium" ? (
                   <TableCell>
-                    <p className="bg-yellow-100 text-[#ff9100] text-center rounded font-semibold uppercase py-1">
+                    <p className="bg-yellow-100 text-[#ff9100] text-center rounded font-medium uppercase py-1">
                       {todo.priority}
                     </p>
                   </TableCell>
                 ) : todo.priority === "Low" ? (
                   <TableCell>
-                    <p className="bg-green-100 text-[#00b109] text-center rounded font-semibold uppercase py-1">
+                    <p className="bg-green-100 text-[#00b109] text-center rounded font-medium uppercase py-1">
                       {todo.priority}
                     </p>
                   </TableCell>
                 ) : todo.priority === "High" ? (
                   <TableCell>
-                    <p className="bg-red-100 text-[#ff4800] text-center rounded font-semibold uppercase py-1">
+                    <p className="bg-red-100 text-[#ff4800] text-center rounded font-medium uppercase py-1">
                       {todo.priority}
                     </p>
                   </TableCell>

@@ -339,11 +339,11 @@ const MeetingsTable = ({ API }) => {
               {meetings
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 ?.map((meeting, index) => (
-                  <TableRow key={meeting?.id}>
+                  <TableRow key={meeting?._id}>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedIds?.includes(meeting?.id)}
-                        onChange={() => handleSelect(meeting?.id)}
+                        checked={selectedIds?.includes(meeting?._id)}
+                        onChange={() => handleSelect(meeting?._id)}
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}

@@ -62,23 +62,24 @@ const UsersTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    if (users === null || reloadUsers || filter) {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          await UserManagement.getUserList(role).then((res) =>
-            dispatch(setUsers(res.data))
-          );
-        } catch (err) {
-          setError(err);
-        } finally {
-          setLoading(false);
-          dispatch(setFilter(false));
-          dispatch(setReloadPage(false));
-          dispatch(setReloadUsers(false));
-        }
-      };
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await UserManagement.getUserList(role);
+        dispatch(setUsers(res.data));
+        setError(null); // Reset error on success
+      } catch (err) {
+        setError(err);
+        toast.error("Failed to fetch users. Please try again later.");
+      } finally {
+        setLoading(false);
+        dispatch(setFilter(false));
+        dispatch(setReloadPage(false));
+        dispatch(setReloadUsers(false));
+      }
+    };
 
+    if (users === null || reloadUsers || filter) {
       fetchData();
     }
   }, [reloadUsers, filter, users]);
@@ -108,10 +109,13 @@ const UsersTable = () => {
   };
 
   const handleDeleteSelected = () => {
-    dispatch(
-      setUsers(users?.filter((status) => !selectedIds.includes(status.id)))
-    );
-    setSelectedIds([]);
+    if (window.confirm("Are you sure you want to delete the selected users?")) {
+      dispatch(
+        setUsers(users?.filter((user) => !selectedIds.includes(user._id)))
+      );
+      setSelectedIds([]);
+      toast.success("Selected users deleted successfully!");
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -260,11 +264,11 @@ const UsersTable = () => {
               {users
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 ?.map((user, index) => (
-                  <TableRow key={user?.id}>
+                  <TableRow key={user?._id}>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedIds?.includes(user?.id)}
-                        onChange={() => handleSelect(user?.id)}
+                        checked={selectedIds?.includes(user?._id)}
+                        onChange={() => handleSelect(user?._id)}
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}

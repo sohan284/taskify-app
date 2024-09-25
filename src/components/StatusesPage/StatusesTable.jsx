@@ -98,15 +98,46 @@ const StatusesTable = () => {
       toast.error("No statuses selected for deletion");
       return;
     }
+
     try {
-      await StatusManagement.deleteStatuses(selectedIds);
-      dispatch(setReloadStatuses(true)); 
+      // Fetch the list of projects to check for associated statuses
+      const projectList = await ProjectManagement.getProjectList();
+      const associatedStatuses = new Set();
+
+      // Check which selected statuses are associated with a project
+      projectList.data?.forEach((project) => {
+        if (selectedIds.includes(project.status._id)) {
+          associatedStatuses.add(project.status._id);
+        }
+      });
+
+      // Filter out the statuses that are associated with projects
+      const statusesToDelete = selectedIds.filter(
+        (id) => !associatedStatuses.has(id)
+      );
+
+      if (statusesToDelete.length === 0) {
+        toast.error(
+          "All selected statuses are associated with projects and cannot be deleted"
+        );
+        return;
+      }
+
+      if (associatedStatuses.size > 0) {
+        toast.warn(
+          "Some statuses are associated with projects and were not deleted"
+        );
+      }
+
+      // Proceed to delete the statuses that are not associated with any project
+      await StatusManagement.deleteStatuses(statusesToDelete);
+      dispatch(setReloadStatuses(true));
       toast.success("Selected statuses deleted successfully");
     } catch (error) {
-      console.error("Error deleting statuses:", error); 
+      console.error("Error deleting statuses:", error);
       toast.error("Failed to delete selected statuses");
     } finally {
-      setSelectedIds([]); 
+      setSelectedIds([]); // Reset the selected IDs
     }
   };
 

@@ -47,14 +47,24 @@ const CreateTaskDialog = ({ open, onClose }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        // Fetching users and clients
         const [userResponse, clientResponse, statusResponse] =
           await Promise.all([
             UserManagement.getUserList(),
             UserManagement.getUserList("client"),
             StatusManagement.getStatusList(),
           ]);
-        setUsers(userResponse?.data);
-        setClients(clientResponse?.data);
+
+        // Filtering for active users and clients
+        const activeUsers = userResponse?.data.filter(
+          (user) => user.status === true
+        );
+        const activeClients = clientResponse?.data.filter(
+          (client) => client.status === true
+        );
+
+        setUsers(activeUsers);
+        setClients(activeClients);
         setStatuses(statusResponse?.data);
       } catch (err) {
         console.log(err);

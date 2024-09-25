@@ -209,11 +209,11 @@ const ClientsTable = () => {
               {clients
                 ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 ?.map((user, index) => (
-                  <TableRow key={user?.id}>
+                  <TableRow key={user?._id}>
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={selectedIds?.includes(user?.id)}
-                        onChange={() => handleSelect(user?.id)}
+                        checked={selectedIds?.includes(user?._id)}
+                        onChange={() => handleSelect(user?._id)}
                       />
                     </TableCell>
                     {visibleColumns?.id && <TableCell>{index + 1}</TableCell>}
