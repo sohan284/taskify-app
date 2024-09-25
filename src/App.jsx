@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import PaymentRoutes from "./routes/PaymentRoutes";
 import Loading from "./shared/Loading";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -34,17 +35,47 @@ function App() {
 
         {/* Authenticated routes */}
         <Route path="/" element={<HomePage />}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route
+            path="/"
+            element={<ProtectedRoute element={<DashboardPage />} />}
+          />
           {/* Grouped feature routes */}
-          <Route path="users/*" element={<UserRoutes />} />
-          <Route path="projects/*" element={<ProjectRoutes />} />
-          <Route path="clients/*" element={<ClientRoutes />} />
-          <Route path="tasks/*" element={<TaskRoutes />} />
-          <Route path="statuses/*" element={<StatusesRoutes />} />
-          <Route path="todos/*" element={<TodosRoutes />} />
-          <Route path="notes/*" element={<NoteRoutes />} />
-          <Route path="meetings/*" element={<MeetingRoutes />} />
-          <Route path="payment/*" element={<PaymentRoutes />} />
+          <Route
+            path="users/*"
+            element={<ProtectedRoute element={<UserRoutes />} />}
+          />
+          <Route
+            path="projects/*"
+            element={<ProtectedRoute element={<ProjectRoutes />} />}
+          />
+          <Route
+            path="clients/*"
+            element={<ProtectedRoute element={<ClientRoutes />} />}
+          />
+          <Route
+            path="tasks/*"
+            element={<ProtectedRoute element={<TaskRoutes />} />}
+          />
+          <Route
+            path="statuses/*"
+            element={<ProtectedRoute element={<StatusesRoutes />} />}
+          />
+          <Route
+            path="todos/*"
+            element={<ProtectedRoute element={<TodosRoutes />} />}
+          />
+          <Route
+            path="notes/*"
+            element={<ProtectedRoute element={<NoteRoutes />} />}
+          />
+          <Route
+            path="meetings/*"
+            element={<ProtectedRoute element={<MeetingRoutes />} />}
+          />
+          <Route
+            path="payment/*"
+            element={<ProtectedRoute element={<PaymentRoutes />} />}
+          />
         </Route>
       </Routes>
     </Suspense>
