@@ -139,53 +139,58 @@ const CustomChart = () => {
         <ReactApexChart options={options} series={todosCount} type="donut" />
       </div>
       <div className="ml-10 my-5">
-        {todos?.slice(0, 5)?.map((todo, index) => (
-          <div key={index}>
-            <div className="text-[gray] flex justify-between w-[50%]">
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onChange={() => handleTodos(todo._id, todo.status)}
-                    checked={todo.status}
-                    sx={{
-                      color: "#6479f3",
-                      "&.Mui-checked": {
+        <div
+          className="overflow-y-auto"
+          style={{ maxHeight: "250px", width: "100%" }} // Adjust height as needed
+        >
+          {todos?.map((todo, index) => (
+            <div key={index}>
+              <div className="text-[gray] flex justify-between w-[50%]">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={() => handleTodos(todo._id, todo.status)}
+                      checked={todo.status}
+                      sx={{
                         color: "#6479f3",
-                      },
+                        "&.Mui-checked": {
+                          color: "#6479f3",
+                        },
+                      }}
+                    />
+                  }
+                  label={todo.status ? <s>{todo.title}</s> : todo.title}
+                  sx={{
+                    "& .MuiFormControlLabel-label": {
+                      fontSize: "16px", // Adjust font size of the label
+                      fontWeight: "500", // Adjust width of the label
+                    },
+                  }}
+                />
+                <div className="flex mt-3">
+                  <FaRegEdit
+                    style={{
+                      color: "#3f51b5",
+                      fontSize: "16px",
+                      marginRight: "20px",
                     }}
                   />
-                }
-                label={todo.status ? <s>{todo.title}</s> : todo.title}
-                sx={{
-                  "& .MuiFormControlLabel-label": {
-                    fontSize: "16px", // Adjust font size of the label
-                    fontWeight: "500", // Adjust width of the label
-                  },
-                }}
-              />
-              <div className="flex mt-3">
-                <FaRegEdit
-                  style={{
-                    color: "#3f51b5",
-                    fontSize: "16px",
-                    marginRight: "20px",
-                  }}
-                />
-                <RiDeleteBinLine
-                  onClick={() => handleDeleteTodos(todo._id)}
-                  style={{
-                    color: "tomato",
-                    fontSize: "16px",
-                    marginRight: "20px",
-                  }}
-                />
+                  <RiDeleteBinLine
+                    onClick={() => handleDeleteTodos(todo._id)}
+                    style={{
+                      color: "tomato",
+                      fontSize: "16px",
+                      marginRight: "20px",
+                    }}
+                  />
+                </div>
               </div>
+              <p className="text-xs ml-8 text-gray-400">
+                {moment(todo?.date).format("MMMM D, YYYY hh:mm:ss A")}
+              </p>
             </div>
-            <p className="text-xs ml-8 text-gray-400">
-              {moment(todo?.date).format("MMMM D, YYYY hh:mm:ss A")}
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <div id="html-dist"></div>

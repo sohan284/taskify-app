@@ -11,8 +11,6 @@ import { Button, Collapse, Divider, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { RiHome8Line } from "react-icons/ri";
-import { useAuthState } from "react-firebase-hooks/auth";
-import auth from "../firebase.init";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
@@ -27,11 +25,13 @@ import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
 import { SiGotomeeting } from "react-icons/si";
 import UserManagement from "../service/User";
+import { useAuth } from "../context/AuthContext";
 const drawerWidth = 240;
 
 function SideBar(props) {
-  const [user] = useAuthState(auth);
+  const { userEmail, userRole } = useAuth();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -40,26 +40,16 @@ function SideBar(props) {
   const [collapseProjects, setCollapseProjects] = useState(false);
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const [userId, setUserId] = useState(null);
-  const [loadUser, setLoadUser] = useState(false);
-  const token = localStorage.getItem("token");
-  const decodedToken = token?.split(".");
-  var userRole;
-  if (decodedToken?.length === 3) {
-    const payload = JSON.parse(atob(decodedToken[1])); // Decode the payload part
-    userRole = payload.role;
-  }
   useEffect(() => {
-    if (loadUser && user) {
-      UserManagement.getUserList().then((res) => {
-        const foundUser = res.data.find((u) => u.email === user.email);
-        if (foundUser) {
-          setUserId(foundUser._id);
-        }
-        setLoadUser(false); // Set loadUser to false after fetching
-      });
-    }
-  }, [loadUser]);
-
+    UserManagement.getUserList().then((res) => {
+      const foundUser = res.data.find((u) => u.email == userEmail);
+      if (foundUser) {
+        setUserId(foundUser._id);
+        setUser(foundUser);
+      }
+    });
+  }, []);
+  
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -80,7 +70,6 @@ function SideBar(props) {
   };
 
   const handleMenuClick = (event) => {
-    setLoadUser(true);
     setAnchorEl(event.currentTarget);
   };
 
@@ -361,6 +350,12 @@ function SideBar(props) {
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleMenuClose}
+                PaperProps={{
+                  style: {
+                    width: "180px", // Set the desired width here
+                    paddingBlock: "10px",
+                  },
+                }}
                 anchorOrigin={{
                   vertical: "bottom",
                   horizontal: "right",
@@ -377,18 +372,20 @@ function SideBar(props) {
                   My Account
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleSignOut}>
-                  <Button
-                    style={{ color: "tomato", border: "1px solid tomato" }}
-                    size="small"
-                    className="w-full"
-                  >
-                    Logout
-                    <LogoutSharpIcon
-                      style={{ fontSize: "18px", marginLeft: "10px" }}
-                    />
-                  </Button>
-                </MenuItem>
+                <div
+                  className="text-[tomato] m-2 inline rounded p-1.5 hover:bg-[tomato] hover:text-white"
+                  onClick={handleSignOut}
+                  style={{
+                    border: "1px solid tomato",
+                    fontSize: "12px",
+                  }}
+                  size="small"
+                >
+                  Logout
+                  <LogoutSharpIcon
+                    style={{ fontSize: "18px", marginLeft: "10px" }}
+                  />
+                </div>
               </Menu>
             </div>
           </div>

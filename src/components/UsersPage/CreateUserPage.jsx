@@ -18,8 +18,6 @@ import { useNavigate } from "react-router-dom";
 import UserManagement from "../../service/User";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import auth from "../../firebase.init";
 import { useDispatch } from "react-redux";
 import { setReloadUsers } from "../../store/features/userSlice";
 
@@ -90,24 +88,11 @@ const CreateUsersPage = () => {
   };
 
   const handleCreate = async () => {
-    const { email, password, displayName } = formData;
-
     try {
-      // Firebase sign-up logic
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      // Update the user's profile with displayName
-      await updateProfile(userCredential.user, { displayName });
-
       // You can now add the rest of the form data to your own backend
       const newUser = {
         ...formData,
         phoneNumber: phone,
-        uid: userCredential.user.uid, // Store Firebase user ID
       };
 
       // Upsert user in your backend system

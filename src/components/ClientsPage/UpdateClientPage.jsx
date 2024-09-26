@@ -17,9 +17,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import UserManagement from "../../service/User";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { useDispatch } from "react-redux";
+import { setReloadClients } from "../../store/features/clientSlice";
 const UpdateClientPage = () => {
   const { id } = useParams();
   const [phone, setPhone] = useState(null);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     displayName: "",
@@ -138,6 +141,7 @@ const UpdateClientPage = () => {
           requireEmailVerification: false,
           photoURL: null,
         });
+        dispatch(setReloadClients(true));
         navigate("/clients");
       })
       .catch((error) => {

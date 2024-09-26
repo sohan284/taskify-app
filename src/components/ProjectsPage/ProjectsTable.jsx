@@ -401,7 +401,7 @@ const ProjectsTable = ({ API }) => {
                                       "Remove from Favourite"
                                     )
                                   }
-                                  className="mt-1 text-[orange] mr-3 text-[15px]"
+                                  className="mt-1 cursor-pointer text-[orange] mr-3 text-[15px]"
                                 />
                               ) : (
                                 <FaRegStar
@@ -412,10 +412,10 @@ const ProjectsTable = ({ API }) => {
                                       "Added to favourite"
                                     )
                                   }
-                                  className="mt-1 text-[orange] mr-3 text-[15px]"
+                                  className="mt-1 cursor-pointer text-[orange] mr-3 text-[15px]"
                                 />
                               )}
-                              <IoChatbubbleEllipsesOutline className="mt-1 text-[tomato] text-[15px]" />
+                              <IoChatbubbleEllipsesOutline className="mt-1 cursor-pointer text-[tomato] text-[15px]" />
                             </div>
                           </TableCell>
                         )}

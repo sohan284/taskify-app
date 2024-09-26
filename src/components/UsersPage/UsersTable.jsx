@@ -142,7 +142,7 @@ const UsersTable = () => {
   const handleDelete = (id) => {
     UserManagement.deleteUser(id)
       .then(() => {
-        dispatch(setReloadPage(true));
+        dispatch(setReloadUsers(true));
         handleClose();
         toast.success("Status Delete Successfully");
       })
