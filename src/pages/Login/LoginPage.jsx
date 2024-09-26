@@ -41,21 +41,6 @@ function LoginPage() {
 
       if (response && response.token) {
         localStorage.setItem("token", response.token);
-
-        // Safely decode the token
-        const token = response.token;
-        const decodedToken = token.split(".");
-
-        if (decodedToken.length === 3) {
-          const payload = JSON.parse(atob(decodedToken[1])); // Decode the payload part
-          const userRole = payload.role;
-          if (userRole) {
-            localStorage.setItem("userRole", userRole);
-          }
-        } else {
-          setErrorMsg("Invalid token format.");
-        }
-
         setIsAuthenticated(true);
         navigate("/");
       } else {
@@ -102,7 +87,7 @@ function LoginPage() {
         )}
 
         <Button
-          style={{ backgroundColor: "#5b46bb", marginTop: 20, color: "white" }}
+          style={{ backgroundColor: "#8064ff", marginTop: 20, color: "white" }}
           className="w-full"
           onClick={handleLogin}
         >
@@ -113,7 +98,7 @@ function LoginPage() {
           {"Don't have an account?"}{" "}
           <span
             onClick={() => navigate("/signup")}
-            className="text-[#5b46bb] cursor-pointer"
+            className="text-[#8064ff] cursor-pointer"
           >
             Sign Up
           </span>

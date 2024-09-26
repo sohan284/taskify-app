@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import PaymentRoutes from "./routes/PaymentRoutes";
 import Loading from "./shared/Loading";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import NotFound from "./shared/NotFound";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -20,7 +21,14 @@ const StatusesRoutes = lazy(() => import("./routes/StatusesRoutes"));
 const TodosRoutes = lazy(() => import("./routes/TodosRoutes"));
 
 function App() {
-  const userRole = localStorage.getItem("userRole");
+  const token = localStorage.getItem("token");
+  const decodedToken = token?.split(".");
+  var userRole;
+  if (decodedToken?.length === 3) {
+    const payload = JSON.parse(atob(decodedToken[1])); // Decode the payload part
+    userRole = payload.role;
+  }
+  console.log(userRole);
 
   return (
     <Suspense
@@ -47,17 +55,18 @@ function App() {
             element={<ProtectedRoute element={<ProjectRoutes />} />}
           />
           {userRole === "admin" && (
-            <>
-              <Route
-                path="users/*"
-                element={<ProtectedRoute element={<UserRoutes />} />}
-              />
-              <Route
-                path="clients/*"
-                element={<ProtectedRoute element={<ClientRoutes />} />}
-              />
-            </>
+            <Route
+              path="users/*"
+              element={<ProtectedRoute element={<UserRoutes />} />}
+            />
           )}
+          {userRole === "admin" && (
+            <Route
+              path="clients/*"
+              element={<ProtectedRoute element={<ClientRoutes />} />}
+            />
+          )}
+
           <Route
             path="tasks/*"
             element={<ProtectedRoute element={<TaskRoutes />} />}
@@ -83,6 +92,7 @@ function App() {
             element={<ProtectedRoute element={<PaymentRoutes />} />}
           />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   );

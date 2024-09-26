@@ -4,20 +4,26 @@ import axios from "axios";
 
 // Async thunk to fetch data
 export const fetchData = createAsyncThunk("data/fetchData", async () => {
-  const response = await axios.get("http://localhost:5000/users");
+  const response = await axios.get(
+    "https://taskify-server-iota.vercel.app/users"
+  );
   return response.data;
 });
 export const fetchProjects = createAsyncThunk(
   "data/fetchProjects",
   async () => {
-    const response = await axios.get("http://localhost:5000/projects");
+    const response = await axios.get(
+      "https://taskify-server-iota.vercel.app/projects"
+    );
     return response.data;
   }
 );
 export const fetchStatuses = createAsyncThunk(
   "data/fetchStatuses",
   async () => {
-    const response = await axios.get("http://localhost:5000/statuses");
+    const response = await axios.get(
+      "https://taskify-server-iota.vercel.app/statuses"
+    );
     return response.data;
   }
 );

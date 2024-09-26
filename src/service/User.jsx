@@ -2,7 +2,10 @@ import axios from "axios";
 
 const upsertUser = async (userData) => {
   try {
-    const response = await axios.post(`http://localhost:5000/users`, userData);
+    const response = await axios.post(
+      `https://taskify-server-iota.vercel.app/users`,
+      userData
+    );
     return response.data;
   } catch (error) {
     // Handle errors
@@ -13,7 +16,7 @@ const upsertUser = async (userData) => {
 const getUserList = async (role = "") => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/users?role=${role}`
+      `https://taskify-server-iota.vercel.app/users?role=${role}`
     );
     return response.data;
   } catch (error) {
@@ -23,7 +26,9 @@ const getUserList = async (role = "") => {
 };
 const getSingleUser = async (id) => {
   try {
-    const response = await axios.get(`http://localhost:5000/users/${id}`);
+    const response = await axios.get(
+      `https://taskify-server-iota.vercel.app/users/${id}`
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to fetch User:", error);
@@ -32,7 +37,9 @@ const getSingleUser = async (id) => {
 };
 const deleteUser = async (id) => {
   try {
-    const response = await axios.delete(`http://localhost:5000/users/${id}`); // Replace with your API endpoint
+    const response = await axios.delete(
+      `https://taskify-server-iota.vercel.app/users/${id}`
+    ); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to delete :", error);
@@ -41,10 +48,13 @@ const deleteUser = async (id) => {
 };
 const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(`http://localhost:5000/login`, {
-      email,
-      password,
-    });
+    const response = await axios.post(
+      `https://taskify-server-iota.vercel.app/login`,
+      {
+        email,
+        password,
+      }
+    );
     if (response.data?.token) {
       localStorage.setItem("token", response.data.token);
     }

@@ -41,8 +41,13 @@ function SideBar(props) {
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const [userId, setUserId] = useState(null);
   const [loadUser, setLoadUser] = useState(false);
-  const userRole = localStorage.getItem("userRole");
-
+  const token = localStorage.getItem("token");
+  const decodedToken = token?.split(".");
+  var userRole;
+  if (decodedToken?.length === 3) {
+    const payload = JSON.parse(atob(decodedToken[1])); // Decode the payload part
+    userRole = payload.role;
+  }
   useEffect(() => {
     if (loadUser && user) {
       UserManagement.getUserList().then((res) => {

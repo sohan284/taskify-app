@@ -3,7 +3,7 @@ import axios from "axios";
 const createMeeting = async (meetingData) => {
   try {
     const response = await axios.post(
-      `http://localhost:5000/meetings`,
+      `https://taskify-server-iota.vercel.app/meetings`,
       meetingData
     );
     return response.data;
@@ -25,7 +25,7 @@ const getMeetingList = async (
 ) => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/meetings?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
+      `https://taskify-server-iota.vercel.app/meetings?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {
@@ -36,7 +36,7 @@ const getMeetingList = async (
 const updateMeeting = async (id, data) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/meetings/${id}`,
+      `https://taskify-server-iota.vercel.app/meetings/${id}`,
       data
     ); // Replace with your API endpoint
     return response.data;
@@ -47,7 +47,9 @@ const updateMeeting = async (id, data) => {
 };
 const deleteMeeting = async (id) => {
   try {
-    const response = await axios.delete(`http://localhost:5000/meetings/${id}`); // Replace with your API endpoint
+    const response = await axios.delete(
+      `https://taskify-server-iota.vercel.app/meetings/${id}`
+    ); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update meeting list:", error);
@@ -57,7 +59,7 @@ const deleteMeeting = async (id) => {
 const updateMeetingstatus = async (meetingId, status) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/meetings/${meetingId}`,
+      `https://taskify-server-iota.vercel.app/meetings/${meetingId}`,
       { status }
     );
     if (response.data.success) {
@@ -73,7 +75,7 @@ const updateMeetingstatus = async (meetingId, status) => {
 const updateMeetingFavourite = async (meetingId, favourite) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/meetings/${meetingId}`,
+      `https://taskify-server-iota.vercel.app/meetings/${meetingId}`,
       { favourite }
     );
     if (response.data.success) {

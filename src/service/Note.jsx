@@ -1,7 +1,10 @@
 import axios from "axios";
 const createNote = async (data) => {
   try {
-    const response = await axios.post(`http://localhost:5000/notes`, data);
+    const response = await axios.post(
+      `https://taskify-server-iota.vercel.app/notes`,
+      data
+    );
     return response.data;
   } catch (error) {
     // Handle errors
@@ -11,7 +14,9 @@ const createNote = async (data) => {
 };
 const getNotes = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/notes");
+    const response = await axios.get(
+      "https://taskify-server-iota.vercel.app/notes"
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to fetch task list:", error);
@@ -20,7 +25,10 @@ const getNotes = async () => {
 };
 const updateNote = async (id, data) => {
   try {
-    const response = await axios.put(`http://localhost:5000/notes/${id}`, data); // Replace with your API endpoint
+    const response = await axios.put(
+      `https://taskify-server-iota.vercel.app/notes/${id}`,
+      data
+    ); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update note list:", error);
@@ -29,7 +37,9 @@ const updateNote = async (id, data) => {
 };
 const deleteNote = async (id) => {
   try {
-    const response = await axios.delete(`http://localhost:5000/notes/${id}`); // Replace with your API endpoint
+    const response = await axios.delete(
+      `https://taskify-server-iota.vercel.app/notes/${id}`
+    ); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to delete list:", error);
