@@ -5,7 +5,7 @@ const PayPalButton = () => {
     try {
       // Call your backend to create the PayPal payment
       const response = await axios.post(
-        "http://localhost:5000/create-payment",
+        "https://taskify-server-iota.vercel.app/create-payment",
         {
           totalAmount: "10.00", // Adjust the amount dynamically
         }
@@ -26,11 +26,11 @@ const PayPalButton = () => {
 
   return (
     <div className="flex justify-center h-screen">
-     <div className="flex justify-center flex-col">
-     <button onClick={handlePayment} style={styles.button}>
-      Go to PayPal
-    </button>
-     </div>
+      <div className="flex justify-center flex-col">
+        <button onClick={handlePayment} style={styles.button}>
+          Go to PayPal
+        </button>
+      </div>
     </div>
   );
 };

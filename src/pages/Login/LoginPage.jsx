@@ -1,18 +1,15 @@
 import { Button, TextField, Alert } from "@mui/material";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import auth from "../../firebase.init";
 import { useState } from "react";
-
+import UserManagement from "../../service/User";
+import { useAuth } from "../../context/AuthContext";
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState(null);
   const navigate = useNavigate();
-
-  const [signInWithEmailAndPassword, loading, error] =
-    useSignInWithEmailAndPassword(auth);
+  const { setIsAuthenticated } = useAuth();
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,32 +17,39 @@ function LoginPage() {
   };
 
   const handleLogin = async () => {
-    setErrorMsg(null); // Clear any previous errors
+    setErrorMsg(null); // Clear any previous error messages
 
-    // Check if fields are filled
+    // Validate input fields
     if (!email || !password) {
       setErrorMsg("All fields are required.");
       return;
     }
 
-    // Validate email format
     if (!validateEmail(email)) {
       setErrorMsg("Invalid email format.");
       return;
     }
 
-    // Validate password length (at least 6 characters)
     if (password.length < 6) {
       setErrorMsg("Password must be at least 6 characters long.");
       return;
     }
 
     try {
-      // Attempt to sign in
-      await signInWithEmailAndPassword(email, password);
-      navigate("/"); // Navigate only if sign in is successful
-    } catch (err) {
-      setErrorMsg(err.message); // Show error message if sign in fails
+      // Send login request to the backend
+      const response = await UserManagement.loginUser(email, password);
+
+      if (response && response.token) {
+        // If the login is successful and the token is received
+        localStorage.setItem("token", response.token);
+        setIsAuthenticated(true);
+        navigate("/");
+      } else {
+        setErrorMsg("Invalid email or password.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrorMsg("An error occurred during login. Please try again.");
     }
   };
 
@@ -53,12 +57,7 @@ function LoginPage() {
     <div className="flex justify-center my-20">
       <div className="text-start p-5 w-[400px] rounded-lg shadow-lg">
         <div className="flex justify-center">
-          <img
-            onClick={() => navigate("/")}
-            className="w-[80%]"
-            src={logo}
-            alt="Logo"
-          />
+          <img className="w-[80%]" src={logo} alt="Logo" />
         </div>
         <h2 className="text-xl font-medium text-gray-500 mt-8">
           Welcome to Taskify!
@@ -70,9 +69,7 @@ function LoginPage() {
           size="small"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{
-            marginTop: 40,
-          }}
+          style={{ marginTop: 40 }}
           className="w-full text-sm"
         />
         <TextField
@@ -81,9 +78,7 @@ function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{
-            marginTop: 20,
-          }}
+          style={{ marginTop: 20 }}
           className="w-full text-sm"
         />
         {errorMsg && (
@@ -96,26 +91,19 @@ function LoginPage() {
           style={{ backgroundColor: "#5b46bb", marginTop: 20, color: "white" }}
           className="w-full"
           onClick={handleLogin}
-          disabled={loading}
         >
-          {loading ? "Logging in..." : "Login"}
+          Login
         </Button>
 
         <p className="text-center my-5">
           {"Don't have an account?"}{" "}
           <span
             onClick={() => navigate("/signup")}
-            className="text-[#5b46bb] cursor-pointer "
+            className="text-[#5b46bb] cursor-pointer"
           >
             Sign Up
           </span>
         </p>
-
-        {error && (
-          <Alert severity="error" className="mt-4">
-            {error.message}
-          </Alert>
-        )}
       </div>
     </div>
   );

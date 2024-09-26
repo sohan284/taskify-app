@@ -35,47 +35,17 @@ function App() {
 
         {/* Authenticated routes */}
         <Route path="/" element={<HomePage />}>
-          <Route
-            path="/"
-            element={<ProtectedRoute element={<DashboardPage />} />}
-          />
+          <Route path="/" element={<ProtectedRoute element={<DashboardPage />} />} />
           {/* Grouped feature routes */}
-          <Route
-            path="users/*"
-            element={<ProtectedRoute element={<UserRoutes />} />}
-          />
-          <Route
-            path="projects/*"
-            element={<ProtectedRoute element={<ProjectRoutes />} />}
-          />
-          <Route
-            path="clients/*"
-            element={<ProtectedRoute element={<ClientRoutes />} />}
-          />
-          <Route
-            path="tasks/*"
-            element={<ProtectedRoute element={<TaskRoutes />} />}
-          />
-          <Route
-            path="statuses/*"
-            element={<ProtectedRoute element={<StatusesRoutes />} />}
-          />
-          <Route
-            path="todos/*"
-            element={<ProtectedRoute element={<TodosRoutes />} />}
-          />
-          <Route
-            path="notes/*"
-            element={<ProtectedRoute element={<NoteRoutes />} />}
-          />
-          <Route
-            path="meetings/*"
-            element={<ProtectedRoute element={<MeetingRoutes />} />}
-          />
-          <Route
-            path="payment/*"
-            element={<ProtectedRoute element={<PaymentRoutes />} />}
-          />
+          <Route path="users/*" element={<ProtectedRoute element={<UserRoutes />} />} />
+          <Route path="projects/*" element={<ProtectedRoute element={<ProjectRoutes />} />} />
+          <Route path="clients/*" element={<ProtectedRoute element={<ClientRoutes />} />} />
+          <Route path="tasks/*" element={<ProtectedRoute element={<TaskRoutes />} />} />
+          <Route path="statuses/*" element={<ProtectedRoute element={<StatusesRoutes />} />} />
+          <Route path="todos/*" element={<ProtectedRoute element={<TodosRoutes />} />} />
+          <Route path="notes/*" element={<ProtectedRoute element={<NoteRoutes />} />} />
+          <Route path="meetings/*" element={<ProtectedRoute element={<MeetingRoutes />} />} />
+          <Route path="payment/*" element={<ProtectedRoute element={<PaymentRoutes />} />} />
         </Route>
       </Routes>
     </Suspense>

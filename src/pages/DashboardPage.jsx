@@ -133,6 +133,8 @@ function DashboardPage() {
               email: user.email,
               photoURL: user.photoURL || "",
               displayName: user.displayName || "",
+              role: "user",
+              
             };
 
             if (!existingUser && createUser) {

@@ -21,7 +21,7 @@ import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRig
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
 import { IoGrid } from "react-icons/io5";
-import {  FaHandsClapping } from "react-icons/fa6";
+import { FaHandsClapping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
 import { GrNotes } from "react-icons/gr";
@@ -81,12 +81,11 @@ function SideBar(props) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
   const handleSignOut = () => {
-    auth.signOut().then(() => {
-      navigate("/login");
-    });
+    localStorage.removeItem("token");
+    navigate("/login");
   };
+
   const handleCollapse = () => {
     if (collapseProjects == true) {
       setCollapseProjects(false);

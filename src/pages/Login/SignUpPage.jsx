@@ -1,29 +1,33 @@
 import { Button, TextField, Alert } from "@mui/material";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
-import GoogleIcon from "@mui/icons-material/Google";
-import {
-  useCreateUserWithEmailAndPassword,
-  useSignInWithGoogle,
-} from "react-firebase-hooks/auth";
-import { updateProfile } from "firebase/auth"; // Import updateProfile to set displayName
-import auth from "../../firebase.init";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setCreateUser } from "../../store/features/userSlice";
+import UserManagement from "../../service/User";
+import { toast } from "react-toastify";
 
 function SignUpPage() {
-  const [signInWithGoogle, googleLoading] = useSignInWithGoogle(auth);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [cPassword, setCPassword] = useState("");
+  const [formData, setFormData] = useState({
+    displayName: "",
+    lastName: "",
+    email: "",
+    countryCode: "+1",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+    dateOfBirth: "",
+    dateOfJoining: "",
+    role: "user",
+    address: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: "",
+    status: false,
+    requireEmailVerification: false,
+    photoURL: null,
+  });
   const [errorMsg, setErrorMsg] = useState(null);
-
-  const [createUserWithEmailAndPassword, loading, error] =
-    useCreateUserWithEmailAndPassword(auth);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,14 +35,16 @@ function SignUpPage() {
   };
 
   const validatePasswordStrength = (password) => {
-    // Password must be at least 6 characters long
     return password.length >= 6;
   };
 
   const handleSignUp = async () => {
-    setErrorMsg(null); // Clear any previous errors
+    setErrorMsg(null);
 
-    if (!name || !email || !password || !cPassword) {
+    const { displayName, email, password, confirmPassword } = formData;
+
+    // Basic validation
+    if (!displayName || !email || !password || !confirmPassword) {
       setErrorMsg("All fields are required.");
       return;
     }
@@ -48,40 +54,39 @@ function SignUpPage() {
       return;
     }
 
-    if (password !== cPassword) {
-      setErrorMsg("Passwords do not match.");
-      return;
-    }
-
     if (!validatePasswordStrength(password)) {
       setErrorMsg("Password must be at least 6 characters long.");
       return;
     }
 
-    try {
-      // Create user with email and password
-      const userCredential = await createUserWithEmailAndPassword(
-        email,
-        password
-      );
-
-      // Update the user's profile with displayName
-      await updateProfile(userCredential.user, { displayName: name });
-
-      // Dispatch user creation status and navigate to the homepage
-      dispatch(setCreateUser(true));
-      navigate("/");
-    } catch (err) {
-      setErrorMsg(err.message);
+    if (password !== confirmPassword) {
+      setErrorMsg("Passwords do not match.");
+      return;
     }
-  };
 
-  const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle().then(() => navigate("/"));
-      dispatch(setCreateUser(true));
-    } catch (err) {
-      setErrorMsg(err.message); // Show detailed error message
+      const newUser = {
+        displayName,
+        email,
+        password,
+        role: "user",
+      };
+      await UserManagement.upsertUser(newUser);
+
+      toast.success("User created successfully");
+
+      // Clear form fields
+      setFormData({
+        displayName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      navigate("/login");
+    } catch (error) {
+      setErrorMsg(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
@@ -89,12 +94,7 @@ function SignUpPage() {
     <div className="flex justify-center my-20">
       <div className="text-start p-5 w-[400px] rounded-lg shadow-lg">
         <div className="flex justify-center">
-          <img
-            onClick={() => navigate("/")}
-            className="w-[80%]"
-            src={logo}
-            alt="Logo"
-          />
+          <img className="w-[80%]" src={logo} alt="Logo" />
         </div>
         <h2 className="text-xl font-medium text-gray-500 mt-8">
           Welcome to Taskify!
@@ -103,43 +103,41 @@ function SignUpPage() {
         <TextField
           label="Your Name"
           size="small"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{
-            marginTop: 40,
-          }}
+          value={formData.displayName}
+          onChange={(e) =>
+            setFormData({ ...formData, displayName: e.target.value })
+          }
+          style={{ marginTop: 40 }}
           className="w-full text-sm"
         />
         <TextField
           label="Your Email"
           size="small"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            marginTop: 40,
-          }}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          style={{ marginTop: 20 }}
           className="w-full text-sm"
         />
         <TextField
           label="Password"
           size="small"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            marginTop: 20,
-          }}
+          value={formData.password}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
+          style={{ marginTop: 20 }}
           className="w-full text-sm"
         />
         <TextField
           label="Re-enter Password"
           size="small"
           type="password"
-          value={cPassword}
-          onChange={(e) => setCPassword(e.target.value)}
-          style={{
-            marginTop: 20,
-          }}
+          value={formData.confirmPassword}
+          onChange={(e) =>
+            setFormData({ ...formData, confirmPassword: e.target.value })
+          }
+          style={{ marginTop: 20 }}
           className="w-full text-sm"
         />
         {errorMsg && (
@@ -151,47 +149,18 @@ function SignUpPage() {
           style={{ backgroundColor: "#5b46bb", marginTop: 20, color: "white" }}
           className="w-full"
           onClick={handleSignUp}
-          disabled={loading}
         >
-          {loading ? "Signing Up..." : "Sign Up"}
+          Sign Up
         </Button>
-
         <p className="text-center my-5">
           {"Already have an account?"}{" "}
           <span
             onClick={() => navigate("/login")}
-            className="text-[#5b46bb] cursor-pointer "
+            className="text-[#5b46bb] cursor-pointer"
           >
             Login
           </span>
         </p>
-
-        <Button
-          onClick={handleGoogleSignIn}
-          style={{ backgroundColor: "tomato", marginTop: 20, color: "white" }}
-          className="w-full"
-          disabled={googleLoading}
-        >
-          {googleLoading ? (
-            "Signing In..."
-          ) : (
-            <>
-              <GoogleIcon className="mr-3" /> Sign In With Google
-            </>
-          )}
-        </Button>
-
-        {error && (
-          <Alert severity="error" className="mt-4">
-            {error.message}
-          </Alert>
-        )}
-
-        {/* {googleError && (
-          <Alert severity="error" className="mt-4">
-            {googleError.message}
-          </Alert>
-        )} */}
       </div>
     </div>
   );

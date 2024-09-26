@@ -46,12 +46,30 @@ const deleteUser = async (id) => {
     throw error;
   }
 };
-// Attach the functions to an object
+const loginUser = async (email, password) => {
+  try {
+    const response = await axios.post(
+      `https://taskify-server-iota.vercel.app/login`,
+      {
+        email,
+        password,
+      }
+    );
+    if (response.data?.token) {
+      localStorage.setItem("token", response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Login failed:", error);
+    throw error;
+  }
+};
 const UserManagement = {
   upsertUser,
   getUserList,
   getSingleUser,
   deleteUser,
+  loginUser,
 };
 
 // Export the object
