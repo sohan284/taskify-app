@@ -154,7 +154,7 @@ function DashboardPage() {
       };
       fetchData();
     }
-  }, [reloadPage, dispatch, createUser]);
+  }, [dashboard.reloadDashboard, dispatch, createUser]);
 
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">

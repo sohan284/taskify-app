@@ -43,6 +43,7 @@ function LoginPage() {
         localStorage.setItem("token", response.token);
         setIsAuthenticated(true);
         navigate("/");
+        window.location.reload();
       } else {
         setErrorMsg("Invalid email or password.");
       }
