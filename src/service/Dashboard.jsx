@@ -3,9 +3,7 @@ import axios from "axios";
 // Define the functions
 const getDashboardCount = async () => {
   try {
-    const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/dashboardCount"
-    ); // Replace with your API endpoint
+    const response = await axios.get("http://localhost:5000/dashboardCount"); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to fetch dashboard count:", error);

@@ -2,10 +2,7 @@ import axios from "axios";
 
 const createTask = async (taskData) => {
   try {
-    const response = await axios.post(
-      `https://taskify-server-iota.vercel.app/tasks`,
-      taskData
-    );
+    const response = await axios.post(`http://localhost:5000/tasks`, taskData);
     return response.data;
   } catch (error) {
     // Handle errors
@@ -25,7 +22,7 @@ const getTaskList = async (
 ) => {
   try {
     const response = await axios.get(
-      `https://taskify-server-iota.vercel.app/tasks?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
+      `http://localhost:5000/tasks?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {
@@ -35,10 +32,7 @@ const getTaskList = async (
 };
 const updateTask = async (id, data) => {
   try {
-    const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/tasks/${id}`,
-      data
-    ); // Replace with your API endpoint
+    const response = await axios.put(`http://localhost:5000/tasks/${id}`, data); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update task list:", error);
@@ -47,9 +41,7 @@ const updateTask = async (id, data) => {
 };
 const deleteTask = async (id) => {
   try {
-    const response = await axios.delete(
-      `https://taskify-server-iota.vercel.app/tasks/${id}`
-    ); // Replace with your API endpoint
+    const response = await axios.delete(`http://localhost:5000/tasks/${id}`); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update task list:", error);
@@ -58,12 +50,9 @@ const deleteTask = async (id) => {
 };
 const updateTaskStatus = async (taskId, status) => {
   try {
-    const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/tasks/${taskId}`,
-      {
-        status,
-      }
-    );
+    const response = await axios.put(`http://localhost:5000/tasks/${taskId}`, {
+      status,
+    });
     if (response.data.success) {
       console.log("Task status updated successfully");
     } else {

@@ -1,10 +1,7 @@
 import axios from "axios";
 const createStatus = async (data) => {
   try {
-    const response = await axios.post(
-      `https://taskify-server-iota.vercel.app/statuses`,
-      data
-    );
+    const response = await axios.post(`http://localhost:5000/statuses`, data);
     return response.data;
   } catch (error) {
     // Handle errors
@@ -14,9 +11,7 @@ const createStatus = async (data) => {
 };
 const getStatusList = async () => {
   try {
-    const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/statuses"
-    );
+    const response = await axios.get("http://localhost:5000/statuses");
     return response.data;
   } catch (error) {
     console.error("Failed to fetch task list:", error);
@@ -26,7 +21,7 @@ const getStatusList = async () => {
 const updateStatus = async (id, data) => {
   try {
     const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/statuses/${id}`,
+      `http://localhost:5000/statuses/${id}`,
       data
     ); // Replace with your API endpoint
     return response.data;
@@ -37,9 +32,7 @@ const updateStatus = async (id, data) => {
 };
 const deleteStatus = async (id) => {
   try {
-    const response = await axios.delete(
-      `https://taskify-server-iota.vercel.app/statuses/${id}`
-    ); // Replace with your API endpoint
+    const response = await axios.delete(`http://localhost:5000/statuses/${id}`); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to delete list:", error);
@@ -49,7 +42,7 @@ const deleteStatus = async (id) => {
 const deleteStatuses = async (ids) => {
   try {
     const response = await axios.delete(
-      `https://taskify-server-iota.vercel.app/statuses/delete/multiple`, // Bulk delete endpoint
+      `http://localhost:5000/statuses/delete/multiple`, // Bulk delete endpoint
       {
         headers: {
           "Content-Type": "application/json", // Make sure headers are set for JSON

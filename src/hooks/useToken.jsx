@@ -10,7 +10,7 @@ const useToken = (user) => {
     const currentUser = { email: email, name: name, photoURL: photoURL };
     console.log(user);
     if (email) {
-      fetch(`https://taskify-server-iota.vercel.app/user/${email}`, {
+      fetch(`http://localhost:5000/user/${email}`, {
         method: "PUT",
         headers: {
           "content-type": "application/json",

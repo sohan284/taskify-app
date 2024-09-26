@@ -1,10 +1,7 @@
 import axios from "axios";
 const createTag = async (data) => {
   try {
-    const response = await axios.post(
-      `https://taskify-server-iota.vercel.app/tags`,
-      data
-    );
+    const response = await axios.post(`http://localhost:5000/tags`, data);
     return response.data;
   } catch (error) {
     // Handle errors
@@ -14,9 +11,7 @@ const createTag = async (data) => {
 };
 const getTagList = async () => {
   try {
-    const response = await axios.get(
-      "https://taskify-server-iota.vercel.app/tags"
-    );
+    const response = await axios.get("http://localhost:5000/tags");
     return response.data;
   } catch (error) {
     console.error("Failed to fetch task list:", error);
@@ -25,10 +20,7 @@ const getTagList = async () => {
 };
 const updateTag = async (id, data) => {
   try {
-    const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/tags/${id}`,
-      data
-    ); // Replace with your API endpoint
+    const response = await axios.put(`http://localhost:5000/tags/${id}`, data); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update tag list:", error);
@@ -37,9 +29,7 @@ const updateTag = async (id, data) => {
 };
 const deleteTag = async (id) => {
   try {
-    const response = await axios.delete(
-      `https://taskify-server-iota.vercel.app/tags/${id}`
-    ); // Replace with your API endpoint
+    const response = await axios.delete(`http://localhost:5000/tags/${id}`); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to delete list:", error);

@@ -5,7 +5,7 @@ const PayPalButton = () => {
     try {
       // Call your backend to create the PayPal payment
       const response = await axios.post(
-        "https://taskify-server-iota.vercel.app/create-payment",
+        "http://localhost:5000/create-payment",
         {
           totalAmount: "10.00", // Adjust the amount dynamically
         }

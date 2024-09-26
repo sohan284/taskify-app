@@ -3,7 +3,7 @@ import axios from "axios";
 const createProject = async (projectData) => {
   try {
     const response = await axios.post(
-      `https://taskify-server-iota.vercel.app/projects`,
+      `http://localhost:5000/projects`,
       projectData
     );
     return response.data;
@@ -25,7 +25,7 @@ const getProjectList = async (
 ) => {
   try {
     const response = await axios.get(
-      `https://taskify-server-iota.vercel.app/projects?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
+      `http://localhost:5000/projects?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {
@@ -45,7 +45,7 @@ const getFavouriteProjectList = async (
 ) => {
   try {
     const response = await axios.get(
-      `https://taskify-server-iota.vercel.app/projects/favourite?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
+      `http://localhost:5000/projects/favourite?status=${status}&user=${user}&client=${client}&start_date_from=${start_date_from}&start_date_to=${start_date_to}&end_date_from=${end_date_from}&end_date_to=${end_date_to}&search=${search}`
     );
     return response.data;
   } catch (error) {
@@ -56,7 +56,7 @@ const getFavouriteProjectList = async (
 const updateProject = async (id, data) => {
   try {
     const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/projects/${id}`,
+      `http://localhost:5000/projects/${id}`,
       data
     ); // Replace with your API endpoint
     return response.data;
@@ -67,9 +67,7 @@ const updateProject = async (id, data) => {
 };
 const deleteProject = async (id) => {
   try {
-    const response = await axios.delete(
-      `https://taskify-server-iota.vercel.app/projects/${id}`
-    ); // Replace with your API endpoint
+    const response = await axios.delete(`http://localhost:5000/projects/${id}`); // Replace with your API endpoint
     return response.data;
   } catch (error) {
     console.error("Failed to update project list:", error);
@@ -79,7 +77,7 @@ const deleteProject = async (id) => {
 const updateProjectStatus = async (projectId, status) => {
   try {
     const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/projects/${projectId}`,
+      `http://localhost:5000/projects/${projectId}`,
       { status }
     );
     if (response.data.success) {
@@ -95,7 +93,7 @@ const updateProjectStatus = async (projectId, status) => {
 const updateProjectFavourite = async (projectId, favourite) => {
   try {
     const response = await axios.put(
-      `https://taskify-server-iota.vercel.app/projects/${projectId}`,
+      `http://localhost:5000/projects/${projectId}`,
       { favourite }
     );
     if (response.data.success) {

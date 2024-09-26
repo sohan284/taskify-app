@@ -41,6 +41,7 @@ function SideBar(props) {
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const [userId, setUserId] = useState(null);
   const [loadUser, setLoadUser] = useState(false);
+  const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
     if (loadUser && user) {
@@ -83,6 +84,7 @@ function SideBar(props) {
   };
   const handleSignOut = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userRole");
     navigate("/login");
   };
 
@@ -233,38 +235,42 @@ function SideBar(props) {
             />
             Meetings
           </Button>
-          <Button
-            className="flex items-center w-full"
-            style={{
-              fontWeight: "500",
-              color: "#888888",
-              justifyContent: "flex-start",
-              textTransform: "none",
-            }}
-            onClick={() => handleNavigate("/users")}
-          >
-            <LuUsers2
-              style={{ color: "#6479f3", fontSize: "20" }}
-              className="mr-4"
-            />
-            Users
-          </Button>
-          <Button
-            className="flex items-center w-full"
-            style={{
-              fontWeight: "500",
-              color: "#888888",
-              justifyContent: "flex-start",
-              textTransform: "none",
-            }}
-            onClick={() => handleNavigate("/clients")}
-          >
-            <LuUsers2
-              style={{ color: "orange", fontSize: "20" }}
-              className="mr-4"
-            />
-            Clients
-          </Button>
+          {userRole === "admin" && (
+            <Button
+              className="flex items-center w-full"
+              style={{
+                fontWeight: "500",
+                color: "#888888",
+                justifyContent: "flex-start",
+                textTransform: "none",
+              }}
+              onClick={() => handleNavigate("/users")}
+            >
+              <LuUsers2
+                style={{ color: "#6479f3", fontSize: "20" }}
+                className="mr-4"
+              />
+              Users
+            </Button>
+          )}
+          {userRole === "admin" && (
+            <Button
+              className="flex items-center w-full"
+              style={{
+                fontWeight: "500",
+                color: "#888888",
+                justifyContent: "flex-start",
+                textTransform: "none",
+              }}
+              onClick={() => handleNavigate("/clients")}
+            >
+              <LuUsers2
+                style={{ color: "orange", fontSize: "20" }}
+                className="mr-4"
+              />
+              Clients
+            </Button>
+          )}
           <Button
             className="flex items-center w-full"
             style={{
@@ -334,7 +340,7 @@ function SideBar(props) {
               <p className="mr-3 text-gray-500 flex">
                 Hi{" "}
                 <FaHandsClapping className="mx-1 mt-0.5  text-[orange] mr-2" />{" "}
-                Admin
+                <p className="uppercase">{userRole}</p>
               </p>
               {user?.photoURL ? (
                 <img

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import UserManagement from "../../service/User";
 import { useAuth } from "../../context/AuthContext";
+
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,12 +37,25 @@ function LoginPage() {
     }
 
     try {
-      // Send login request to the backend
       const response = await UserManagement.loginUser(email, password);
 
       if (response && response.token) {
-        // If the login is successful and the token is received
         localStorage.setItem("token", response.token);
+
+        // Safely decode the token
+        const token = response.token;
+        const decodedToken = token.split(".");
+
+        if (decodedToken.length === 3) {
+          const payload = JSON.parse(atob(decodedToken[1])); // Decode the payload part
+          const userRole = payload.role;
+          if (userRole) {
+            localStorage.setItem("userRole", userRole);
+          }
+        } else {
+          setErrorMsg("Invalid token format.");
+        }
+
         setIsAuthenticated(true);
         navigate("/");
       } else {
@@ -49,7 +63,7 @@ function LoginPage() {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMsg("An error occurred during login. Please try again.");
+      setErrorMsg("Invalid email or password.");
     }
   };
 
