@@ -53,6 +53,13 @@ function LoginPage() {
     }
   };
 
+  // Function to handle keypress and check for 'Enter' key
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
+
   return (
     <div className="flex justify-center my-20">
       <div className="text-start p-5 w-[400px] rounded-lg shadow-lg">
@@ -69,6 +76,7 @@ function LoginPage() {
           size="small"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyPress={handleKeyPress} // Add the keypress handler here
           style={{ marginTop: 40 }}
           className="w-full text-sm"
         />
@@ -78,6 +86,7 @@ function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyPress={handleKeyPress} // Add the keypress handler here
           style={{ marginTop: 20 }}
           className="w-full text-sm"
         />

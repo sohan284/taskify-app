@@ -18,7 +18,7 @@ import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined"; // 
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
-import { IoGrid } from "react-icons/io5";
+import { IoGrid, IoSettingsOutline } from "react-icons/io5";
 import { FaHandsClapping } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { LuUsers2 } from "react-icons/lu";
@@ -26,6 +26,7 @@ import { GrNotes } from "react-icons/gr";
 import { SiGotomeeting } from "react-icons/si";
 import UserManagement from "../service/User";
 import { useAuth } from "../context/AuthContext";
+import { FaRegUser } from "react-icons/fa";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -40,8 +41,9 @@ function SideBar(props) {
   const [collapseProjects, setCollapseProjects] = useState(false);
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const [userId, setUserId] = useState(null);
+  let usertype = userRole === "client" ? "client" : "";
   useEffect(() => {
-    UserManagement.getUserList().then((res) => {
+    UserManagement.getUserList(usertype).then((res) => {
       const foundUser = res.data.find((u) => u.email == userEmail);
       if (foundUser) {
         setUserId(foundUser._id);
@@ -49,7 +51,7 @@ function SideBar(props) {
       }
     });
   }, []);
-  
+
   const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
@@ -331,7 +333,7 @@ function SideBar(props) {
           <div className="flex justify-between w-full">
             <p className="text-gray-400">Search</p>
             <div className="flex">
-              <p className="mr-3 text-gray-500 flex">
+              <p className="mr-3 mt-1.5 text-gray-500 flex">
                 Hi{" "}
                 <FaHandsClapping className="mx-1 mt-0.5  text-[orange] mr-2" />{" "}
                 <p className="uppercase">{userRole}</p>
@@ -344,7 +346,10 @@ function SideBar(props) {
                   onClick={handleMenuClick}
                 />
               ) : (
-                <AccountCircleIcon onClick={handleMenuClick} />
+                <AccountCircleIcon
+                  style={{ fontSize: "32px" }}
+                  onClick={handleMenuClick}
+                />
               )}
               <Menu
                 anchorEl={anchorEl}
@@ -352,7 +357,7 @@ function SideBar(props) {
                 onClose={handleMenuClose}
                 PaperProps={{
                   style: {
-                    width: "180px", // Set the desired width here
+                    width: "200px", // Set the desired width here
                     paddingBlock: "10px",
                   },
                 }}
@@ -365,15 +370,43 @@ function SideBar(props) {
                   horizontal: "right",
                 }}
               >
-                <MenuItem onClick={() => handleNavigate(`/users/${userId}`)}>
-                  Profile
+                <MenuItem>
+                  <div>
+                    <div className="flex justify-around">
+                      {user?.photoURL ? (
+                        <img
+                          className="w-10 h-10 shadow shadow-black rounded-full"
+                          src={user?.photoURL}
+                          alt="img"
+                        />
+                      ) : (
+                        <AccountCircleIcon style={{ fontSize: "36px" }} />
+                      )}
+                      <p className="text-[14px] text-gray-500 ml-5">
+                        <p className="font-medium">{user?.displayName}</p>
+                        <p className="text-gray-400 text-[12px]">
+                          {user?.role}
+                        </p>
+                      </p>
+                    </div>
+                  </div>
                 </MenuItem>
-                <MenuItem onClick={() => handleNavigate("/account")}>
-                  My Account
+                <Divider />
+                <MenuItem
+                  onClick={() => handleNavigate(`/users/${userId}`)}
+                  style={{ color: "gray", fontSize: "14px" }}
+                >
+                  <FaRegUser className="mr-3 text-lg m-1" /> My Profile
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleNavigate("/account")}
+                  style={{ color: "gray", fontSize: "14px" }}
+                >
+                  <IoSettingsOutline className="mr-3 text-lg m-1" /> Preferences
                 </MenuItem>
                 <Divider />
                 <div
-                  className="text-[tomato] m-2 inline rounded p-1.5 hover:bg-[tomato] hover:text-white"
+                  className="text-[tomato] m-5 inline rounded p-1.5 hover:bg-[tomato] hover:text-white"
                   onClick={handleSignOut}
                   style={{
                     border: "1px solid tomato",
