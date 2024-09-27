@@ -7,6 +7,7 @@ import NotFound from "./shared/NotFound";
 import ProfileRoutes from "./routes/ProfileRoutes";
 import PrioritiesRoutes from "./routes/PrioritiesRoutes";
 import "./i18n";
+import ChatRoutes from "./routes/ChatRoutes";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -84,6 +85,10 @@ function App() {
           <Route
             path="priorities/*"
             element={<ProtectedRoute element={<PrioritiesRoutes />} />}
+          />
+          <Route
+            path="chat/*"
+            element={<ProtectedRoute element={<ChatRoutes />} />}
           />
           <Route
             path="todos/*"

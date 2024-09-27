@@ -29,7 +29,7 @@ import { useAuth } from "../context/AuthContext";
 import { FaArrowUp, FaRegUser } from "react-icons/fa";
 import LanguageButton from "./LanguageButton";
 import { useTranslation } from "react-i18next";
-
+import { BiChat } from "react-icons/bi";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -116,7 +116,9 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/")}
+            onClick={() => {
+              handleNavigate("/"), handleDrawerClose();
+            }}
           >
             <RiHome8Line
               style={{ color: "tomato", fontSize: "22" }}
@@ -154,19 +156,25 @@ function SideBar(props) {
             <div className="ml-8 text-[#888888]">
               <MenuItem
                 style={{ fontSize: "14px" }}
-                onClick={() => handleNavigate("/projects")}
+                onClick={() => {
+                  handleNavigate("/projects"), handleDrawerClose();
+                }}
               >
                 {t("manageProjects")}
               </MenuItem>
               <MenuItem
                 style={{ fontSize: "14px" }}
-                onClick={() => handleNavigate("/projects/favourite")}
+                onClick={() => {
+                  handleNavigate("/projects/favourite"), handleDrawerClose();
+                }}
               >
                 {t("favoriteProjects")}
               </MenuItem>
               <MenuItem
                 style={{ fontSize: "14px" }}
-                onClick={() => handleNavigate("/projects/tags")}
+                onClick={() => {
+                  handleNavigate("/projects/tags"), handleDrawerClose();
+                }}
               >
                 {t("tags")}
               </MenuItem>
@@ -181,7 +189,9 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/tasks")}
+            onClick={() => {
+              handleNavigate("/tasks"), handleDrawerClose();
+            }}
           >
             <AssignmentTurnedInOutlinedIcon
               style={{ color: "3f51b5", fontSize: "24" }}
@@ -197,7 +207,9 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/statuses")}
+            onClick={() => {
+              handleNavigate("/statuses"), handleDrawerClose();
+            }}
           >
             <IoGrid className="mr-5 ml-1" />
             {t("statuses")}
@@ -210,12 +222,13 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/priorities")}
+            onClick={() => {
+              handleNavigate("/priorities"), handleDrawerClose();
+            }}
           >
             <FaArrowUp className="mr-5 ml-1" style={{ color: "lightgreen" }} />
             {t("priorities")}
           </Button>
-
           <Button
             className="flex items-center w-full"
             style={{
@@ -224,7 +237,27 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/todos")}
+            onClick={() => {
+              handleNavigate("/chat"), handleDrawerClose();
+            }}
+          >
+            <BiChat
+              className="mr-5"
+              style={{ color: "orange", fontSize: "18" }}
+            />
+            {t("chat")}
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "500",
+              color: "#888888",
+              justifyContent: "flex-start",
+              textTransform: "none",
+            }}
+            onClick={() => {
+              handleNavigate("/todos"), handleDrawerClose();
+            }}
           >
             <FcTodoList
               style={{ color: "3f51b5", fontSize: "20" }}
@@ -245,7 +278,9 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/meetings")}
+            onClick={() => {
+              handleNavigate("/meetings"), handleDrawerClose();
+            }}
           >
             <SiGotomeeting className="mr-5" style={{ color: "lightgreen" }} />
             {t("meetings")}
@@ -259,7 +294,9 @@ function SideBar(props) {
                 justifyContent: "flex-start",
                 textTransform: "none",
               }}
-              onClick={() => handleNavigate("/users")}
+              onClick={() => {
+                handleNavigate("/users"), handleDrawerClose();
+              }}
             >
               <LuUsers2
                 style={{ color: "#6479f3", fontSize: "20" }}
@@ -277,7 +314,9 @@ function SideBar(props) {
                 justifyContent: "flex-start",
                 textTransform: "none",
               }}
-              onClick={() => handleNavigate("/clients")}
+              onClick={() => {
+                handleNavigate("/clients"), handleDrawerClose();
+              }}
             >
               <LuUsers2
                 style={{ color: "orange", fontSize: "20" }}
@@ -294,7 +333,9 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={() => handleNavigate("/notes")}
+            onClick={() => {
+              handleNavigate("/notes"), handleDrawerClose();
+            }}
           >
             <GrNotes className="mr-5" />
             {t("notes")}
