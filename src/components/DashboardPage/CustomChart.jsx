@@ -4,6 +4,7 @@ import { MdOutlineBusinessCenter } from "react-icons/md";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
+import { t } from "i18next";
 // import Loading from "../../shared/Loading";
 
 const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
@@ -48,7 +49,9 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
 
   return (
     <div className="">
-      <p className="text-lg font-medium m-5 text-gray-500">{title}</p>
+      <p className="text-lg font-medium m-5 text-gray-500">
+        {title === "Projects" ? t("projects") : t("tasks")} {t("statistics")}
+      </p>
       <div className="w-96" id="chart">
         <ReactApexChart options={options} series={series} type="donut" />
       </div>

@@ -17,6 +17,7 @@ import {
   setTodos,
   setTodosCount,
 } from "../../store/features/todoSlice";
+import { t } from "i18next";
 
 const CustomChart = () => {
   const reloadTodos = useSelector((state) => state.todo.reloadTodos);
@@ -123,7 +124,9 @@ const CustomChart = () => {
   return (
     <div className="shadow-xl rounded-xl">
       <div className="flex justify-between">
-        <p className="text-lg font-medium m-5 text-gray-500">Todos Overview</p>
+        <p className="text-lg font-medium m-5 text-gray-500">{`${t(
+          "todos"
+        )} ${t("overview")}`}</p>
         <div className="mt-6 flex h-8">
           <div className="bg-[#6479f3] text-lg mr-1 px-3 pt-2 hover:text-xl rounded text-white">
             <IoMdAdd onClick={() => setOpen(true)} />

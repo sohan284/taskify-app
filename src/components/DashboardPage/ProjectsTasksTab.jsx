@@ -9,6 +9,7 @@ import ProjectsTable from "../ProjectsPage/ProjectsTable";
 import ProjectManagement from "../../service/Project";
 import TasksTable from "../TasksPage/TasksTable";
 import TaskManagement from "../../service/Task";
+import { t } from "i18next";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -52,7 +53,7 @@ export default function ProjectsTasksTab() {
               <BusinessCenterOutlinedIcon style={{ color: "lightgreen" }} />
             }
             iconPosition="start"
-            label="Projects"
+            label={t("projects")}
             value={0}
           />
           <Tab
@@ -60,14 +61,14 @@ export default function ProjectsTasksTab() {
               <AssignmentTurnedInOutlinedIcon style={{ color: "#8761df" }} />
             }
             iconPosition="start"
-            label="Tasks"
+            label={t("tasks")}
             value={1}
           />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
         <h1 className="text-xl font-bold text-gray-500 mb-5">
-          {"Admin's Projects"}
+          {`Admin's ${t("projects")}`}
         </h1>
         <ProjectsTable API={ProjectManagement.getProjectList} />
       </CustomTabPanel>

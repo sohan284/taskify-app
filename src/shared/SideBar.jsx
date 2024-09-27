@@ -14,7 +14,7 @@ import { RiHome8Line } from "react-icons/ri";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 import LogoutSharpIcon from "@mui/icons-material/LogoutSharp";
-import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined"; // Added import for the dropdown arrow icon
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { FcTodoList } from "react-icons/fc";
@@ -27,9 +27,13 @@ import { SiGotomeeting } from "react-icons/si";
 import UserManagement from "../service/User";
 import { useAuth } from "../context/AuthContext";
 import { FaArrowUp, FaRegUser } from "react-icons/fa";
+import LanguageButton from "./LanguageButton";
+import { useTranslation } from "react-i18next";
+
 const drawerWidth = 240;
 
 function SideBar(props) {
+  const { t } = useTranslation();
   const { userEmail, userRole } = useAuth();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -42,15 +46,16 @@ function SideBar(props) {
   const pendingTodos = useSelector((state) => state.reload.pendingTodos);
   const [userId, setUserId] = useState(null);
   let usertype = userRole === "client" ? "client" : "";
+
   useEffect(() => {
     UserManagement.getUserList(usertype).then((res) => {
-      const foundUser = res.data.find((u) => u.email == userEmail);
+      const foundUser = res.data.find((u) => u.email === userEmail);
       if (foundUser) {
         setUserId(foundUser._id);
         setUser(foundUser);
       }
     });
-  }, []);
+  }, [userEmail, usertype]);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -78,6 +83,7 @@ function SideBar(props) {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   const handleSignOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
@@ -85,9 +91,7 @@ function SideBar(props) {
   };
 
   const handleCollapse = () => {
-    if (collapseProjects == true) {
-      setCollapseProjects(false);
-    } else setCollapseProjects(true);
+    setCollapseProjects(!collapseProjects);
   };
 
   const drawer = (
@@ -99,7 +103,7 @@ function SideBar(props) {
         style={{ cursor: "pointer" }}
       />
       <div className="bg-[#6479f3] mx-1 rounded text-white text-center py-2 mt-2 shadow-lg">
-        <p className="inline">Main Workspace</p>
+        <p className="inline">{t("mainWorkSpace")}</p>
         <KeyboardArrowRightOutlinedIcon />
       </div>
       <div className="mt-5 w-full">
@@ -116,9 +120,9 @@ function SideBar(props) {
           >
             <RiHome8Line
               style={{ color: "tomato", fontSize: "22" }}
-              className="mr-4 "
+              className="mr-4"
             />
-            Dashboard
+            {t("dashboard")}
           </Button>
           <Button
             className="flex items-center w-full"
@@ -128,13 +132,13 @@ function SideBar(props) {
               justifyContent: "flex-start",
               textTransform: "none",
             }}
-            onClick={(event) => handleCollapse(event)}
+            onClick={handleCollapse}
           >
             <BusinessCenterOutlinedIcon
               style={{ color: "lightgreen", fontSize: "22" }}
               className="mr-4"
             />
-            Projects
+            {t("projects")}
             <span className="ml-auto">
               <IconButton size="small">
                 {collapseProjects ? (
@@ -147,29 +151,30 @@ function SideBar(props) {
           </Button>
 
           <Collapse in={collapseProjects} timeout="auto" unmountOnExit>
-            <div className="ml-8  text-[#888888]">
+            <div className="ml-8 text-[#888888]">
               <MenuItem
                 style={{ fontSize: "14px" }}
                 onClick={() => handleNavigate("/projects")}
               >
-                Manage Projects
+                {t("manageProjects")}
               </MenuItem>
               <MenuItem
                 style={{ fontSize: "14px" }}
                 onClick={() => handleNavigate("/projects/favourite")}
               >
-                Favorite Projects
+                {t("favoriteProjects")}
               </MenuItem>
               <MenuItem
                 style={{ fontSize: "14px" }}
                 onClick={() => handleNavigate("/projects/tags")}
               >
-                Tags
+                {t("tags")}
               </MenuItem>
             </div>
           </Collapse>
+
           <Button
-            className="flex  items-center w-full"
+            className="flex items-center w-full"
             style={{
               fontWeight: "500",
               color: "#888888",
@@ -182,7 +187,7 @@ function SideBar(props) {
               style={{ color: "3f51b5", fontSize: "24" }}
               className="mr-4 pr-0.5 py-0.5"
             />
-            Tasks
+            {t("tasks")}
           </Button>
           <Button
             className="flex items-center w-full"
@@ -194,8 +199,8 @@ function SideBar(props) {
             }}
             onClick={() => handleNavigate("/statuses")}
           >
-            <IoGrid style={{ color: "" }} className="mr-5 ml-1" />
-            Statuses
+            <IoGrid className="mr-5 ml-1" />
+            {t("statuses")}
           </Button>
           <Button
             className="flex items-center w-full"
@@ -207,12 +212,12 @@ function SideBar(props) {
             }}
             onClick={() => handleNavigate("/priorities")}
           >
-            <FaArrowUp style={{ color: "green" }} className="mr-5 ml-1" />
-            Priorities
+            <FaArrowUp className="mr-5 ml-1" style={{ color: "lightgreen" }} />
+            {t("priorities")}
           </Button>
 
           <Button
-            className="flex  items-center w-full"
+            className="flex items-center w-full"
             style={{
               fontWeight: "500",
               color: "#888888",
@@ -225,7 +230,7 @@ function SideBar(props) {
               style={{ color: "3f51b5", fontSize: "20" }}
               className="mr-4"
             />
-            Todos
+            {t("todos")}
             {pendingTodos > 0 && (
               <p className="bg-[#fc2a2ad8] text-white ml-1 px-1.5 h-5 rounded">
                 {pendingTodos}
@@ -242,11 +247,8 @@ function SideBar(props) {
             }}
             onClick={() => handleNavigate("/meetings")}
           >
-            <SiGotomeeting
-              style={{ fontSize: "16", color: "lightgreen" }}
-              className="mr-5 "
-            />
-            Meetings
+            <SiGotomeeting className="mr-5" style={{ color: "lightgreen" }} />
+            {t("meetings")}
           </Button>
           {userRole === "admin" && (
             <Button
@@ -263,7 +265,7 @@ function SideBar(props) {
                 style={{ color: "#6479f3", fontSize: "20" }}
                 className="mr-4"
               />
-              Users
+              {t("users")}
             </Button>
           )}
           {userRole === "admin" && (
@@ -281,7 +283,7 @@ function SideBar(props) {
                 style={{ color: "orange", fontSize: "20" }}
                 className="mr-4"
               />
-              Clients
+              {t("clients")}
             </Button>
           )}
           <Button
@@ -294,29 +296,9 @@ function SideBar(props) {
             }}
             onClick={() => handleNavigate("/notes")}
           >
-            <GrNotes
-              style={{ color: "3f51b5", fontSize: "16" }}
-              className="mr-5"
-            />
-            Notes
+            <GrNotes className="mr-5" />
+            {t("notes")}
           </Button>
-          {/* <Button
-            className="flex items-center w-full"
-            style={{
-              fontWeight: "500",
-              color: "#888888",
-              justifyContent: "flex-start",
-              textTransform: "none",
-            }}
-            onClick={() => handleNavigate("/payment")}
-          >
-            <FaArrowRight
-              style={{ color: "red", fontSize: "16" }}
-              className="mr-5"
-            />
-            
-            Payment
-          </Button> */}
         </div>
       </div>
     </div>
@@ -348,11 +330,12 @@ function SideBar(props) {
             <MenuIcon />
           </IconButton>
           <div className="flex justify-between w-full">
-            <p className="text-gray-400">Search</p>
+            <p className="text-gray-400">{t("search")}</p>
             <div className="flex">
+              <LanguageButton />
               <p className="mr-3 mt-1.5 text-gray-500 flex">
-                Hi{" "}
-                <FaHandsClapping className="mx-1 mt-0.5  text-[orange] mr-2" />{" "}
+                {t("hi")}{" "}
+                <FaHandsClapping className="mx-1 mt-0.5 text-[orange] mr-2" />
                 <p className="uppercase">{userRole}</p>
               </p>
               {user?.photoURL ? (
@@ -374,7 +357,7 @@ function SideBar(props) {
                 onClose={handleMenuClose}
                 PaperProps={{
                   style: {
-                    width: "200px", // Set the desired width here
+                    width: "200px",
                     paddingBlock: "10px",
                   },
                 }}
@@ -413,13 +396,14 @@ function SideBar(props) {
                   onClick={() => handleNavigate(`/profile/${userId}`)}
                   style={{ color: "gray", fontSize: "14px" }}
                 >
-                  <FaRegUser className="mr-3 text-lg m-1" /> My Profile
+                  <FaRegUser className="mr-3 text-lg m-1" /> {t("myProfile")}
                 </MenuItem>
                 <MenuItem
                   onClick={() => handleNavigate("/account")}
                   style={{ color: "gray", fontSize: "14px" }}
                 >
-                  <IoSettingsOutline className="mr-3 text-lg m-1" /> Preferences
+                  <IoSettingsOutline className="mr-3 text-lg m-1" />{" "}
+                  {t("preferences")}
                 </MenuItem>
                 <Divider />
                 <div
@@ -431,7 +415,7 @@ function SideBar(props) {
                   }}
                   size="small"
                 >
-                  Logout
+                  {t("logout")}
                   <LogoutSharpIcon
                     style={{ fontSize: "18px", marginLeft: "10px" }}
                   />
@@ -453,7 +437,7 @@ function SideBar(props) {
           onTransitionEnd={handleDrawerTransitionEnd}
           onClose={handleDrawerClose}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },

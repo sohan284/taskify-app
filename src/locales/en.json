@@ -1,0 +1,25 @@
+{
+    "mainWorkSpace": "Main Workspace",
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "manageProjects": "Manage Projects",
+    "favoriteProjects": "Favorite Projects",
+    "tags": "Tags",
+    "tasks": "Tasks",
+    "statuses": "Statuses",
+    "priorities": "Priorities",
+    "todos": "Todos",
+    "meetings": "Meetings",
+    "users": "Users",
+    "clients": "Clients",
+    "notes": "Notes",
+    "logout": "Logout",
+    "myProfile": "My Profile",
+    "preferences": "Preferences",
+    "total":"Total",
+    "statistics":"Statistics",
+    "view":"View",
+    "more":"More",
+    "overview":"Overview"
+  }
+  

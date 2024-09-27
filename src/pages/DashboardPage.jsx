@@ -21,8 +21,10 @@ import {
   setTasksCount,
   setUsersCount,
 } from "../store/features/dashboardSlice";
+import { useTranslation } from "react-i18next";
 
 function DashboardPage() {
+  const { t } = useTranslation();
   const [user] = useAuthState(auth);
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
@@ -32,23 +34,23 @@ function DashboardPage() {
   const dashboard = useSelector((state) => state.dashboard);
   let cardDetails = [
     {
-      title: "Projects",
+      title: t("projects"), // Translate title
       total: dashboard?.projectsCount,
       color: "#70d100",
     },
     {
-      title: "Tasks",
+      title: t("tasks"), // Translate title
       total: dashboard.tasksCount,
       color: "#852bfa",
     },
     {
-      title: "Users",
+      title: t("users"), // Translate title
       total: dashboard?.usersCount,
       color: "#ebb400",
     },
     {
       _id: "66dbda4e634dfb28c415b5cb",
-      title: "Clients",
+      title: t("clients"), // Translate title
       total: dashboard?.clientsCount,
       color: "#00b9d1",
     },
@@ -112,13 +114,13 @@ function DashboardPage() {
           dispatch(
             setChartDetails([
               {
-                title: "Project Statistics",
+                title: "Projects",
                 series: projectSeries,
                 labels: projectLabels,
                 colors: projectColors,
               },
               {
-                title: "Task Statistics",
+                title: "Tasks",
                 series: taskSeries,
                 labels: taskLabels,
                 colors: projectColors, // You can use the same colors for both

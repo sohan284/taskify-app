@@ -6,6 +6,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import NotFound from "./shared/NotFound";
 import ProfileRoutes from "./routes/ProfileRoutes";
 import PrioritiesRoutes from "./routes/PrioritiesRoutes";
+import "./i18n";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
