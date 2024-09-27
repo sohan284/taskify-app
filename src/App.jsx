@@ -4,6 +4,8 @@ import PaymentRoutes from "./routes/PaymentRoutes";
 import Loading from "./shared/Loading";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import NotFound from "./shared/NotFound";
+import ProfileRoutes from "./routes/ProfileRoutes";
+import PrioritiesRoutes from "./routes/PrioritiesRoutes";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -49,7 +51,10 @@ function App() {
             path="/"
             element={<ProtectedRoute element={<DashboardPage />} />}
           />
-          {/* Grouped feature routes */}
+          <Route
+            path="profile/*"
+            element={<ProtectedRoute element={<ProfileRoutes />} />}
+          />
           <Route
             path="projects/*"
             element={<ProtectedRoute element={<ProjectRoutes />} />}
@@ -74,6 +79,10 @@ function App() {
           <Route
             path="statuses/*"
             element={<ProtectedRoute element={<StatusesRoutes />} />}
+          />
+          <Route
+            path="priorities/*"
+            element={<ProtectedRoute element={<PrioritiesRoutes />} />}
           />
           <Route
             path="todos/*"

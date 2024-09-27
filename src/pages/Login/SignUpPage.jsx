@@ -115,7 +115,7 @@ function SignUpPage() {
           <div
             onClick={() => handleUserType("client")}
             className={`border ${
-              userType === "client" ? "text-[white] bg-[#8064ff]" : "bg-white"
+              userType === "client" ? "text-[white] bg-[#6479f3]" : "bg-white"
             } border-[#8064ff] text-[#8064ff] w-full text-center font-medium rounded-s-md p-2 hover:bg-[#8064ff] hover:text-white hover:shadow-2xl`}
           >
             As a Client
@@ -123,7 +123,7 @@ function SignUpPage() {
           <div
             onClick={() => handleUserType("member")}
             className={`border ${
-              userType === "member" ? "text-[white] bg-[#8064ff]" : "bg-white"
+              userType === "member" ? "text-[white] bg-[#6479f3]" : "bg-white"
             } border-[#8064ff] text-[#8064ff] w-full text-center font-medium rounded-e-md p-2 hover:bg-[#8064ff] hover:text-white hover:shadow-2xl`}
           >
             As a Team member
@@ -205,7 +205,7 @@ function SignUpPage() {
           </Alert>
         )}
         <Button
-          style={{ backgroundColor: "#8064ff", marginTop: 20, color: "white" }}
+          style={{ backgroundColor: "#6479f3", marginTop: 20, color: "white" }}
           className="w-full"
           onClick={handleSignUp}
         >
@@ -215,7 +215,7 @@ function SignUpPage() {
           {"Already have an account?"}{" "}
           <span
             onClick={() => navigate("/login")}
-            className="text-[#8064ff] cursor-pointer"
+            className="text-[#6479f3] cursor-pointer"
           >
             Login
           </span>

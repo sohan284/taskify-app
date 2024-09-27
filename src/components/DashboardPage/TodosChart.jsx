@@ -121,7 +121,7 @@ const CustomChart = () => {
   }
 
   return (
-    <div className="shadow-xl">
+    <div className="shadow-xl rounded-xl">
       <div className="flex justify-between">
         <p className="text-lg font-medium m-5 text-gray-500">Todos Overview</p>
         <div className="mt-6 flex h-8">

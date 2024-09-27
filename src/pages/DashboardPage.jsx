@@ -134,7 +134,6 @@ function DashboardPage() {
               photoURL: user.photoURL || "",
               displayName: user.displayName || "",
               role: "user",
-              
             };
 
             if (!existingUser && createUser) {
@@ -183,7 +182,7 @@ function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mx-3 mt-5">
             {dashboard?.chartDetails?.map((detail) => (
-              <div key={detail.title} className="shadow-lg">
+              <div key={detail.title} className="shadow-lg rounded-xl">
                 <CustomChart
                   title={detail?.title}
                   series={detail?.series}

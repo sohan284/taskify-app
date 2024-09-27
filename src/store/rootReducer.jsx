@@ -9,6 +9,7 @@ import todo from "./features/todoSlice";
 import client from "./features/clientSlice";
 import status from "./features/statusSlice";
 import meeting from "./features/meetingSlice";
+import priority from "./features/prioritySlice";
 
 const createReducer = () => (state, action) => {
   const combinedReducer = combineReducers({
@@ -22,6 +23,7 @@ const createReducer = () => (state, action) => {
     client,
     status,
     meeting,
+    priority,
   });
 
   return combinedReducer(state, action);

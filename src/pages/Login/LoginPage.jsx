@@ -97,7 +97,7 @@ function LoginPage() {
         )}
 
         <Button
-          style={{ backgroundColor: "#8064ff", marginTop: 20, color: "white" }}
+          style={{ backgroundColor: "#6479f3", marginTop: 20, color: "white" }}
           className="w-full"
           onClick={handleLogin}
         >
@@ -108,7 +108,7 @@ function LoginPage() {
           {"Don't have an account?"}{" "}
           <span
             onClick={() => navigate("/signup")}
-            className="text-[#8064ff] cursor-pointer"
+            className="text-[#6479f3] cursor-pointer"
           >
             Sign Up
           </span>

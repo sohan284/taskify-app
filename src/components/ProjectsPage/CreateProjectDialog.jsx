@@ -43,7 +43,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
     users: [],
     clients: [],
     tags: [],
-    favourite: true,
+    favourite: false,
   });
   const [loading, setLoading] = useState({
     users: true,
@@ -138,7 +138,7 @@ const CreateProjectDialog = ({ open, onClose }) => {
           users: [],
           clients: [],
           tags: [],
-          favourite: true,
+          favourite: false,
         });
         dispatch(setReloadUsers(true));
         dispatch(setReloadProjects(true));

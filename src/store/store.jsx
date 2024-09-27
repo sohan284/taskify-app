@@ -9,6 +9,7 @@ import todo from "./features/todoSlice";
 import client from "./features/clientSlice";
 import status from "./features/statusSlice";
 import meeting from "./features/meetingSlice";
+import priority from "./features/prioritySlice";
 const store = configureStore({
   reducer: {
     reload,
@@ -21,6 +22,7 @@ const store = configureStore({
     client,
     status,
     meeting,
+    priority,
   },
 });
 export default store;

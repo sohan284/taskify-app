@@ -26,7 +26,7 @@ import { GrNotes } from "react-icons/gr";
 import { SiGotomeeting } from "react-icons/si";
 import UserManagement from "../service/User";
 import { useAuth } from "../context/AuthContext";
-import { FaRegUser } from "react-icons/fa";
+import { FaArrowUp, FaRegUser } from "react-icons/fa";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -98,7 +98,11 @@ function SideBar(props) {
         alt="logo"
         style={{ cursor: "pointer" }}
       />
-      <div className="mt-8 w-full">
+      <div className="bg-[#6479f3] mx-1 rounded text-white text-center py-2 mt-2 shadow-lg">
+        <p className="inline">Main Workspace</p>
+        <KeyboardArrowRightOutlinedIcon />
+      </div>
+      <div className="mt-5 w-full">
         <div className="flex flex-col pl-3">
           <Button
             className="flex items-center w-full"
@@ -192,6 +196,19 @@ function SideBar(props) {
           >
             <IoGrid style={{ color: "" }} className="mr-5 ml-1" />
             Statuses
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "500",
+              color: "#888888",
+              justifyContent: "flex-start",
+              textTransform: "none",
+            }}
+            onClick={() => handleNavigate("/priorities")}
+          >
+            <FaArrowUp style={{ color: "green" }} className="mr-5 ml-1" />
+            Priorities
           </Button>
 
           <Button
@@ -393,7 +410,7 @@ function SideBar(props) {
                 </MenuItem>
                 <Divider />
                 <MenuItem
-                  onClick={() => handleNavigate(`/users/${userId}`)}
+                  onClick={() => handleNavigate(`/profile/${userId}`)}
                   style={{ color: "gray", fontSize: "14px" }}
                 >
                   <FaRegUser className="mr-3 text-lg m-1" /> My Profile
@@ -406,7 +423,7 @@ function SideBar(props) {
                 </MenuItem>
                 <Divider />
                 <div
-                  className="text-[tomato] m-5 inline rounded p-1.5 hover:bg-[tomato] hover:text-white"
+                  className="text-[tomato] m-5 inline cursor-pointer rounded p-1.5 hover:bg-[tomato] hover:text-white"
                   onClick={handleSignOut}
                   style={{
                     border: "1px solid tomato",
