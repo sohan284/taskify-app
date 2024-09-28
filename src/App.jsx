@@ -87,10 +87,6 @@ function App() {
             element={<ProtectedRoute element={<PrioritiesRoutes />} />}
           />
           <Route
-            path="chat/*"
-            element={<ProtectedRoute element={<ChatRoutes />} />}
-          />
-          <Route
             path="todos/*"
             element={<ProtectedRoute element={<TodosRoutes />} />}
           />
@@ -107,6 +103,10 @@ function App() {
             element={<ProtectedRoute element={<PaymentRoutes />} />}
           />
         </Route>
+        <Route
+          path="chat/*"
+          element={<ProtectedRoute element={<ChatRoutes />} />}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
