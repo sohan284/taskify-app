@@ -16,35 +16,39 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { LuSendHorizonal } from "react-icons/lu";
 import PropTypes from "prop-types";
 import Loading from "../shared/Loading";
+import { useDispatch, useSelector } from "react-redux";
+import { setUsers } from "../store/features/userSlice";
 const drawerWidth = 280;
 const socket = io("http://localhost:4000");
 
 const ChatPage = (props) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { userEmail } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [recipient, setRecipient] = useState(""); // Store recipient ID
-  const [userList, setUserList] = useState([]); // Store user list
+  // const [userList, setUserList] = useState([]); // Store user list
   const navigate = useNavigate();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const [isClosing, setIsClosing] = useState(false);
   const [user, setUser] = useState("");
-
+  const userList = useSelector((state) => state.user.users);
+  const dispatch = useDispatch();
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const users = await UserManagement.getUserList();
-        setUserList(users.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-
-    fetchUsers();
+    if (userList === null) {
+      const fetchUsers = async () => {
+        try {
+          const users = await UserManagement.getUserList();
+          dispatch(setUsers(users.data));
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        }
+      };
+      fetchUsers();
+    }
+    setLoading(false);
 
     socket.emit("join", userEmail);
 
@@ -66,7 +70,7 @@ const ChatPage = (props) => {
     // Listen for user list updates (optional)
     socket.on("user list", (userList) => {
       console.log("User list updated:", userList);
-      setUserList(userList);
+      dispatch(setUsers(userList));
     });
 
     return () => {

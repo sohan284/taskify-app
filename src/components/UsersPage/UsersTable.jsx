@@ -144,7 +144,7 @@ const UsersTable = () => {
       .then(() => {
         dispatch(setReloadUsers(true));
         handleClose();
-        toast.success("Status Delete Successfully");
+        toast.success("User Delete Successfully");
       })
       .catch((error) => {
         console.error("Error deleting the Status:", error);

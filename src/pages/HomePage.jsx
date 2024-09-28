@@ -6,7 +6,7 @@ const HomePage = () => {
   return (
     <div className="home-container">
       <SideBar />
-      <div className="content">
+      <div className="content min-h-[80vh]">
         <Outlet />
       </div>
       <Footer />

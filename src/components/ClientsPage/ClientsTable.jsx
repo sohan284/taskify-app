@@ -132,7 +132,7 @@ const ClientsTable = () => {
       .then(() => {
         dispatch(setReloadClients(true));
         handleClose();
-        toast.success("Status Delete Successfully");
+        toast.success("Client Delete Successfully");
       })
       .catch((error) => {
         console.error("Error deleting the Status:", error);
