@@ -8,6 +8,7 @@ import ProfileRoutes from "./routes/ProfileRoutes";
 import PrioritiesRoutes from "./routes/PrioritiesRoutes";
 import "./i18n";
 import ChatRoutes from "./routes/ChatRoutes";
+import ActivityLogRoutes from "./routes/ActivityLogRoutes";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -73,7 +74,12 @@ function App() {
               element={<ProtectedRoute element={<ClientRoutes />} />}
             />
           )}
-
+          {userRole === "admin" && (
+            <Route
+              path="activity-log/*"
+              element={<ProtectedRoute element={<ActivityLogRoutes />} />}
+            />
+          )}
           <Route
             path="tasks/*"
             element={<ProtectedRoute element={<TaskRoutes />} />}

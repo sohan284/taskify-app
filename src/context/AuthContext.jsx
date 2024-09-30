@@ -10,8 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState(null); // State to store user email
   const [userRole, setUserRole] = useState(null); // State to store user role
-
-  // Check for token and set authentication state
+  const [userName, setUserName] = useState(null);
+  const [userImg, setUserImg] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem("token"); // or however you store your token
 
@@ -22,6 +22,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true); // Set authentication state to true
         setUserEmail(decodedToken.email); // Extract and set the user email
         setUserRole(decodedToken.role); // Extract and set the user role
+        setUserName(decodedToken.name);
+        setUserImg(decodedToken.photoURL);
       } catch (error) {
         console.error("Invalid token:", error);
         setIsAuthenticated(false); // Set authentication state to false if token is invalid
@@ -37,7 +39,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, userEmail, userRole, setIsAuthenticated }}
+      value={{
+        isAuthenticated,
+        userEmail,
+        userRole,
+        userName,
+        userImg,
+        setIsAuthenticated,
+      }}
     >
       {children}
     </AuthContext.Provider>

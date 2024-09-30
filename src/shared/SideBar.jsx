@@ -29,7 +29,7 @@ import { useAuth } from "../context/AuthContext";
 import { FaArrowUp, FaRegUser } from "react-icons/fa";
 import LanguageButton from "./LanguageButton";
 import { useTranslation } from "react-i18next";
-import { BiChat } from "react-icons/bi";
+import { BiChat, BiLineChart } from "react-icons/bi";
 const drawerWidth = 240;
 
 function SideBar(props) {
@@ -111,10 +111,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/"), handleDrawerClose();
@@ -129,10 +130,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={handleCollapse}
           >
@@ -184,10 +186,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/tasks"), handleDrawerClose();
@@ -202,10 +205,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/statuses"), handleDrawerClose();
@@ -217,10 +221,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/priorities"), handleDrawerClose();
@@ -232,10 +237,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/chat"), handleDrawerClose();
@@ -250,10 +256,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/todos"), handleDrawerClose();
@@ -273,10 +280,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/meetings"), handleDrawerClose();
@@ -289,10 +297,11 @@ function SideBar(props) {
             <Button
               className="flex items-center w-full"
               style={{
-                fontWeight: "500",
+                fontWeight: "400",
                 color: "#888888",
                 justifyContent: "flex-start",
                 textTransform: "none",
+                fontSize: "15px",
               }}
               onClick={() => {
                 handleNavigate("/users"), handleDrawerClose();
@@ -309,10 +318,11 @@ function SideBar(props) {
             <Button
               className="flex items-center w-full"
               style={{
-                fontWeight: "500",
+                fontWeight: "400",
                 color: "#888888",
                 justifyContent: "flex-start",
                 textTransform: "none",
+                fontSize: "15px",
               }}
               onClick={() => {
                 handleNavigate("/clients"), handleDrawerClose();
@@ -328,10 +338,11 @@ function SideBar(props) {
           <Button
             className="flex items-center w-full"
             style={{
-              fontWeight: "500",
+              fontWeight: "400",
               color: "#888888",
               justifyContent: "flex-start",
               textTransform: "none",
+              fontSize: "15px",
             }}
             onClick={() => {
               handleNavigate("/notes"), handleDrawerClose();
@@ -339,6 +350,25 @@ function SideBar(props) {
           >
             <GrNotes className="mr-5" />
             {t("notes")}
+          </Button>
+          <Button
+            className="flex items-center w-full"
+            style={{
+              fontWeight: "400",
+              color: "#888888",
+              justifyContent: "flex-start",
+              textTransform: "none",
+              fontSize: "15px",
+            }}
+            onClick={() => {
+              handleNavigate("/activity-log"), handleDrawerClose();
+            }}
+          >
+            <BiLineChart
+              style={{ color: "orange", fontSize: "18" }}
+              className="mr-4"
+            />
+            {t("activity log")}
           </Button>
         </div>
       </div>
