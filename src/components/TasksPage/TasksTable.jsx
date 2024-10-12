@@ -39,6 +39,7 @@ import TaskManagement from "../../service/Task";
 import GridTable from "../ProjectsPage/GridTable";
 import Loading from "../../shared/Loading";
 import { setReloadTasks, setTasks } from "../../store/features/taskSlice";
+import { setStatuses } from "../../store/features/statusSlice";
 const TasksTable = ({ API }) => {
   const dispatch = useDispatch();
   const filter = useSelector((state) => state.project.filter);
@@ -69,8 +70,7 @@ const TasksTable = ({ API }) => {
   const [startDates, setStartDates] = useState([]);
   const [endDates, setEndDates] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statuses, setStatuses] = useState(null);
-
+  const statuses = useSelector((state) => state.status.statuses);
   // Pagination states
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -92,7 +92,9 @@ const TasksTable = ({ API }) => {
           );
 
           dispatch(setTasks(result?.data));
-          StatusManagement.getStatusList().then((res) => setStatuses(res.data));
+          StatusManagement.getStatusList().then((res) =>
+            dispatch(setStatuses(res.data))
+          );
         } catch (err) {
           setError(err);
         } finally {
