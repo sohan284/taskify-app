@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CustomCard from "../components/DashboardPage/CustomCard";
 import CustomChart from "../components/DashboardPage/CustomChart";
-// import EventsTab from "../components/DashboardPage/EventsTab";
 import ProjectsTasksTab from "../components/DashboardPage/ProjectsTasksTab";
 import ProjectManagement from "../service/Project";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,28 +28,30 @@ function DashboardPage() {
   const dispatch = useDispatch();
   const reloadPage = useSelector((state) => state.reload.reloadPage);
   const createUser = useSelector((state) => state.user.createUser);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const dashboard = useSelector((state) => state.dashboard);
-  let cardDetails = [
+
+  // Card details for the dashboard
+  const cardDetails = [
     {
-      title: t("projects"), // Translate title
+      title: t("projects"),
       total: dashboard?.projectsCount,
       color: "#70d100",
     },
     {
-      title: t("tasks"), // Translate title
+      title: t("tasks"),
       total: dashboard.tasksCount,
       color: "#852bfa",
     },
     {
-      title: t("users"), // Translate title
+      title: t("users"),
       total: dashboard?.usersCount,
       color: "#ebb400",
     },
     {
       _id: "66dbda4e634dfb28c415b5cb",
-      title: t("clients"), // Translate title
+      title: t("clients"),
       total: dashboard?.clientsCount,
       color: "#00b9d1",
     },
@@ -61,6 +62,7 @@ function DashboardPage() {
       const fetchData = async () => {
         try {
           setLoading(true); // Start loading
+
           // Fetch all data concurrently
           const [projectResult, taskResult, userResult, clientResult] =
             await Promise.all([
@@ -110,7 +112,6 @@ function DashboardPage() {
           const taskSeries = taskLabels.map((label) => tasksCounts[label] || 0);
 
           // Set chart details
-
           dispatch(
             setChartDetails([
               {
@@ -123,7 +124,7 @@ function DashboardPage() {
                 title: "Tasks",
                 series: taskSeries,
                 labels: taskLabels,
-                colors: projectColors, // You can use the same colors for both
+                colors: projectColors,
               },
             ])
           );
@@ -149,10 +150,11 @@ function DashboardPage() {
         } catch (err) {
           setError(err);
         } finally {
-          setLoading(false);
+          setLoading(false); // Stop loading after all operations
           dispatch(setReloadDashboard(false));
         }
       };
+
       fetchData();
     }
   }, [dashboard.reloadDashboard, dispatch, createUser]);
@@ -160,15 +162,17 @@ function DashboardPage() {
   return (
     <div className="lg:ml-64 mt-20 mx-2 sm:ml-64">
       {loading && reloadPage ? (
-        <div>
+        <div className="flex justify-center items-center h-screen">
           <Loading />
         </div>
       ) : error ? (
-        <div>Error loading data: {error.message}</div>
+        <div className="text-red-500 text-center">
+          Error loading data: {error.message}
+        </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 text-[#df3b3b] lg:grid-cols-4 gap-5 mx-3">
-            {cardDetails?.length > 0 ? (
+          <div className="grid grid-cols-2 text-[#df3b3b] lg:grid-cols-4 gap-5 mx-3 mb-5">
+            {cardDetails.length > 0 ? (
               cardDetails.map((detail) => (
                 <div key={detail.title}>
                   <CustomCard
@@ -179,24 +183,33 @@ function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div>No data available</div>
+              <div className="text-center col-span-4">No data available</div>
             )}
           </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mx-3 mt-5">
-            {dashboard?.chartDetails?.map((detail) => (
-              <div key={detail.title} className="shadow-lg rounded-xl">
-                <CustomChart
-                  title={detail?.title}
-                  series={detail?.series}
-                  labels={detail?.labels}
-                  colors={detail?.colors}
-                />
-              </div>
-            ))}
+            <div className="shadow-lg rounded-xl p-4">
+              <CustomChart
+                title="Projects"
+                series={dashboard.chartDetails[0]?.series}
+                labels={dashboard.chartDetails[0]?.labels}
+                colors={dashboard.chartDetails[0]?.colors}
+                loading={loading}
+              />
+            </div>
+            <div className="shadow-lg rounded-xl p-4">
+              <CustomChart
+                title="Tasks"
+                series={dashboard.chartDetails[1]?.series}
+                labels={dashboard.chartDetails[1]?.labels}
+                colors={dashboard.chartDetails[1]?.colors}
+                loading={loading}
+              />
+            </div>
             <TodosChart />
           </div>
-          <div>{/* <EventsTab /> */}</div>
-          <div>
+
+          <div className="mt-5">
             <ProjectsTasksTab />
           </div>
         </>

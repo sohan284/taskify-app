@@ -94,7 +94,7 @@ const UsersTable = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(users.map((status) => status.id));
+      setSelectedIds(users.map((status) => status._id));
     } else {
       setSelectedIds([]);
     }

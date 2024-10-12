@@ -85,7 +85,7 @@ const ClientsTable = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(clients.map((status) => status.id));
+      setSelectedIds(clients.map((status) => status._id));
     } else {
       setSelectedIds([]);
     }

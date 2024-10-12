@@ -73,7 +73,7 @@ const TagsTable = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(tags.map((tag) => tag.id));
+      setSelectedIds(tags.map((tag) => tag._id));
     } else {
       setSelectedIds([]);
     }

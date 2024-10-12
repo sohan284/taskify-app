@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import {
   Table,
   TableBody,
@@ -124,7 +123,7 @@ const ProjectsTable = ({ API }) => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedIds(projects.map((project) => project.id));
+      setSelectedIds(projects.map((project) => project._id));
     } else {
       setSelectedIds([]);
     }
@@ -147,7 +146,7 @@ const ProjectsTable = ({ API }) => {
     setSelectedIds([]);
   };
 
-  const handleSaveVisibility = () => {};
+  // const handleSaveVisibility = () => {};
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -291,7 +290,7 @@ const ProjectsTable = ({ API }) => {
             >
               <RiDeleteBinLine className="mr-1 text-lg" /> Delete Selected
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               onClick={handleSaveVisibility}
               sx={{
@@ -305,7 +304,7 @@ const ProjectsTable = ({ API }) => {
               }}
             >
               <SaveOutlinedIcon className="mr-1" /> Save Column Visibility
-            </Button>
+            </Button> */}
           </div>
           <div className="flex">
             <SearchFilter

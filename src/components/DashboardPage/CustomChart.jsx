@@ -5,15 +5,23 @@ import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurned
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
 import { t } from "i18next";
-// import Loading from "../../shared/Loading";
+import Loading from "../../shared/Loading";
 
-const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
+const CustomChart = ({
+  title,
+  series = [],
+  labels = [],
+  colors = [],
+  loading,
+}) => {
   CustomChart.propTypes = {
     title: PropTypes.string,
     series: PropTypes.array,
     colors: PropTypes.array,
     labels: PropTypes.array,
+    loading: PropTypes.bool, // Use bool for loading
   };
+
   const [options] = useState({
     chart: {
       type: "donut",
@@ -40,15 +48,16 @@ const CustomChart = ({ title, series = [], labels = [], colors = [] }) => {
     ? series.reduce((acc, value) => acc + (value || 0), 0)
     : 0;
 
-  // if (loading)
-  //   return (
-  //     <div>
-  //       <Loading />
-  //     </div>
-  //   );
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
-    <div className="">
+    <div>
       <p className="text-lg font-medium m-5 text-gray-500">
         {title === "Projects" ? t("projects") : t("tasks")} {t("statistics")}
       </p>
