@@ -32,6 +32,7 @@ const ClientsTable = () => {
   const clients = useSelector((state) => state.client.clients);
   const reloadClients = useSelector((state) => state.client.reloadClients);
   const filter = useSelector((state) => state.project.filter);
+  const userRole = useSelector((state) => state.user.userRole);
   // const [users, setUsers] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,15 +129,20 @@ const ClientsTable = () => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    UserManagement.deleteUser(id)
-      .then(() => {
-        dispatch(setReloadClients(true));
-        handleClose();
-        toast.success("Client Delete Successfully");
-      })
-      .catch((error) => {
-        console.error("Error deleting the Status:", error);
-      });
+    if (userRole === "super admin") {
+      UserManagement.deleteUser(id)
+        .then(() => {
+          dispatch(setReloadClients(true));
+          handleClose();
+          toast.success("Client Delete Successfully");
+        })
+        .catch((error) => {
+          console.error("Error deleting the Status:", error);
+        });
+    } else {
+      toast.error("Only Super Admin Can Delete ");
+      handleClose();
+    }
   };
 
   return (

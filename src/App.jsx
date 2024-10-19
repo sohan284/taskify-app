@@ -10,6 +10,8 @@ import "./i18n";
 import ChatRoutes from "./routes/ChatRoutes";
 import ActivityLogRoutes from "./routes/ActivityLogRoutes";
 import GoogleAnalytics from "./components/GoogleAnalytics";
+import { useDispatch } from "react-redux";
+import { setUserRole } from "./store/features/userSlice";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -29,13 +31,14 @@ const TodosRoutes = lazy(() => import("./routes/TodosRoutes"));
 function App() {
   const trackingId = "G-DKK33PF0SK";
   const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
   const decodedToken = token?.split(".");
   var userRole;
   if (decodedToken?.length === 3) {
     const payload = JSON.parse(atob(decodedToken[1])); // Decode the payload part
     userRole = payload.role;
+    dispatch(setUserRole(userRole));
   }
-  console.log(userRole);
 
   return (
     <>
@@ -66,19 +69,19 @@ function App() {
               path="projects/*"
               element={<ProtectedRoute element={<ProjectRoutes />} />}
             />
-            {userRole === "admin" && (
+            {(userRole === "admin" || userRole === "super admin") && (
               <Route
                 path="users/*"
                 element={<ProtectedRoute element={<UserRoutes />} />}
               />
             )}
-            {userRole === "admin" && (
+            {(userRole === "admin" || userRole === "super admin") && (
               <Route
                 path="clients/*"
                 element={<ProtectedRoute element={<ClientRoutes />} />}
               />
             )}
-            {userRole === "admin" && (
+            {(userRole === "admin" || userRole === "super admin") && (
               <Route
                 path="activity-log/*"
                 element={<ProtectedRoute element={<ActivityLogRoutes />} />}

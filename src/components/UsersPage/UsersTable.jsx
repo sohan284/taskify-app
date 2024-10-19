@@ -34,6 +34,7 @@ import { setReloadUsers, setUsers } from "../../store/features/userSlice";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.user.users);
+  const userRole = useSelector((state) => state.user.userRole);
   const reloadUsers = useSelector((state) => state.user.reloadUsers);
   const filter = useSelector((state) => state.project.filter);
   const [role, setRole] = useState("");
@@ -140,15 +141,20 @@ const UsersTable = () => {
     setOpen(false);
   };
   const handleDelete = (id) => {
-    UserManagement.deleteUser(id)
-      .then(() => {
-        dispatch(setReloadUsers(true));
-        handleClose();
-        toast.success("User Delete Successfully");
-      })
-      .catch((error) => {
-        console.error("Error deleting the Status:", error);
-      });
+    if (userRole === "super admin") {
+      UserManagement.deleteUser(id)
+        .then(() => {
+          dispatch(setReloadUsers(true));
+          handleClose();
+          toast.success("User Delete Successfully");
+        })
+        .catch((error) => {
+          console.error("Error deleting the Status:", error);
+        });
+    } else {
+      toast.error("Only Super Admin Can Delete");
+      handleClose();
+    }
   };
   const handleRoleFilter = (event) => {
     if (event === "Select Role") {
@@ -321,7 +327,9 @@ const UsersTable = () => {
                       <TableCell>
                         <p
                           className={`  inline p-1 px-2 rounded uppercase font-medium text-xs ${
-                            user?.role === "admin"
+                            user?.role === "super admin"
+                              ? "bg-purple-200 text-purple-700"
+                              : user?.role === "admin"
                               ? "bg-blue-200 text-blue-700"
                               : user?.role === "member"
                               ? "bg-green-200 text-green-800"

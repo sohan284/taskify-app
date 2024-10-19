@@ -293,7 +293,7 @@ function SideBar(props) {
             <SiGotomeeting className="mr-5" style={{ color: "lightgreen" }} />
             {t("meetings")}
           </Button>
-          {userRole === "admin" && (
+          {(userRole === "admin" || userRole === "super admin") && (
             <Button
               className="flex items-center w-full"
               style={{
@@ -314,7 +314,7 @@ function SideBar(props) {
               {t("users")}
             </Button>
           )}
-          {userRole === "admin" && (
+          {(userRole === "admin" || userRole === "super admin") && (
             <Button
               className="flex items-center w-full"
               style={{
